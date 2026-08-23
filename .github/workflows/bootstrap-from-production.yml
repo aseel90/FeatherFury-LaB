@@ -1,0 +1,49 @@
+name: Bootstrap Lab from production
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/bootstrap-from-production.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Lab
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Clone current production snapshot
+        run: |
+          git clone --depth 1 https://github.com/aseel90/FeatherFury.git /tmp/featherfury-prod
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/workflows/bootstrap-from-production.yml' \
+            /tmp/featherfury-prod/ ./
+
+      - name: Keep Lab identity
+        run: |
+          cat > LAB.md <<'EOF'
+          # FeatherFury Lab
+          This repository is the isolated development copy of FeatherFury.
+          Production repository: aseel90/FeatherFury
+          Do not promote experimental changes to production until explicitly approved.
+          EOF
+
+      - name: Commit complete production copy
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing to copy"
+          else
+            git commit -m "Copy current FeatherFury production snapshot into Lab"
+            git push origin main
+          fi
