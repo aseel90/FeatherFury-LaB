@@ -110,6 +110,26 @@
         return window.game || null;
     }
 
+    function setupInstantMenuAudio(game) {
+        if (!game?.sound) return;
+        document.addEventListener('pointerdown', () => game.sound.init(), { capture: true, passive: true });
+        const play = name => {
+            const fn = game.sound?.[name];
+            if (typeof fn === 'function') fn.call(game.sound);
+        };
+        ['shopBtnStart', 'shopBtnGameOver', 'leaderboardBtn'].forEach(id => {
+            document.getElementById(id)?.addEventListener('click', () => play('playUIOpen'));
+        });
+        ['closeShopBtn', 'closeLeaderboardBtn'].forEach(id => {
+            document.getElementById(id)?.addEventListener('click', () => play('playUIClose'));
+        });
+        document.getElementById('startStoryBtn')?.addEventListener('click', () => {
+            const i = Number(game.currentWorldIndex || 0);
+            const locked = (i === 1 && !game.w1Completed) || (i === 2 && !game.w2Completed) || i === 3;
+            if (!locked) play('playUIStart');
+        });
+    }
+
     function applyMenuWorld(game) {
         const start = document.getElementById('startScreen');
         if (!start || !game) return;
@@ -415,6 +435,7 @@
     function init(game) {
         setupDebugLogger();
         debugLog('lab-init', { world: game.currentWorldIndex, screen: getActiveScreenId() });
+        setupInstantMenuAudio(game);
         stopZoom();
         addPanelClasses();
         polishStaticButtons();
