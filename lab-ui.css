@@ -233,3 +233,40 @@ button:focus-visible,.arcade-btn:focus-visible,.icon-btn:focus-visible,.shop-tri
   .start-actions-group .arcade-btn{min-height:64px;font-size:1.2rem;border-radius:20px}
   #startEndlessBtn{width:82%;min-height:52px;font-size:1.02rem}
 }
+
+/* LAB arcade polish: make the menu feel like a game HUD rather than an app shell */
+#startScreen .top-bar{
+  padding-inline:clamp(10px,3vw,18px);
+}
+#startScreen .game-hint{
+  width:min(84vw,310px);
+  min-height:36px;
+  padding:7px 14px;
+  margin-top:clamp(10px,2vh,18px);
+  border:1px solid rgba(142,125,97,.55);
+  border-radius:12px;
+  background:linear-gradient(180deg,rgba(34,44,56,.90),rgba(17,25,35,.94));
+  color:#dbe4ed;
+  box-shadow:0 4px 0 rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.06);
+  font-size:clamp(.72rem,2.8vw,.82rem);
+  line-height:1.25;
+  text-align:center;
+}
+#startScreen .game-hint::before{
+  content:"TIP";
+  display:inline-block;
+  margin-inline-end:7px;
+  color:#fbbf24;
+  font-family:'Press Start 2P',cursive;
+  font-size:.5rem;
+  letter-spacing:.2px;
+}
+#startScreen .start-main-content{
+  min-height:0;
+}
+@media(min-height:760px){
+  #startScreen .start-main-content{gap:clamp(9px,1.15vh,13px)}
+}
+@media(min-width:700px){
+  #startScreen .game-hint{width:min(58vw,390px);font-size:.86rem}
+}
