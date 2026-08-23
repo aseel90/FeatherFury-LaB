@@ -6,6 +6,96 @@
     const buttonIds = ['startBtn', 'endlessBtn', 'shopBtn', 'leaderboardBtn', 'settingsBtn', 'prevWorldBtn', 'nextWorldBtn'];
     let lastTouchEnd = 0;
 
+    const DEBUG_KEY = 'ff_lab_debug_log_v1';
+    const debugEntries = [];
+
+    function debugLog(event, data = {}) {
+        const entry = {
+            t: new Date().toISOString(),
+            event,
+            data
+        };
+        debugEntries.push(entry);
+        if (debugEntries.length > 120) debugEntries.shift();
+        try {
+            localStorage.setItem(DEBUG_KEY, JSON.stringify(debugEntries));
+        } catch (_) {}
+        console.log('[FF-LAB]', event, data);
+        updateDebugPanel();
+    }
+
+    function getActiveScreenId() {
+        return document.querySelector('.overlay-screen.active:not(.hidden)')?.id || 'none';
+    }
+
+    function setupDebugLogger() {
+        try {
+            const saved = JSON.parse(localStorage.getItem(DEBUG_KEY) || '[]');
+            if (Array.isArray(saved)) debugEntries.push(...saved.slice(-80));
+        } catch (_) {}
+
+        window.addEventListener('error', e => {
+            debugLog('js-error', {
+                message: e.message,
+                file: e.filename,
+                line: e.lineno,
+                col: e.colno
+            });
+        });
+        window.addEventListener('unhandledrejection', e => {
+            debugLog('unhandled-rejection', { reason: String(e.reason) });
+        });
+        document.addEventListener('click', e => {
+            const target = e.target?.closest?.('button, [role="button"]');
+            if (!target) return;
+            debugLog('click', {
+                id: target.id || null,
+                text: (target.textContent || '').trim().slice(0, 50),
+                screen: getActiveScreenId()
+            });
+            setTimeout(() => debugLog('screen-after-click', { screen: getActiveScreenId() }), 0);
+        }, true);
+
+        window.FF_DEBUG = {
+            logs: () => [...debugEntries],
+            clear: () => {
+                debugEntries.length = 0;
+                try { localStorage.removeItem(DEBUG_KEY); } catch (_) {}
+                updateDebugPanel();
+            },
+            copy: async () => {
+                const text = JSON.stringify(debugEntries, null, 2);
+                try { await navigator.clipboard.writeText(text); } catch (_) {}
+                return text;
+            }
+        };
+
+        if (new URLSearchParams(location.search).get('debug') === '1') createDebugPanel();
+        debugLog('debug-ready', { screen: getActiveScreenId() });
+    }
+
+    function createDebugPanel() {
+        if (document.getElementById('ffDebugPanel')) return;
+        const panel = document.createElement('details');
+        panel.id = 'ffDebugPanel';
+        panel.style.cssText = 'position:fixed;z-index:99999;left:8px;bottom:8px;width:min(92vw,430px);max-height:42vh;overflow:auto;background:#05080dcc;color:#d7f7ff;border:1px solid #36c8ff;border-radius:10px;padding:7px;font:11px/1.35 monospace;text-align:left;direction:ltr;';
+        const summary = document.createElement('summary');
+        summary.textContent = 'FF DEBUG';
+        summary.style.cssText = 'cursor:pointer;font-weight:700;color:#61dcff';
+        const pre = document.createElement('pre');
+        pre.id = 'ffDebugText';
+        pre.style.cssText = 'white-space:pre-wrap;margin:7px 0 0;';
+        panel.append(summary, pre);
+        document.body.appendChild(panel);
+        updateDebugPanel();
+    }
+
+    function updateDebugPanel() {
+        const pre = document.getElementById('ffDebugText');
+        if (!pre) return;
+        pre.textContent = debugEntries.slice(-18).map(x => `${x.t.slice(11,19)} ${x.event} ${JSON.stringify(x.data)}`).join('\n');
+    }
+
     function stopZoom() {
         document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
         document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
@@ -50,7 +140,7 @@
             }
             if (e.key === 'Escape' || e.key === 'Backspace') {
                 if (active.id === 'settingsScreen') document.getElementById('settingsReturnBtn')?.click();
-                if (active.id === 'shopScreen') document.getElementById('shopReturnBtn')?.click();
+                if (active.id === 'shopScreen') document.getElementById('closeShopBtn')?.click();
                 if (active.id === 'leaderboardScreen') document.getElementById('closeLeaderboardBtn')?.click();
             }
         });
@@ -174,18 +264,53 @@
     }
 
     function setupShop(game) {
-        const shopBtn = document.getElementById('shopBtn');
+        const shopButtons = [
+            document.getElementById('shopBtnStart'),
+            document.getElementById('shopBtnGameOver')
+        ].filter(Boolean);
         const screen = document.getElementById('shopScreen');
-        const back = document.getElementById('shopReturnBtn');
-        if (!shopBtn || !screen || !back) return;
+        const back = document.getElementById('closeShopBtn');
+        const grid = document.getElementById('skinsGrid');
+        if (!shopButtons.length || !screen || !back || !grid) {
+            debugLog('shop-bind-failed', {
+                buttons: shopButtons.length,
+                screen: !!screen,
+                back: !!back,
+                grid: !!grid
+            });
+            return;
+        }
+
         const heading = screen.querySelector('h2, .shop-title');
         heading?.classList.add('lab-panel-title');
         back.classList.add('lab-return-btn');
+        grid.classList.add('lab-shop-grid');
 
-        shopBtn.addEventListener('click', () => {
-            rebuildShop(game);
-            requestAnimationFrame(() => back.focus({ preventScroll: true }));
+        shopButtons.forEach(btn => {
+            btn.classList.add('lab-game-button');
+            btn.addEventListener('click', () => {
+                debugLog('shop-open', { source: btn.id, world: game.currentWorld });
+                requestAnimationFrame(() => {
+                    screen.classList.add('lab-shop-panel');
+                    grid.classList.add('lab-shop-grid');
+                    decorateExistingShop(grid);
+                });
+            });
         });
+
+        back.addEventListener('click', () => {
+            debugLog('shop-close', { world: game.currentWorld });
+        });
+    }
+
+    function decorateExistingShop(grid) {
+        const cards = [...grid.children];
+        cards.forEach(card => {
+            card.classList.add('lab-shop-card');
+            const button = card.querySelector('button');
+            if (button) button.classList.add('lab-shop-action');
+        });
+        debugLog('shop-rendered', { cards: cards.length });
     }
 
     function rebuildLeaderboard(game) {
@@ -285,6 +410,8 @@
     }
 
     function init(game) {
+        setupDebugLogger();
+        debugLog('lab-init', { world: game.currentWorld, screen: getActiveScreenId() });
         stopZoom();
         addPanelClasses();
         polishStaticButtons();
@@ -305,6 +432,7 @@
                 clearInterval(timer);
                 init(game);
             } else if (++tries > 100) {
+                console.error('[FF-LAB] Game boot timeout');
                 clearInterval(timer);
             }
         }, 100);
