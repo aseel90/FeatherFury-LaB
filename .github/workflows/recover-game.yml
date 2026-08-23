@@ -25,3 +25,4 @@ jobs:
             git revert fecff407c4d50beaeec6282b79f3d91c6c4fe83b --no-edit
             git push origin main
           fi
+# retrigger recovery
