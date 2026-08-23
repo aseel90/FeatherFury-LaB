@@ -41,11 +41,9 @@ class SoundManager {
     } catch(e) {}
   }
 
-  // --- Procedural Nature & Ambient Audio for World 1: Ruins ---
   startRuinsAmbiance() {
     if (this.muted || !this.sfxEnabled || !this.ctx || this.ambientNodes) return;
     try {
-      // 1. Forest Breeze & Gentle Wind (Brown noise with gentle modulation)
       const bufferSize = this.ctx.sampleRate * 2;
       const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
       const data = buffer.getChannelData(0);
@@ -66,7 +64,6 @@ class SoundManager {
       filter.frequency.setValueAtTime(320, this.ctx.currentTime);
       filter.Q.setValueAtTime(1.2, this.ctx.currentTime);
 
-      // Slow LFO for natural wind breathing
       const lfo = this.ctx.createOscillator();
       lfo.frequency.setValueAtTime(0.18, this.ctx.currentTime);
       const lfoGain = this.ctx.createGain();
@@ -86,8 +83,6 @@ class SoundManager {
       lfo.start();
 
       this.ambientNodes = { noise, filter, lfo, mainGain };
-
-      // 2. Schedule Procedural Forest Bird Calls
       this._scheduleForestBirds();
     } catch(e) {}
   }
@@ -112,7 +107,6 @@ class SoundManager {
       const type = Math.random();
 
       if (type < 0.5) {
-        // Double sweet chirp
         osc.type = 'sine';
         osc.frequency.setValueAtTime(2600, now);
         osc.frequency.exponentialRampToValueAtTime(3800, now + 0.08);
@@ -123,7 +117,6 @@ class SoundManager {
         osc.start(now);
         osc.stop(now + 0.25);
       } else {
-        // High warble
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(3200, now);
         osc.frequency.linearRampToValueAtTime(3600, now + 0.05);
@@ -144,7 +137,6 @@ class SoundManager {
     if (this.muted || !this.sfxEnabled || !this.ctx) return;
     try {
       const now = this.ctx.currentTime;
-      // Lub-dub deep pulse
       [0, 0.12].forEach((offset, idx) => {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
@@ -204,7 +196,9 @@ class SoundManager {
   playHit() { this._play('square', (o, g, n) => { o.type='square'; o.frequency.setValueAtTime(200,n); o.frequency.exponentialRampToValueAtTime(30,n+0.2); g.gain.setValueAtTime(0.4,n); g.gain.exponentialRampToValueAtTime(0.01,n+0.2); o.start(n); o.stop(n+0.2); }); }
   playCoin() { this._play('sine', (o, g, n) => { o.type='sine'; o.frequency.setValueAtTime(987,n); o.frequency.setValueAtTime(1318,n+0.1); g.gain.setValueAtTime(0.3,n); g.gain.exponentialRampToValueAtTime(0.01,n+0.2); o.start(n); o.stop(n+0.2); }); }
   playTick() { this._play('square', (o, g, n) => { o.type='square'; o.frequency.setValueAtTime(800,n); g.gain.setValueAtTime(0.1,n); g.gain.exponentialRampToValueAtTime(0.01,n+0.05); o.start(n); o.stop(n+0.05); }); }
+  playUIOpen() { this._play('triangle', (o, g, n) => { o.type='triangle'; o.frequency.setValueAtTime(520,n); o.frequency.exponentialRampToValueAtTime(760,n+0.075); g.gain.setValueAtTime(0.11,n); g.gain.exponentialRampToValueAtTime(0.001,n+0.095); o.start(n); o.stop(n+0.10); }); }
+  playUIClose() { this._play('triangle', (o, g, n) => { o.type='triangle'; o.frequency.setValueAtTime(700,n); o.frequency.exponentialRampToValueAtTime(430,n+0.065); g.gain.setValueAtTime(0.09,n); g.gain.exponentialRampToValueAtTime(0.001,n+0.085); o.start(n); o.stop(n+0.09); }); }
+  playUIStart() { this._play('square', (o, g, n) => { o.type='square'; o.frequency.setValueAtTime(330,n); o.frequency.exponentialRampToValueAtTime(660,n+0.09); o.frequency.exponentialRampToValueAtTime(880,n+0.16); g.gain.setValueAtTime(0.12,n); g.gain.exponentialRampToValueAtTime(0.001,n+0.19); o.start(n); o.stop(n+0.20); }); }
   playSmash() { this._play('sawtooth', (o, g, n) => { o.type='sawtooth'; o.frequency.setValueAtTime(150,n); o.frequency.exponentialRampToValueAtTime(20,n+0.3); g.gain.setValueAtTime(0.6,n); g.gain.exponentialRampToValueAtTime(0.01,n+0.3); o.start(n); o.stop(n+0.3); }); }
   playLaser() { this._play('sine', (o, g, n) => { o.type='sine'; o.frequency.setValueAtTime(1200,n); o.frequency.exponentialRampToValueAtTime(300,n+0.2); g.gain.setValueAtTime(0.3,n); g.gain.exponentialRampToValueAtTime(0.01,n+0.2); o.start(n); o.stop(n+0.2); }); }
 }
-
