@@ -24,7 +24,7 @@ jobs:
           git clone --depth 1 https://github.com/aseel90/FeatherFury.git /tmp/featherfury-prod
           rsync -a --delete \
             --exclude='.git/' \
-            --exclude='.github/workflows/bootstrap-from-production.yml' \
+            --exclude='.github/workflows/' \
             /tmp/featherfury-prod/ ./
 
       - name: Keep Lab identity
