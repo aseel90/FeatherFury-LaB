@@ -1,0 +1,82 @@
+/* FeatherFury dynamic world menu backgrounds — web preview layer */
+
+#startScreen {
+  isolation: isolate;
+  transition: background 320ms ease, box-shadow 320ms ease;
+}
+
+/* World 1 — Ruins */
+#startScreen:has(#worldCard.theme-ruins) {
+  background:
+    linear-gradient(180deg, rgba(4,8,15,.18) 0%, rgba(4,8,15,.48) 50%, rgba(2,6,12,.94) 100%),
+    url('world1_ruins.jpg') center center / cover no-repeat !important;
+}
+
+/* World 2 — Frostbite Peaks */
+#startScreen:has(#worldCard.theme-ice) {
+  background:
+    radial-gradient(circle at 50% 12%, rgba(224,242,254,.38), transparent 30%),
+    radial-gradient(circle at 20% 74%, rgba(125,211,252,.26), transparent 26%),
+    linear-gradient(180deg, #0b2848 0%, #164e76 37%, #0b3555 64%, #041422 100%) !important;
+}
+
+#startScreen:has(#worldCard.theme-ice)::before {
+  background:
+    linear-gradient(118deg, transparent 0 14%, rgba(255,255,255,.08) 14.5% 15%, transparent 15.5% 44%, rgba(186,230,253,.11) 44.5% 45%, transparent 45.5%),
+    radial-gradient(ellipse at 50% 115%, rgba(224,242,254,.32), transparent 48%),
+    linear-gradient(90deg, rgba(2,8,23,.42), transparent 24%, transparent 76%, rgba(2,8,23,.42)) !important;
+}
+
+/* World 3 — Storm Spire */
+#startScreen:has(#worldCard.theme-storm) {
+  background:
+    radial-gradient(circle at 52% 22%, rgba(56,189,248,.18), transparent 20%),
+    radial-gradient(circle at 74% 46%, rgba(192,132,252,.16), transparent 28%),
+    linear-gradient(180deg, #080b1a 0%, #11133b 38%, #17123e 66%, #050711 100%) !important;
+}
+
+#startScreen:has(#worldCard.theme-storm)::before {
+  background:
+    linear-gradient(112deg, transparent 0 47%, rgba(125,211,252,.42) 47.4% 47.8%, transparent 48.2% 100%),
+    linear-gradient(68deg, transparent 0 58%, rgba(196,181,253,.25) 58.3% 58.6%, transparent 59% 100%),
+    radial-gradient(circle at 50% 28%, rgba(99,102,241,.25), transparent 36%),
+    linear-gradient(90deg, rgba(0,0,0,.42), transparent 24%, transparent 76%, rgba(0,0,0,.42)) !important;
+  animation: ff-menu-storm-pulse 3.2s ease-in-out infinite;
+}
+
+@keyframes ff-menu-storm-pulse {
+  0%,100% { opacity:.72; filter:brightness(.95); }
+  50% { opacity:1; filter:brightness(1.18); }
+}
+
+/* World 4 — Volcanic Valley */
+#startScreen:has(#worldCard.theme-volcano) {
+  background:
+    radial-gradient(circle at 50% 92%, rgba(249,115,22,.50), transparent 28%),
+    radial-gradient(circle at 14% 64%, rgba(239,68,68,.18), transparent 24%),
+    linear-gradient(180deg, #160909 0%, #2a0c0a 38%, #43130b 70%, #120503 100%) !important;
+}
+
+#startScreen:has(#worldCard.theme-volcano)::before {
+  background:
+    linear-gradient(168deg, transparent 0 56%, rgba(251,146,60,.18) 56.4% 57%, transparent 57.4%),
+    linear-gradient(14deg, transparent 0 61%, rgba(239,68,68,.16) 61.4% 62%, transparent 62.4%),
+    radial-gradient(ellipse at 50% 110%, rgba(251,146,60,.28), transparent 45%),
+    linear-gradient(90deg, rgba(0,0,0,.4), transparent 24%, transparent 76%, rgba(0,0,0,.4)) !important;
+}
+
+/* TV / keyboard focus visibility */
+#startScreen button:focus-visible,
+#startScreen .arcade-btn:focus-visible {
+  outline: 4px solid #fef08a !important;
+  outline-offset: 4px !important;
+  filter: brightness(1.16) drop-shadow(0 0 10px rgba(250,204,21,.65));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #startScreen,
+  #startScreen:has(#worldCard.theme-storm)::before {
+    transition: none;
+    animation: none;
+  }
+}

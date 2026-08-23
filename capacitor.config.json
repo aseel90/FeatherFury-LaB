@@ -1,0 +1,6 @@
+{
+  "appId": "com.aseel.featherfury",
+  "appName": "Feather Hero",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
