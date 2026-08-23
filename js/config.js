@@ -11,7 +11,7 @@ const CONFIG = {
   GROUND_HEIGHT: 95, BIRD_RADIUS: 14,
   FEVER_MAX: 100, FEVER_PER_COIN: 25, FEVER_DURATION: 300,
   STAGE1_END: 15, STAGE2_END: 35, BOSS_HP: 5,
-  REVIVE_COST: 10,
+  REVIVE_COST: 1,
   // World 2: Frostbite Peaks
   W2_BOSS_HP: 8, W2_GAP_SIZE: 146, W2_SPEED: 2.2,
   WIND_FORCE: 0.10, WIND_INTERVAL: 200,
@@ -133,4 +133,3 @@ const SKINS = {
   king: { id: 'king', name_ar: 'الملك الذهبي', name_en: 'Golden King', price: 300, body: '#fbbf24', wing: '#f59e0b', belly: '#d97706', beak: '#b45309', maskColor: '#78350f', acc: 'crown', bodyType: 'fat' },
   eagle: { id: 'eagle', name_ar: 'نسر الجبال', name_en: 'Mountain Eagle', price: 9999, body: '#451a03', wing: '#78350f', belly: '#fef3c7', beak: '#f59e0b', maskColor: '#451a03', acc: 'aura', bodyType: 'muscle' }
 };
-
