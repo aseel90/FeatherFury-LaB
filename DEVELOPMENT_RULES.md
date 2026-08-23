@@ -1,136 +1,98 @@
-# FeatherFury LAB Development Rules
+# FeatherFury LAB — Mandatory Development Rules
 
-This file is the mandatory safety checklist for all future work in `FeatherFury-LaB`.
+This file is the first reference for any future change in `FeatherFury-LaB`.
 
-## 1. Purpose of LAB
+## 1. Repository roles
 
-- `FeatherFury-LaB` is the experimental repository.
-- Do not modify the production repository `FeatherFury` unless the user explicitly approves promotion of tested changes.
-- Browser testing may temporarily require the LAB repository to be public because GitHub Pages is not available for a private repository on the current plan.
-- Final target is an Android game for Google Play. Browser deployment is only a temporary test environment.
+- `FeatherFury` = stable/production source. Do not modify unless explicitly approved.
+- `FeatherFury-LaB` = all experiments, UI work, testing and risky changes.
+- Never copy experimental LAB changes back to production without user approval.
 
-## 2. Protected files
+## 2. Protected core files
 
-The following files are high-risk and must never be replaced from an incomplete or stale local copy:
+Treat these as protected files:
 
-- `index.html`
 - `game.js`
+- `index.html`
 - `style.css`
-- `.github/workflows/*`
+- `js/config.js`
+- `js/world1.js`
+- `js/world2.js`
+- `js/world3.js`
+- `js/graphics.js`
+- `js/audio.js`
 
-Before changing an existing protected file:
+Rules:
 
-1. Fetch the latest version directly from GitHub.
-2. Record its current SHA and file size.
-3. Make the smallest possible edit.
-4. Upload using the current blob SHA whenever the tool supports it.
-5. Fetch the file again after the commit and verify its size/content.
+1. Never replace a protected file from a stale local copy.
+2. Always read the latest GitHub version immediately before editing.
+3. Prefer isolated LAB files (`lab-ui.css`, `lab-ui.js`) for UI-only changes.
+4. If a protected file must change, make the smallest possible edit.
+5. Do not minify, reformat, or rewrite the whole protected file unless explicitly required.
+6. After editing a protected file, verify its size and diff before considering the change complete.
+7. If file size unexpectedly drops substantially, stop and restore before doing anything else.
 
-If a protected file suddenly becomes dramatically smaller, STOP. Do not continue other edits. Restore it first.
+## 3. Branch / rollback policy
 
-## 3. UI isolation
+For changes that touch gameplay, core files, Android build files, or multiple major systems:
 
-For visual experiments, prefer LAB-only files:
+1. Create a dedicated branch from the current stable LAB `main`.
+2. Make changes there.
+3. Review changed-file list and diff.
+4. Run syntax checks where applicable.
+5. Merge only after verification.
 
-- `lab-ui.css`
-- `lab-ui.js`
-- new LAB-specific assets
+Small isolated CSS/UI changes may go directly to LAB `main` only when they do not modify protected core files.
 
-Do not edit gameplay physics or core world logic for a visual request.
+## 4. Pre-change checklist
 
-If UI can be achieved with CSS or LAB JS hooks, do not edit `game.js`.
+Before every change:
 
-## 4. Never repeat these incidents
+- Confirm repository is `FeatherFury-LaB`.
+- Read this file.
+- Read the latest versions of every target file from GitHub.
+- Identify whether the task is UI-only or changes gameplay logic.
+- Preserve the current working state and commit SHA.
 
-### Incident A — truncated `index.html`
+## 5. Post-change verification
 
-An incomplete local copy was uploaded and replaced the full file.
+After every change:
 
-Prevention:
-- Always fetch current GitHub `index.html` first.
-- Never use an old `/mnt/data/index.html` as the source of truth.
-- If only CSS changes are required, do not touch `index.html` at all.
+- Confirm `index.html` still has the expected full size/content.
+- Confirm `game.js` is not truncated.
+- Run JavaScript syntax checks for changed JS.
+- Verify only intended files changed.
+- Confirm no screen is accidentally active/visible on top of the start screen.
+- Verify mobile responsiveness.
+- Verify keyboard/remote focus behavior when UI controls are changed.
+- Do not claim visual browser testing succeeded if it was not actually performed.
 
-### Incident B — truncated `game.js`
+## 6. UI rules
 
-A tool/local-file mismatch caused `game.js` to be overwritten with a tiny file.
+- Mobile-first responsive design.
+- Must scale to phones, tablets and Smart TV / Android TV.
+- Use `clamp()`, relative units and max-width constraints where useful.
+- Avoid fixed layouts that only fit one phone size.
+- No emoji icons in production UI. Use clean SVG/vector artwork or text instead.
+- World-specific backgrounds must not cover or overlay UI controls.
+- Avoid negative z-index / pseudo-element background tricks that can expose gameplay canvas or other screens.
+- Keep primary and secondary actions visually distinct.
 
-Prevention:
-- Treat `game.js` as protected.
-- For UI work, do not edit it.
-- If a gameplay edit is needed, fetch current GitHub content first and verify syntax + size before committing.
-- Keep a known-good commit SHA before any risky edit.
+## 7. Android / Google Play direction
 
-### Incident C — global UI layers covering the menu
+The final product is intended for Android / Google Play.
 
-A global background/pseudo-element caused gameplay/map visuals to appear over or behind the menu.
+- Web preview is only a development/testing method.
+- Do not make architectural decisions solely to suit GitHub Pages.
+- Preserve compatibility with a future Android packaging approach chosen after performance testing.
+- Final Android build should consider AAB, signing, target SDK, fullscreen, safe areas, back button, lifecycle/audio behavior and Android TV where appropriate.
 
-Prevention:
-- No global pseudo-element overlays without visual testing.
-- World/menu backgrounds must be scoped to `#startScreen` or an equivalent screen container.
-- Always check stacking context (`z-index`, `position`, pseudo-elements) before merge.
+## 8. Source/privacy rules
 
-## 5. Required checks after every UI change
-
-At minimum verify:
-
-- main menu still opens;
-- world carousel still changes worlds;
-- stars, bird preview, skin badge and world status stay centered;
-- Start Mission works;
-- Endless Mode works;
-- Shop opens/closes;
-- Settings opens/closes;
-- Leaderboard opens/closes;
-- no unexpected page scroll;
-- no double-tap zoom regression;
-- mobile layout works at narrow width;
-- short-height screens do not overlap;
-- Smart TV keyboard focus still works;
-- no old `world1_ruins.jpg` reference is reintroduced.
-
-## 6. Responsive design rules
-
-The UI is Android-first and must transfer naturally to Capacitor/WebView or another Android wrapper chosen later.
-
-Use:
-
-- responsive widths (`min()`, `max()`, `clamp()`);
-- max widths to prevent tablet/TV overexpansion;
-- height-aware media queries for short phones;
-- `env(safe-area-inset-*)` where needed;
-- touch targets large enough for phones;
-- clear `:focus-visible` styles for Smart TV/keyboard navigation.
-
-Avoid:
-
-- hard-coded layouts that only fit one iPhone screenshot;
-- fixed widths that overflow small Android devices;
-- unnecessary vertical empty space;
-- equal visual weight for primary and secondary actions.
-
-## 7. Visual identity rules
-
-- This is a mobile arcade game, not a generic app dashboard.
-- Avoid emoji icons in the UI.
-- Prefer custom SVG/vector icons or no icon.
-- Keep Start Mission visually primary.
-- Endless Mode should be visually secondary.
-- Settings, Leaderboard and Shop should share the same design system as the main menu.
-- Do not re-add the deleted old Ruins JPG asset. Ruins currently uses `menu-bg-ruins.svg` unless a brand-new approved asset replaces it.
-
-## 8. Android / Google Play direction
-
-Do not assume Capacitor is permanently the final packaging technology.
-
-When Android packaging begins:
-
-- benchmark the current HTML5/Canvas build on Android;
-- compare the practical wrappers/runtime options;
-- choose based on FPS, input latency, audio behavior, memory, fullscreen/safe areas, Android back handling and Google Play compatibility;
-- produce AAB for Play Store release;
-- keep permissions minimal;
-- protect signing keystore and secrets; never commit them to GitHub.
+- Production and LAB should normally remain private.
+- LAB may be made public temporarily only for web preview/testing when necessary.
+- Do not rely on public GitHub-hosted source files as a permanent runtime dependency.
+- Before returning LAB to private, all runtime code/assets must exist inside the repository/build itself.
 
 ## 9. Current recovery note
 
