@@ -9,7 +9,7 @@ button,.arcade-btn,.icon-btn,.shop-trigger-btn,.carousel-nav-btn{touch-action:ma
   background-image:
     linear-gradient(180deg,rgba(4,8,14,.10) 0%,rgba(5,10,18,.22) 32%,rgba(5,10,18,.58) 68%,rgba(4,8,14,.84) 100%),
     radial-gradient(circle at 50% 12%,rgba(255,220,120,.16),rgba(255,220,120,0) 22%),
-    url('world1_ruins.jpg');
+    url('menu-bg-ruins.svg');
   background-size:cover,auto,cover;
   background-position:center,50% 8%,center;
   background-repeat:no-repeat;
@@ -19,7 +19,7 @@ button,.arcade-btn,.icon-btn,.shop-trigger-btn,.carousel-nav-btn{touch-action:ma
   background-image:
     linear-gradient(180deg,rgba(4,8,14,.10) 0%,rgba(5,10,18,.22) 32%,rgba(5,10,18,.58) 68%,rgba(4,8,14,.84) 100%),
     radial-gradient(circle at 50% 12%,rgba(255,220,120,.16),rgba(255,220,120,0) 22%),
-    url('world1_ruins.jpg');
+    url('menu-bg-ruins.svg');
 }
 #startScreen.world-bg-ice{
   background-image:
