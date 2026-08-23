@@ -108,3 +108,14 @@ Before declaring the LAB ready for private/offline/Android use:
 
 If a requested change is only visual, do not touch gameplay/core files.
 If a core-file edit is required, protect the working version first and verify the diff before merging.
+
+## 11. Regression-prevention workflow (mandatory from 2026-08-24)
+
+1. **No direct UI changes on `main`.** Every UI or behavior fix must start on a dedicated branch created from the latest `main`.
+2. **One problem per branch.** Do not combine unrelated fixes (for example Shop + Leaderboard + world navigation) in the same change set.
+3. **Protected surfaces:** `index.html`, `game.js`, `lab-ui.js`, and `lab-ui.css` must be fetched fresh from GitHub before modification.
+4. **Never upload a partial local copy.** If a modified file is unexpectedly smaller than the fetched source, stop immediately and restore before any further work.
+5. **Pre-merge verification checklist:** compare file sizes before/after; inspect the diff for only intended selectors/functions; verify Main, Settings, Leaderboard, Shop, and world navigation still render/function; preserve existing approved fixes unless the branch explicitly targets them.
+6. **No merge until validation.** Keep the change isolated until the target behavior is verified; if browser preview limitations require merge for testing, the branch must contain only one isolated change and the pre-change commit SHA must be retained as the immediate rollback point.
+7. **Rollback point first.** Record the source commit SHA used to create the branch so the exact previous state can be restored.
+8. **Do not fix forward across multiple screens.** If a new regression appears, stop the current change, restore the last good state for the affected file/screen, then address the regression in its own branch.
