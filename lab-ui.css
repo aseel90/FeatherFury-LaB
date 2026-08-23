@@ -151,18 +151,48 @@ button,.arcade-btn,.icon-btn,.shop-trigger-btn,.carousel-nav-btn{touch-action:ma
 }
 
 .start-actions-group{
-  width:100%;max-width:332px;
-  gap:10px;margin-top:8px;margin-bottom:0;
+  width:min(92vw,332px);
+  display:flex;flex-direction:column;align-items:center;
+  gap:clamp(6px,1.1vh,10px);
+  margin-top:clamp(6px,1.2vh,10px);
+  margin-bottom:0;
 }
 .start-actions-group .arcade-btn{
   width:100%;
-  min-height:56px;
-  padding:11px 18px;
-  font-size:1.08rem;
+  min-height:clamp(52px,6.6vh,62px);
+  padding:clamp(10px,1.35vh,13px) 18px;
+  font-size:clamp(1rem,3.7vw,1.12rem);
   border-radius:18px;
+  letter-spacing:.15px;
   box-shadow:0 5px 0 rgba(0,0,0,.28),0 10px 18px rgba(0,0,0,.18), inset 0 1px 2px rgba(255,255,255,.22);
 }
-.start-actions-group .secondary-action-btn{box-shadow:0 5px 0 #0f172a,0 10px 18px rgba(15,23,42,.28), inset 0 1px 2px rgba(255,255,255,.15)}
+#startStoryBtn{
+  width:100%;
+  font-weight:900;
+  background:linear-gradient(180deg,#35d875 0%,#20b75d 52%,#159449 100%);
+  border-color:#126b39;
+  box-shadow:0 5px 0 #0d5a30,0 10px 20px rgba(25,180,92,.26),inset 0 1px 0 rgba(255,255,255,.28);
+}
+#startStoryBtn:hover,#startStoryBtn:focus-visible{
+  filter:brightness(1.08);
+  box-shadow:0 6px 0 #0d5a30,0 12px 22px rgba(25,180,92,.32),inset 0 1px 0 rgba(255,255,255,.32);
+}
+#startEndlessBtn{
+  width:88%;
+  min-height:clamp(44px,5.5vh,50px);
+  padding:clamp(8px,1vh,10px) 16px;
+  font-size:clamp(.9rem,3.25vw,1rem);
+  font-weight:800;
+  color:#eef3f8;
+  background:linear-gradient(180deg,#3f5063 0%,#314152 100%);
+  border:2px solid #202d3c;
+  border-radius:15px;
+  box-shadow:0 4px 0 #17212d,0 7px 14px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.12);
+}
+#startEndlessBtn:hover,#startEndlessBtn:focus-visible{
+  filter:brightness(1.09);
+  transform:translateY(-1px);
+}
 
 button:focus-visible,.arcade-btn:focus-visible,.icon-btn:focus-visible,.shop-trigger-btn:focus-visible,.carousel-nav-btn:focus-visible{outline:3px solid #fbbf24!important;outline-offset:3px}
 
@@ -172,7 +202,9 @@ button:focus-visible,.arcade-btn:focus-visible,.icon-btn:focus-visible,.shop-tri
   .carousel-nav-btn{width:42px;height:42px}
   .world-card{max-width:236px;min-height:228px;height:228px;max-height:228px;padding:13px 12px 11px}
   .preview-canvas-wrap{width:68px;height:68px;flex-basis:68px}#previewBirdCanvas{width:56px;height:56px}
-  .start-actions-group{max-width:320px}.start-actions-group .arcade-btn{min-height:54px;font-size:1.03rem}
+  .start-actions-group{width:min(92vw,320px)}
+  .start-actions-group .arcade-btn{min-height:52px}
+  #startEndlessBtn{width:86%;min-height:44px}
 }
 
 @media(max-width:370px){
@@ -184,5 +216,20 @@ button:focus-visible,.arcade-btn:focus-visible,.icon-btn:focus-visible,.shop-tri
   .preview-canvas-wrap{width:62px;height:62px;flex-basis:62px}#previewBirdCanvas{width:52px;height:52px}
   .skin-name-badge{width:min(100%,154px);font-size:.78rem;min-height:28px}
   .world-status{font-size:.8rem}
-  .start-actions-group .arcade-btn{min-height:52px;font-size:1rem}
+  .start-actions-group{width:min(94vw,304px);gap:6px}
+  .start-actions-group .arcade-btn{min-height:50px;font-size:.98rem}
+  #startEndlessBtn{width:84%;min-height:42px;font-size:.9rem}
+}
+
+@media(max-height:720px){
+  #startScreen .start-main-content{gap:7px;padding-top:6px;padding-bottom:6px}
+  .start-actions-group{gap:6px;margin-top:4px}
+  .start-actions-group .arcade-btn{min-height:48px;padding:9px 16px}
+  #startEndlessBtn{min-height:40px;padding:7px 14px}
+}
+
+@media(min-width:900px){
+  .start-actions-group{width:min(42vw,430px);gap:12px}
+  .start-actions-group .arcade-btn{min-height:64px;font-size:1.2rem;border-radius:20px}
+  #startEndlessBtn{width:82%;min-height:52px;font-size:1.02rem}
 }
