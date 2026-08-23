@@ -425,6 +425,85 @@
         game.__labCarouselHooked = true;
     }
 
+    function installRuinsPillarArt(game) {
+        if (!game?.assets || game.__labRuinsPillarArt) return;
+        const c = document.createElement('canvas');
+        c.width = 84;
+        c.height = 640;
+        const ctx = c.getContext('2d');
+        if (!ctx) return;
+
+        const bodyX = 12;
+        const bodyW = 60;
+        const capH = 28;
+        const stone = ctx.createLinearGradient(bodyX, 0, bodyX + bodyW, 0);
+        stone.addColorStop(0, '#222b35');
+        stone.addColorStop(0.18, '#3b4652');
+        stone.addColorStop(0.52, '#56616c');
+        stone.addColorStop(0.82, '#343f4a');
+        stone.addColorStop(1, '#1c242c');
+        ctx.fillStyle = stone;
+        ctx.fillRect(bodyX, 0, bodyW, c.height);
+
+        ctx.strokeStyle = 'rgba(9,14,20,.48)';
+        ctx.lineWidth = 1.5;
+        for (let y = 52; y < c.height; y += 58) {
+            ctx.beginPath();
+            ctx.moveTo(bodyX + 3, y);
+            ctx.lineTo(bodyX + bodyW - 3, y);
+            ctx.stroke();
+            const joint = ((y / 58) % 2) ? bodyX + 23 : bodyX + 42;
+            ctx.beginPath();
+            ctx.moveTo(joint, y - 58);
+            ctx.lineTo(joint, y);
+            ctx.stroke();
+        }
+
+        ctx.lineCap = 'round';
+        const cracks = [
+            [[43,38],[35,76],[44,108],[31,145],[39,183]],
+            [[49,218],[38,252],[46,287],[34,325]],
+            [[38,374],[48,410],[36,452],[43,493],[31,532]],
+            [[45,548],[37,580],[47,615]]
+        ];
+        cracks.forEach((pts, i) => {
+            ctx.beginPath();
+            pts.forEach(([x,y], n) => n ? ctx.lineTo(x,y) : ctx.moveTo(x,y));
+            ctx.strokeStyle = 'rgba(7,12,18,.82)';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            ctx.beginPath();
+            pts.forEach(([x,y], n) => n ? ctx.lineTo(x,y) : ctx.moveTo(x,y));
+            ctx.strokeStyle = i % 2 ? '#d79a35' : '#e8b34c';
+            ctx.lineWidth = 1.5;
+            ctx.shadowColor = 'rgba(232,179,76,.42)';
+            ctx.shadowBlur = 5;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+        });
+
+        const cap = ctx.createLinearGradient(0, 0, c.width, 0);
+        cap.addColorStop(0, '#27313b');
+        cap.addColorStop(.5, '#64707b');
+        cap.addColorStop(1, '#27313b');
+        ctx.fillStyle = cap;
+        ctx.fillRect(2, 0, 80, capH);
+        ctx.fillStyle = '#182029';
+        ctx.fillRect(2, capH - 6, 80, 6);
+        ctx.fillStyle = 'rgba(255,255,255,.10)';
+        ctx.fillRect(7, 5, 70, 2);
+
+        ctx.fillStyle = '#0f161e';
+        ctx.beginPath();
+        ctx.moveTo(2, 0); ctx.lineTo(13, 0); ctx.lineTo(2, 9); ctx.closePath(); ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(82, 0); ctx.lineTo(72, 0); ctx.lineTo(82, 7); ctx.closePath(); ctx.fill();
+
+        game.assets.pillarCanvas = c;
+        game.__labRuinsPillarArt = true;
+        debugLog('ruins-pillar-art-installed', { canvasWidth: c.width, bodyWidth: bodyW, collisionWidth: 60 });
+    }
+
     function polishStaticButtons() {
         buttonIds.forEach(id => {
             const btn = document.getElementById(id);
@@ -436,6 +515,7 @@
         setupDebugLogger();
         debugLog('lab-init', { world: game.currentWorldIndex, screen: getActiveScreenId() });
         setupInstantMenuAudio(game);
+        installRuinsPillarArt(game);
         stopZoom();
         addPanelClasses();
         polishStaticButtons();
