@@ -1,0 +1,27 @@
+name: Recover LAB game.js
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/recover-game.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Revert accidental game.js overwrite
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git log --oneline -20 | grep -q fecff407c4d50beaeec6282b79f3d91c6c4fe83b; then
+            git revert fecff407c4d50beaeec6282b79f3d91c6c4fe83b --no-edit
+            git push origin main
+          fi
