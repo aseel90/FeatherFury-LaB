@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" id="htmlTag">
 <head>
-  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Feather Fury</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0f172a">
+  <title>Feather Hero - غضب الريش</title>
   <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a0f19">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Changa:wght@600;800&family=Press+Start+2P&family=Tajawal:wght@700;900&family=Great+Vibes&display=swap" rel="stylesheet">
@@ -17,44 +17,70 @@
   <!-- SVG Definitions -->
   <svg width="0" height="0" style="position:absolute">
     <defs>
-      <filter id="glow">
-        <feGaussianBlur stdDeviation="3.5" result="coloredBlur"/>
-        <feMerge>
-          <feMergeNode in="coloredBlur"/>
-          <feMergeNode in="SourceGraphic"/>
-        </feMerge>
-      </filter>
+      <g id="coin-svg">
+        <circle cx="12" cy="12" r="10" fill="#f1c40f" stroke="#d35400" stroke-width="2"/>
+        <circle cx="12" cy="12" r="6" fill="#f39c12"/>
+      </g>
+      <g id="star-svg">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor" stroke="#000" stroke-width="1" stroke-linejoin="round" />
+      </g>
+      <g id="trophy-svg">
+        <path fill="#f1c40f" d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
+      </g>
+      <g id="settings-svg">
+        <path fill="#ffffff" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+      </g>
+      <g id="sound-on-svg">
+        <path fill="#ffffff" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+      </g>
+      <g id="sound-off-svg">
+        <path fill="#ffffff" d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+      </g>
+      <g id="lang-svg">
+        <path fill="#ffffff" d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56zm2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"/>
+      </g>
     </defs>
   </svg>
 
   <div class="game-wrapper">
-    <div class="game-container">
+    <div class="game-container" id="gameContainer">
       <canvas id="gameCanvas"></canvas>
+      <div id="gameToast" class="game-toast hidden"></div>
 
+      <!-- UI Overlay: Start Screen -->
       <div id="startScreen" class="overlay-screen active">
         <div class="top-bar">
-          <div class="coin-pill"><span>🪙</span><span id="coinDisplay">0</span></div>
-          <div style="display:flex; gap:8px; align-items:center;">
-            <button id="leaderboardBtn" class="icon-btn" aria-label="Leaderboard">🏆</button>
-            <button id="settingsBtn" class="icon-btn" aria-label="Settings">⚙️</button>
-            <button id="shopBtn" class="shop-trigger-btn" data-i18n="shop">المتجر</button>
+          <div class="coin-pill">
+            <svg width="22" height="22" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg>
+            <span id="startTotalCoins">0</span>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button id="leaderboardBtn" class="icon-btn" title="Top Players">
+              <svg width="20" height="20" viewBox="0 0 24 24"><use href="#trophy-svg"></use></svg>
+            </button>
+            <button id="settingsBtn" class="icon-btn" title="Settings">
+              <svg width="20" height="20" viewBox="0 0 24 24"><use href="#settings-svg"></use></svg>
+            </button>
+            <button id="shopBtnStart" class="shop-trigger-btn" data-i18n="shopBtn">المتجر</button>
           </div>
         </div>
 
         <div class="start-main-content">
           <div class="title-container">
             <h1 class="game-title">FEATHER<br><span class="highlight">FURY</span></h1>
-            <div class="game-subtitle">FeatherFury: Vengeance</div>
+            <div class="game-subtitle" data-i18n="subtitle">غضب الريش: الانتقام</div>
           </div>
 
+          <!-- Worlds Carousel -->
           <div class="worlds-carousel">
             <button id="prevWorldBtn" class="carousel-nav-btn" aria-label="Previous World"></button>
+            
             <div class="world-card" id="worldCard">
               <div class="world-title" id="worldTitle">الأطلال</div>
               <div class="world-stars" id="worldStars">
-                <span class="star empty">☆</span>
-                <span class="star empty">☆</span>
-                <span class="star empty">☆</span>
+                <span class="star empty star-small"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span>
+                <span class="star empty star-big"><svg width="1.7em" height="1.7em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span>
+                <span class="star empty star-small"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span>
               </div>
               <div class="bird-preview">
                 <div class="preview-canvas-wrap">
@@ -64,82 +90,153 @@
               </div>
               <div class="world-status" id="worldStatus">جاهز للعب!</div>
             </div>
+            
             <button id="nextWorldBtn" class="carousel-nav-btn" aria-label="Next World"></button>
           </div>
 
           <div class="start-actions-group">
-            <button id="startStoryBtn" class="arcade-btn" data-i18n="startMission">ابدأ المهمة</button>
-            <button id="endlessBtn" class="arcade-btn secondary-action-btn" data-i18n="endlessMode">الوضع اللانهائي</button>
+            <button id='startStoryBtn' class="arcade-btn" data-i18n="playBtn">بدء المهمة</button>
+            <button id='startEndlessBtn' class='arcade-btn secondary-action-btn' data-i18n="endlessBtn">الطور اللانهائي</button>
           </div>
         </div>
       </div>
 
-      <div id="settingsScreen" class="overlay-screen hidden">
-        <div class="screen-panel settings-panel">
-          <button id="settingsCloseBtn" class="close-x-btn">✕</button>
-          <h2 data-i18n="settingsTitle">الإعدادات</h2>
-          <div class="settings-row">
-            <span data-i18n="soundLabel">الصوت</span>
-            <button id="soundToggleBtn" class="toggle-btn">🔊</button>
+      <!-- Settings Modal -->
+      <div id="settingsScreen" class="overlay-screen hidden" style="background: rgba(15, 23, 42, 0.96);">
+        <h2 style="color:#f1c40f; margin-bottom: 20px; font-family: 'Tajawal', sans-serif;" data-i18n="settingsTitle">الإعدادات</h2>
+        
+        <div class="settings-panel">
+          <div class="setting-row">
+            <span data-i18n="langLabel">اللغة</span>
+            <button id="langToggleBtn" class="secondary-btn" style="padding: 6px 14px; font-size: 0.95rem; display: flex; gap: 6px; align-items: center;">
+               <svg width="18" height="18" viewBox="0 0 24 24"><use href="#lang-svg"></use></svg> عربى
+            </button>
           </div>
-          <div class="settings-row">
-            <span data-i18n="musicLabel">الموسيقى</span>
-            <button id="musicToggleBtn" class="toggle-btn">🎵</button>
+          <div class="setting-row">
+            <span data-i18n="sfxLabel">المؤثرات الصوتية</span>
+            <button id="sfxToggleBtn" class="secondary-btn" style="padding: 6px 14px; font-size: 0.95rem;">مفعل</button>
           </div>
-          <div class="settings-row">
-            <span data-i18n="languageLabel">اللغة</span>
-            <button id="languageToggleBtn" class="toggle-btn">AR</button>
+          <div class="setting-row">
+            <span data-i18n="gfxLabel">تأثيرات الجسيمات</span>
+            <button id="gfxToggleBtn" class="secondary-btn" style="padding: 6px 14px; font-size: 0.95rem;">مرتفع</button>
           </div>
-          <div class="settings-row">
-            <span data-i18n="vibrationLabel">الاهتزاز</span>
-            <button id="vibrationToggleBtn" class="toggle-btn">📳</button>
+          <div class="setting-row" style="margin-top: 20px; border-top: 1px solid #334155; padding-top: 15px;">
+            <span style="color: #ff7675;" data-i18n="resetLabel">حذف البيانات (تصفير)</span>
+            <button id="resetDataBtn" class="arcade-btn" style="background: #c0392b; width: auto; font-size: 0.85rem; padding: 6px 14px; border-color: #78281f;" data-i18n="resetConfirm">تأكيد الحذف</button>
+          </div>
+        </div>
+
+        <div class="version-info" style="margin-top: auto; color: rgba(255,255,255,0.4); font-size: 0.85rem; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+          <span data-i18n="versionLabel">الإصدار LAB 2.3.3</span>
+          <!-- Developer Signature -->
+          <div style="font-family: 'Great Vibes', cursive; font-size: 1.8rem; color: #f1c40f; text-shadow: 2px 2px 5px rgba(0,0,0,0.8), 0 0 10px rgba(241, 196, 15, 0.5); display: flex; align-items: center; gap: 5px;">
+            <span data-i18n="devLabel" style="font-family: 'Tajawal', sans-serif; font-size: 0.75rem; color: rgba(255, 255, 255, 0.6); text-shadow: none;">تطوير</span> Aseel Salah
+          </div>
+        </div>
+        <button id="closeSettingsBtn" class="arcade-btn return-btn" style="margin-top: 15px;" data-i18n="returnBtn">عودة</button>
+      </div>
+
+      <!-- UI Overlay: Game HUD -->
+      <div id="gameHud" class="hud-layer hidden">
+        <div class="hud-top">
+          <div class="hud-coin-badge">
+            <svg width="20" height="20" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg>
+            <span id="sessionCoinDisplay">0</span>
+          </div>
+          <div class="score-container">
+            <div class="score-badge" id="currentScoreDisplay">0</div>
+            <div class="stage-badge" id="stageDisplay">الأطلال</div>
+          </div>
+          <button id="soundToggleBtn" class="icon-btn" aria-label="Toggle Sound">
+            <svg width="20" height="20" viewBox="0 0 24 24"><use href="#sound-on-svg"></use></svg>
+          </button>
+        </div>
+        <!-- Fever Bar -->
+        <div class="fever-bar-container">
+          <div class="fever-label" data-i18n="feverLabel">الحمى</div>
+          <div class="fever-bar-bg">
+            <div class="fever-bar-fill" id="feverBarFill"></div>
           </div>
         </div>
       </div>
 
-      <div id="leaderboardScreen" class="overlay-screen hidden">
-        <div class="screen-panel leaderboard-panel">
-          <button id="leaderboardCloseBtn" class="close-x-btn">✕</button>
-          <h2 data-i18n="leaderboardTitle">لوحة الصدارة</h2>
-          <div id="leaderboardList" class="leaderboard-list"></div>
-        </div>
+      <!-- UI Overlay: Boss Warning -->
+      <div id="bossWarning" class="boss-warning hidden" data-i18n="bossWarning">
+        تحذير: الزعيم يقترب! اجمع كرات الطاقة للهجوم!
       </div>
 
-      <div id="shopScreen" class="overlay-screen hidden">
-        <div class="screen-panel shop-panel">
-          <button id="shopCloseBtn" class="close-x-btn">✕</button>
-          <h2 data-i18n="shopTitle">متجر الأبطال</h2>
-          <div id="shopGrid" class="shop-grid"></div>
-        </div>
+      <!-- UI Overlay: Game Hint -->
+      <div id="gameHint" class="game-hint hidden">
+        تلميح: اجمع العملات لملء شريط الحمى!
       </div>
 
-      <div id="pauseScreen" class="overlay-screen hidden">
-        <div class="screen-panel pause-panel">
-          <h2 data-i18n="paused">متوقف مؤقتًا</h2>
-          <button id="resumeBtn" class="arcade-btn" data-i18n="resume">متابعة</button>
-          <button id="quitBtn" class="arcade-btn secondary-action-btn" data-i18n="quit">خروج</button>
-        </div>
-      </div>
-
+      <!-- UI Overlay: Game Over Screen -->
       <div id="gameOverScreen" class="overlay-screen hidden">
-        <div class="screen-panel game-over-panel">
-          <h2 id="gameOverTitle" data-i18n="gameOver">انتهت اللعبة</h2>
-          <div id="gameOverStats"></div>
+        <div class="game-over-dialog">
+          <h2 id="endGameTitle" class="game-over-title" data-i18n="gameOverTitle">انتهت اللعبة</h2>
+          
+          <!-- Run Stars -->
+          <div class="run-stars-container" id="runStarsContainer">
+             <span class="star empty star-side"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span>
+             <span class="star empty star-center"><svg width="1.9em" height="1.9em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span>
+             <span class="star empty star-side"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span>
+          </div>
+
+          <div class="score-card-modern">
+            <div class="score-row-modern">
+              <span class="label" data-i18n="scoreLabel">النقاط</span>
+              <span id="finalScore" class="value score-num">0</span>
+            </div>
+            <div class="score-row-modern best">
+              <span class="label" data-i18n="bestScoreLabel">أعلى نتيجة</span>
+              <span id="highScore" class="value best-num">0</span>
+            </div>
+            <div class="score-row-modern coins">
+              <span class="label" data-i18n="collectedLabel">جمعت</span>
+              <span class="value coins-num"><span id="earnedCoins">0</span> <svg width="18" height="18" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg></span>
+            </div>
+          </div>
+          
           <div class="game-over-buttons-group">
-            <button id="restartBtn" class="arcade-btn" data-i18n="retry">إعادة المحاولة</button>
-            <button id="homeBtn" class="arcade-btn secondary-action-btn" data-i18n="home">الرئيسية</button>
+            <button id="nextWorldActionBtn" class="arcade-btn next-world-btn hidden" data-i18n="nextWorldBtn">العالم التالي</button>
+            <button id="reviveBtn" class="arcade-btn revive-btn" data-i18n="reviveBtn">استمرار (محاولة ثانية)</button>
+            
+            <div class="secondary-btn-grid">
+              <button id="restartBtn" class="arcade-btn action-sub-btn restart-btn" data-i18n="restartBtn">إعادة اللعب</button>
+              <button id="shopBtnGameOver" class="arcade-btn action-sub-btn shop-btn" data-i18n="shopBtn">المتجر</button>
+              <button id="mainMenuBtn" class="arcade-btn action-sub-btn menu-btn" data-i18n="mainMenuBtn">الرئيسية</button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div id="hud" class="hud hidden">
-        <div class="hud-left">
-          <span id="hudScore">0</span>
+      <!-- UI Overlay: Leaderboard Modal -->
+      <div id="leaderboardScreen" class="overlay-screen hidden" style="background: rgba(15, 23, 42, 0.96); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <div class="shop-header" style="width: 100%; max-width: 350px;">
+          <h2 data-i18n="leaderboardTitle">أفضل اللاعبين</h2>
+          <button id="closeLeaderboardBtn" class="arcade-btn" style="background: #e74c3c; font-size: 0.9rem; padding: 5px 15px; width: auto; margin: 0;">✕</button>
         </div>
-        <button id="pauseBtn" class="hud-pause-btn">Ⅱ</button>
+        <div class="leaderboard-content" style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 15px; margin-top: 20px; max-width: 350px; width: 90%;">
+          <ul id="leaderboardList" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px;">
+            <!-- Dummy items will be injected here via JS -->
+          </ul>
+          <div data-i18n="leaderboardSubtitle" style="margin-top: 15px; font-size: 0.8rem; color: #94a3b8; text-align: center;">النتائج المباشرة</div>
+        </div>
       </div>
 
-      <div id="toast" class="toast"></div>
+      <!-- UI Overlay: Skins Shop Modal -->
+      <div id="shopScreen" class="overlay-screen hidden">
+        <div class="shop-header">
+          <h2 data-i18n="shopTitle">متجر الأبطال</h2>
+          <div class="coin-pill shop-balance">
+            <svg width="20" height="20" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg>
+            <span id="shopTotalCoins">0</span>
+          </div>
+        </div>
+        <div class="skins-grid" id="skinsGrid"></div>
+        <button id="closeShopBtn" class="arcade-btn return-btn" data-i18n="returnBtn">العودة للعبة</button>
+      </div>
+
     </div>
   </div>
 
