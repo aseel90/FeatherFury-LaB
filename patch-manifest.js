@@ -151,6 +151,13 @@
         dependsOn: ['w2-boss-orb-v4'],
         readyTimeout: 3500,
         ready: () => !!window.game?.__w2BossCombatV5Installed
+      },
+      {
+        id: 'victory-screen-fix-v1',
+        src: 'victory-screen-fix-v1.js?v=1',
+        dependsOn: ['w2-boss-combat-v5', 'revive-core-fix-v1'],
+        readyTimeout: 2500,
+        ready: () => !!window.game?.__victoryScreenFixV1Installed
       }
     ],
     onCriticalError: async () => {
