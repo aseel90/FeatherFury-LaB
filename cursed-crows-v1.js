@@ -24,103 +24,104 @@
     const phase = meta?.__crowPhase ?? 0;
     const flap = Math.sin(frame * 0.38 + phase);
     const bob = Math.sin(frame * 0.11 + phase) * 1.8;
-    const tilt = flap * 0.035 + (variant === 1 ? -0.05 : variant === 2 ? 0.04 : 0);
+    const tilt = flap * 0.03 + (variant === 1 ? -0.045 : variant === 2 ? 0.035 : 0);
 
     ctx.save();
     ctx.translate(x, y + bob);
     ctx.rotate(tilt);
 
-    // Tail feathers: make the silhouette read as a small crow.
-    ctx.fillStyle = '#0b1220';
+    // Cleaner forked tail: clearer crow silhouette without increasing hitbox.
+    ctx.fillStyle = '#0a101b';
     ctx.beginPath();
-    ctx.moveTo(10, 1);
-    ctx.lineTo(18, -3);
-    ctx.lineTo(15, 3);
-    ctx.lineTo(20, 6);
-    ctx.lineTo(10, 5);
+    ctx.moveTo(9, 1);
+    ctx.lineTo(17, -2);
+    ctx.lineTo(14, 3);
+    ctx.lineTo(18, 6);
+    ctx.lineTo(13, 5);
+    ctx.lineTo(10, 8);
     ctx.closePath();
     ctx.fill();
 
     // Body.
-    const bodyW = variant === 2 ? 12.5 : 13.5;
-    const bodyH = variant === 1 ? 8.8 : 8.2;
-    ctx.fillStyle = variant === 1 ? '#121827' : '#0f172a';
+    const bodyW = variant === 2 ? 12.3 : 13.2;
+    const bodyH = variant === 1 ? 8.6 : 8.0;
+    ctx.fillStyle = variant === 1 ? '#151c2b' : '#101827';
     ctx.beginPath();
-    ctx.ellipse(1, 1, bodyW, bodyH, variant === 2 ? 0.10 : -0.04, 0, Math.PI * 2);
+    ctx.ellipse(1, 1, bodyW, bodyH, variant === 2 ? 0.08 : -0.035, 0, Math.PI * 2);
     ctx.fill();
 
     // Head.
     ctx.fillStyle = '#111827';
     ctx.beginPath();
-    ctx.arc(-8, -3, variant === 2 ? 6.2 : 6.8, 0, Math.PI * 2);
+    ctx.arc(-8, -3, variant === 2 ? 6.1 : 6.6, 0, Math.PI * 2);
     ctx.fill();
 
     // Small forehead crest for variant 2.
     if (variant === 2) {
       ctx.beginPath();
       ctx.moveTo(-10, -8);
-      ctx.lineTo(-6, -13);
+      ctx.lineTo(-6, -12);
       ctx.lineTo(-3, -8);
       ctx.closePath();
       ctx.fill();
     }
 
-    // Beak.
-    ctx.fillStyle = '#f59e0b';
+    // Slightly smaller, sharper beak.
+    ctx.fillStyle = '#e58a0a';
     ctx.beginPath();
-    ctx.moveTo(-13, -2);
-    ctx.lineTo(-20, 1);
-    ctx.lineTo(-13, 4);
+    ctx.moveTo(-13, -1.5);
+    ctx.lineTo(-18.2, 1);
+    ctx.lineTo(-13, 3.5);
     ctx.closePath();
     ctx.fill();
-    ctx.fillStyle = '#fbbf24';
+    ctx.fillStyle = '#f3ad22';
     ctx.beginPath();
-    ctx.moveTo(-13, -2);
-    ctx.lineTo(-18, 0);
+    ctx.moveTo(-13, -1.5);
+    ctx.lineTo(-17.1, 0.2);
     ctx.lineTo(-13, 1);
     ctx.closePath();
     ctx.fill();
 
-    // Eye with tiny glow so it stays readable on the dark forest.
-    ctx.shadowColor = 'rgba(248, 70, 70, .65)';
-    ctx.shadowBlur = 4;
+    // Softer eye glow; still readable on the dark forest.
+    ctx.shadowColor = 'rgba(248, 70, 70, .42)';
+    ctx.shadowBlur = 2.5;
     ctx.fillStyle = '#ef4444';
     ctx.beginPath();
-    ctx.arc(-9, -5, 1.8, 0, Math.PI * 2);
+    ctx.arc(-9, -5, 1.65, 0, Math.PI * 2);
     ctx.fill();
     ctx.shadowBlur = 0;
     ctx.fillStyle = '#fecaca';
     ctx.beginPath();
-    ctx.arc(-9.5, -5.5, .55, 0, Math.PI * 2);
+    ctx.arc(-9.45, -5.45, .48, 0, Math.PI * 2);
     ctx.fill();
 
-    // Wing animation: each variant has a visibly different pose.
-    ctx.fillStyle = '#070d18';
+    // Wing animation: softer curves read more like crow wings than bat wings.
+    ctx.fillStyle = variant === 1 ? '#0b1320' : '#0c1422';
     ctx.beginPath();
     if (variant === 0) {
       ctx.moveTo(-1, 0);
-      ctx.quadraticCurveTo(4, -8 - flap * 7, 11, -12 - flap * 8);
-      ctx.quadraticCurveTo(9, -2, 4, 5);
+      ctx.quadraticCurveTo(4, -6 - flap * 5.5, 10, -9 - flap * 6.5);
+      ctx.quadraticCurveTo(9, -1, 4, 5);
       ctx.closePath();
     } else if (variant === 1) {
       ctx.moveTo(0, 1);
-      ctx.quadraticCurveTo(7, -4 - flap * 5, 14, -5 - flap * 4);
-      ctx.quadraticCurveTo(9, 2, 4, 7);
+      ctx.quadraticCurveTo(6, -3 - flap * 4.2, 12, -4 - flap * 3.4);
+      ctx.quadraticCurveTo(9, 2, 4, 6);
       ctx.closePath();
     } else {
       ctx.moveTo(-1, 0);
-      ctx.quadraticCurveTo(3, -11 - flap * 8, 8, -15 - flap * 10);
-      ctx.quadraticCurveTo(12, -4, 5, 5);
+      ctx.quadraticCurveTo(3, -8 - flap * 6.3, 8, -11 - flap * 7.2);
+      ctx.quadraticCurveTo(10.5, -3, 5, 5);
       ctx.closePath();
     }
     ctx.fill();
 
-    // Secondary lower wing edge improves the crow silhouette on phones.
-    ctx.strokeStyle = 'rgba(71,85,105,.38)';
+    // Slight tonal separation between body and wing for phone readability.
+    ctx.strokeStyle = 'rgba(91,105,125,.34)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(0, 3);
-    ctx.quadraticCurveTo(5, 6, 10, 3);
+    ctx.quadraticCurveTo(5, 5.5, 9.5, 3);
     ctx.stroke();
 
     ctx.restore();
@@ -129,8 +130,8 @@
   function install() {
     if (!window.game) return false;
     window.drawMinionCrow = drawCrow;
-    window.game.__cursedCrowArtV1Installed = true;
-    console.log('[FF-LAB] cursed-crows-v1-installed');
+    window.game.__cursedCrowArtV2Installed = true;
+    console.log('[FF-LAB] cursed-crows-polish-v2-installed');
     return true;
   }
 
