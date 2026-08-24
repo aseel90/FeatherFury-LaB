@@ -158,6 +158,20 @@
         dependsOn: ['w2-boss-combat-v5', 'revive-core-fix-v1'],
         readyTimeout: 2500,
         ready: () => !!window.game?.__victoryScreenFixV1Installed
+      },
+      {
+        id: 'w3-foundation-v1',
+        src: 'w3-foundation-v1.js?v=1',
+        dependsOn: ['victory-screen-fix-v1'],
+        readyTimeout: 3000,
+        ready: () => !!window.game?.__w3FoundationV1Installed
+      },
+      {
+        id: 'w3-world-polish-v1',
+        src: 'w3-world-polish-v1.js?v=1',
+        dependsOn: ['w3-foundation-v1'],
+        readyTimeout: 3500,
+        ready: () => !!window.game?.__w3WorldPolishV1Installed
       }
     ],
     onCriticalError: async () => {
