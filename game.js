@@ -32,6 +32,13 @@
               x.src = 'w1-fixes-batch-v1.js?v=1';
               x.async = false;
               x.onerror = () => console.error('Failed to load World 1 fixes batch');
+              x.onload = () => {
+                const a = document.createElement('script');
+                a.src = 'boss-audio-fix-v2.js?v=2';
+                a.async = false;
+                a.onerror = () => console.error('Failed to load dedicated boss audio fixes');
+                document.head.appendChild(a);
+              };
               document.head.appendChild(x);
             };
             document.head.appendChild(f);
