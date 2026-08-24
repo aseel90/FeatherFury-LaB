@@ -3,6 +3,39 @@
 
   let legacyStarted = false;
 
+  // If Patch Runner is unavailable, load the same post-W2 chain used by the current manifest.
+  // This path is emergency-only and does not affect normal boot.
+  function loadLegacyTail() {
+    const sources = [
+      'w2-boss-orb-v6.js?v=1',
+      'w2-boss-combat-v6.js?v=1',
+      'victory-screen-fix-v1.js?v=1',
+      'w3-foundation-v1.js?v=1',
+      'w3-world-polish-v1.js?v=1',
+      'w3-boss-v1.js?v=1',
+      'w3-final-polish-v1.js?v=1',
+      'w3-balance-visual-v2.js?v=1',
+      'w3-challenge-audio-v3.js?v=1',
+      'w3-final-balance-v4.js?v=1',
+      'w3-critical-fix-v6.js?v=1'
+    ];
+    let index = 0;
+    const next = () => {
+      if (index >= sources.length) return;
+      const src = sources[index++];
+      const script = document.createElement('script');
+      script.src = src;
+      script.async = false;
+      script.onload = next;
+      script.onerror = () => {
+        console.error(`[FeatherFury] Legacy fallback failed to load ${src}`);
+        next();
+      };
+      document.head.appendChild(script);
+    };
+    next();
+  }
+
   window.__FF_START_LEGACY_PATCH_CHAIN__ = function() {
     if (legacyStarted) return;
     legacyStarted = true;
@@ -91,14 +124,15 @@
                                     w2g.onerror = () => console.error('Failed to load World 2 gameplay');
                                     w2g.onload = () => {
                                       const revive = document.createElement('script');
-                                      revive.src = 'revive-core-fix-v1.js?v=1';
+                                      revive.src = 'revive-core-fix-v1.js?v=2';
                                       revive.async = false;
                                       revive.onerror = () => console.error('Failed to load revive core fix');
                                       revive.onload = () => {
                                         const w2BossPolish = document.createElement('script');
                                         w2BossPolish.src = 'w2-boss-polish-v2.js?v=1';
                                         w2BossPolish.async = false;
-                                        w2BossPolish.onerror = () => console.error('Failed to load World 2 boss polish v2');
+                                        w2BossPolish.onerror = () => { console.error('Failed to load World 2 boss polish v2'); loadLegacyTail(); };
+                                        w2BossPolish.onload = loadLegacyTail;
                                         document.head.appendChild(w2BossPolish);
                                       };
                                       document.head.appendChild(revive);
@@ -157,7 +191,7 @@
   loadBootstrapScript(
     'patch-runner.js?v=3',
     () => loadBootstrapScript(
-      'patch-manifest.js?v=11',
+      'patch-manifest.js?v=12',
       () => {},
       () => {
         console.error('[FeatherFury] Failed to load patch manifest; using legacy loader.');

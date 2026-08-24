@@ -102,6 +102,18 @@
       game.heroProjectiles = [];
       game.rain = [];
 
+      // Clear transient boss-attack state so revive always resumes from a safe frame.
+      // Boss HP/progression are intentionally preserved.
+      game.__w2ManualProjectiles = [];
+      game.__w2OrbBossV6 = null;
+      game.__w3PressureV3 = null;
+      game.__w3SonicV3 = null;
+      game.__w3SonicV4 = null;
+      game.__w3SonicV5 = null;
+      game.__w3SonicV6 = null;
+      game.__w3DodgeV4 = null;
+      game.__w3DodgeCooldownV4 = 0;
+
       if (game.boss?.active) {
         if (game.boss.state !== 'EXPLODING') {
           game.boss.timer = 0;
