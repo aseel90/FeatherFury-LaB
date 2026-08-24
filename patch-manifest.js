@@ -102,6 +102,34 @@
         dependsOn: ['stable-runtime'],
         readyTimeout: 2500,
         ready: () => !!window.game?.__world1FinalPolishV1Installed
+      },
+      {
+        id: 'w2-audio-v1',
+        src: 'w2-audio-v1.js?v=1',
+        dependsOn: ['stable-runtime'],
+        readyTimeout: 2500,
+        ready: () => !!window.game?.__w2AudioV1Installed
+      },
+      {
+        id: 'w2-visuals-v1',
+        src: 'w2-visuals-v1.js?v=1',
+        dependsOn: ['stable-runtime'],
+        readyTimeout: 3000,
+        ready: () => !!window.game?.__w2VisualsV1Installed
+      },
+      {
+        id: 'w2-gameplay-v1',
+        src: 'w2-gameplay-v1.js?v=1',
+        dependsOn: ['stable-runtime'],
+        readyTimeout: 3000,
+        ready: () => !!window.game?.__w2GameplayV1Installed
+      },
+      {
+        id: 'revive-core-fix-v1',
+        src: 'revive-core-fix-v1.js?v=1',
+        dependsOn: ['stable-runtime'],
+        readyTimeout: 2500,
+        ready: () => !!window.game?.__reviveCoreFixV1Installed
       }
     ],
     onCriticalError: async () => {
