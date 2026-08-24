@@ -12,6 +12,13 @@
       w.src = 'cursed-woods-v1.js?v=1';
       w.async = false;
       w.onerror = () => console.error('Failed to load Cursed Woods atmosphere override');
+      w.onload = () => {
+        const c = document.createElement('script');
+        c.src = 'cursed-crows-v1.js?v=1';
+        c.async = false;
+        c.onerror = () => console.error('Failed to load Cursed Woods crow art override');
+        document.head.appendChild(c);
+      };
       document.head.appendChild(w);
     };
     document.head.appendChild(p);
