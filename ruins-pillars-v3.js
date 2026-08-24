@@ -11,37 +11,36 @@
     if (!ctx) return null;
 
     const bodyX = 10;
-    const bodyW = 60;
-    const capH = 22;
+    const bodyW = 60; // exactly matches gameplay collision width
 
     const palettes = [
-      ['#71685a', '#b8aa95', '#ded2bd', '#9f927e', '#665e52'],
-      ['#6b6458', '#aa9e8d', '#d1c5b2', '#948979', '#625b50'],
-      ['#776d5e', '#c0b29b', '#e0d5c0', '#a49783', '#6a6154'],
-      ['#6d6558', '#b2a58f', '#d7ccb6', '#978b78', '#625a4f']
+      ['#756b5d', '#c4b69f', '#e6dac5', '#918571', '#675f53'],
+      ['#6c6357', '#b6aa97', '#d8ccb9', '#887e6d', '#60594f'],
+      ['#786f61', '#c9bca6', '#eadfca', '#978b78', '#6b6357'],
+      ['#6f675a', '#bcae98', '#ded2bd', '#8c8170', '#625b50']
     ];
     const p = palettes[variant];
     const stone = ctx.createLinearGradient(bodyX, 0, bodyX + bodyW, 0);
     stone.addColorStop(0, p[0]);
-    stone.addColorStop(.2, p[1]);
+    stone.addColorStop(.22, p[1]);
     stone.addColorStop(.52, p[2]);
     stone.addColorStop(.82, p[3]);
     stone.addColorStop(1, p[4]);
     ctx.fillStyle = stone;
     ctx.fillRect(bodyX, 0, bodyW, SPRITE_H);
 
-    // Slight irregular block courses so each column reads as ancient masonry.
-    ctx.strokeStyle = 'rgba(67,59,49,.30)';
-    ctx.lineWidth = 1.1;
-    let y = 42 + variant * 3;
+    // Stone block courses. Position changes per variant so the shafts do not repeat.
+    ctx.strokeStyle = 'rgba(69,61,51,.26)';
+    ctx.lineWidth = 1.15;
+    let y = 58 + variant * 5;
     let row = 0;
     while (y < SPRITE_H) {
-      const rowH = [50, 58, 54, 62][(row + variant) % 4];
+      const rowH = [55, 63, 59, 68][(row + variant) % 4];
       ctx.beginPath();
       ctx.moveTo(bodyX + 2, y);
       ctx.lineTo(bodyX + bodyW - 2, y);
       ctx.stroke();
-      const joints = [bodyX + 18, bodyX + 31, bodyX + 43];
+      const joints = [bodyX + 17, bodyX + 31, bodyX + 45];
       const joint = joints[(row + variant) % joints.length];
       ctx.beginPath();
       ctx.moveTo(joint, Math.max(0, y - rowH));
@@ -51,60 +50,104 @@
       row++;
     }
 
+    // Soft centre highlight keeps the pillar readable on small phones.
+    const shine = ctx.createLinearGradient(bodyX, 0, bodyX + bodyW, 0);
+    shine.addColorStop(0, 'rgba(255,255,255,0)');
+    shine.addColorStop(.48, 'rgba(255,255,255,.12)');
+    shine.addColorStop(.58, 'rgba(255,255,255,.05)');
+    shine.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = shine;
+    ctx.fillRect(bodyX, 0, bodyW, SPRITE_H);
+
     const crackSets = [
-      [[[34,92],[42,112],[36,140]], [[49,266],[41,292],[47,323]], [[30,450],[38,476],[32,508]]],
-      [[[45,74],[37,105],[43,132],[35,162]], [[29,238],[36,266],[31,294]], [[47,392],[39,421],[45,455],[37,486]]],
-      [[[31,125],[39,150],[34,180]], [[48,307],[40,333],[46,362]], [[32,510],[40,536],[35,566]]],
-      [[[44,102],[36,130],[42,158]], [[31,252],[39,281],[34,315]], [[48,438],[40,468],[46,500],[38,535]]]
+      [ [[31,122],[39,151],[34,183]], [[48,302],[39,335],[45,369]], [[30,480],[38,512],[32,548]] ],
+      [ [[46,92],[37,126],[43,160],[35,194]], [[30,258],[37,291],[31,326]], [[47,421],[39,456],[45,492],[37,532]] ],
+      [ [[32,150],[40,179],[35,211]], [[49,338],[40,369],[46,402]], [[33,510],[41,541],[35,574]] ],
+      [ [[45,116],[36,149],[42,181]], [[31,278],[39,312],[34,350]], [[48,448],[40,482],[46,520],[38,557]] ]
     ];
     crackSets[variant].forEach((pts) => {
       ctx.beginPath();
       pts.forEach(([x, py], i) => i ? ctx.lineTo(x, py) : ctx.moveTo(x, py));
       ctx.strokeStyle = 'rgba(48,42,36,.78)';
-      ctx.lineWidth = 2.3;
+      ctx.lineWidth = variant === 3 ? 2.8 : 2.4;
       ctx.lineCap = 'round';
       ctx.stroke();
     });
 
-    // Small moss accents; kept subtle for mobile readability.
-    const mossSets = [
-      [[16,170,10,4],[47,388,8,3]],
-      [[45,115,9,3],[17,344,12,4]],
-      [[18,246,8,3],[45,515,10,4]],
-      [[14,132,9,3],[42,326,11,4]]
-    ];
-    ctx.fillStyle = 'rgba(83,112,68,.28)';
-    mossSets[variant].forEach(([x, py, w, h]) => ctx.fillRect(x, py, w, h));
-
-    const capOverhang = [7, 9, 6, 8][variant];
-    const capX = bodyX - capOverhang;
-    const capW = bodyW + capOverhang * 2;
-    const cap = ctx.createLinearGradient(capX, 0, capX + capW, 0);
-    cap.addColorStop(0, '#766c5d');
-    cap.addColorStop(.5, '#cfc1aa');
-    cap.addColorStop(1, '#756b5d');
-    ctx.fillStyle = cap;
-    ctx.beginPath();
-    const leftChip = variant === 0 || variant === 3 ? 7 : 2;
-    const rightChip = variant === 1 || variant === 3 ? 8 : 2;
-    ctx.moveTo(capX + leftChip, 2);
-    ctx.lineTo(capX + capW - rightChip, 2);
-    ctx.lineTo(capX + capW, variant === 2 ? 8 : 5);
-    ctx.lineTo(capX + capW - 2, capH);
-    ctx.lineTo(capX + 2, capH);
-    ctx.lineTo(capX, variant === 1 ? 7 : 5);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = 'rgba(66,57,48,.32)';
-    ctx.fillRect(capX + 2, capH - 4, capW - 4, 4);
-    ctx.fillStyle = 'rgba(255,255,255,.12)';
-    ctx.fillRect(capX + 7, 6, Math.max(8, capW - 14), 2);
-
-    // Variant 2 has one missing stone notch; decorative only, collision unchanged.
-    if (variant === 2) {
-      ctx.fillStyle = 'rgba(79,70,60,.42)';
-      ctx.fillRect(bodyX, 214, 8, 20);
+    // Distinct capital silhouettes. Body remains 60px for honest collision readability.
+    if (variant === 0) {
+      // Classic intact temple capital.
+      const capX = 3, capW = 74;
+      ctx.fillStyle = '#a99b84';
+      ctx.fillRect(capX, 0, capW, 22);
+      ctx.fillStyle = '#d5c7b0';
+      ctx.fillRect(7, 2, 66, 7);
+      ctx.fillStyle = 'rgba(73,64,53,.28)';
+      ctx.fillRect(5, 17, 70, 5);
+      ctx.fillStyle = '#92846f';
+      ctx.fillRect(8, 26, 64, 6);
+    } else if (variant === 1) {
+      // Clearly broken left corner and thick stepped capital.
+      ctx.fillStyle = '#a0927c';
+      ctx.beginPath();
+      ctx.moveTo(12, 0); ctx.lineTo(78, 0); ctx.lineTo(78, 25); ctx.lineTo(2, 25);
+      ctx.lineTo(2, 12); ctx.lineTo(7, 12); ctx.lineTo(7, 7); ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#d2c4ac';
+      ctx.fillRect(16, 3, 56, 7);
+      ctx.fillStyle = 'rgba(73,64,53,.30)';
+      ctx.fillRect(5, 20, 71, 5);
+      ctx.fillStyle = '#8f816c';
+      ctx.fillRect(10, 31, 60, 8);
+      // Visible chipped edge on shaft, decorative only.
+      ctx.fillStyle = 'rgba(73,66,57,.42)';
+      ctx.beginPath();
+      ctx.moveTo(bodyX, 248); ctx.lineTo(bodyX + 8, 255); ctx.lineTo(bodyX + 8, 286); ctx.lineTo(bodyX, 294); ctx.closePath(); ctx.fill();
+    } else if (variant === 2) {
+      // Double-ring ceremonial capital, instantly different on mobile.
+      ctx.fillStyle = '#a99b84';
+      ctx.fillRect(5, 0, 70, 18);
+      ctx.fillStyle = '#d9ccb5';
+      ctx.fillRect(9, 3, 62, 6);
+      ctx.fillStyle = '#8e806b';
+      ctx.fillRect(7, 23, 66, 6);
+      ctx.fillStyle = '#b9aa91';
+      ctx.fillRect(11, 32, 58, 8);
+      ctx.fillStyle = 'rgba(75,65,54,.25)';
+      ctx.fillRect(13, 41, 54, 4);
+      // Shallow vertical fluting gives a different shaft texture.
+      ctx.strokeStyle = 'rgba(102,91,75,.23)';
+      ctx.lineWidth = 1;
+      [23, 35, 47, 59].forEach((x) => {
+        ctx.beginPath(); ctx.moveTo(x, 55); ctx.lineTo(x, 590); ctx.stroke();
+      });
+    } else {
+      // Ruined capital: both corners chipped + heavier moss.
+      ctx.fillStyle = '#9d8f79';
+      ctx.beginPath();
+      ctx.moveTo(11, 0); ctx.lineTo(68, 0); ctx.lineTo(77, 8); ctx.lineTo(77, 24);
+      ctx.lineTo(3, 24); ctx.lineTo(3, 9); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#d0c2aa';
+      ctx.fillRect(15, 4, 50, 7);
+      ctx.fillStyle = 'rgba(71,62,52,.32)';
+      ctx.fillRect(6, 19, 68, 5);
+      ctx.fillStyle = '#8d806c';
+      ctx.fillRect(9, 30, 62, 7);
+      ctx.fillStyle = 'rgba(82,112,67,.46)';
+      ctx.fillRect(12, 41, 17, 5);
+      ctx.fillRect(48, 162, 15, 5);
+      ctx.fillRect(15, 346, 13, 5);
+      ctx.fillRect(43, 505, 16, 5);
     }
+
+    const mossSets = [
+      [[16,214,10,4],[47,416,8,3]],
+      [[45,118,9,3],[17,362,13,5]],
+      [[18,268,8,3],[46,534,9,4]],
+      [[15,126,11,4],[42,316,14,5],[18,520,10,4]]
+    ];
+    ctx.fillStyle = variant === 3 ? 'rgba(81,116,67,.45)' : 'rgba(83,112,68,.28)';
+    mossSets[variant].forEach(([x, py, w, h]) => ctx.fillRect(x, py, w, h));
 
     return c;
   }
@@ -112,7 +155,7 @@
   function install() {
     const game = window.game;
     if (!game?.assets || typeof game.drawPillars !== 'function') return false;
-    if (game.__ruinsPillarVariantsV4Installed) return true;
+    if (game.__ruinsPillarVariantsV5Installed) return true;
 
     const variants = Array.from({ length: VARIANTS }, (_, i) => buildVariantCanvas(i));
     if (variants.some(v => !v)) return false;
@@ -125,30 +168,29 @@
       }
 
       const gap = CONFIG.GAP_SIZE;
-      this.pillars.forEach((p) => {
-        if (p.smashed) return;
-        if (p.__ruinsVariant == null) p.__ruinsVariant = Math.floor(Math.random() * VARIANTS);
+      this.pillars.forEach((pillar) => {
+        if (pillar.smashed) return;
+        if (pillar.__ruinsVariantV5 == null) pillar.__ruinsVariantV5 = Math.floor(Math.random() * VARIANTS);
 
-        const canvas = this.assets.ruinsPillarVariants[p.__ruinsVariant % VARIANTS];
-        const botY = p.topHeight + gap;
+        const canvas = this.assets.ruinsPillarVariants[pillar.__ruinsVariantV5 % VARIANTS];
+        const botY = pillar.topHeight + gap;
         const botH = CONFIG.CANVAS_HEIGHT - CONFIG.GROUND_HEIGHT - botY;
         const drawW = 80;
-        const drawX = p.x - (drawW - p.width) / 2;
+        const drawX = pillar.x - (drawW - pillar.width) / 2;
 
         this.ctx.save();
-        this.ctx.translate(drawX, p.topHeight);
+        this.ctx.translate(drawX, pillar.topHeight);
         this.ctx.scale(1, -1);
-        this.ctx.drawImage(canvas, 0, 0, SPRITE_W, Math.min(SPRITE_H, p.topHeight), 0, 0, drawW, p.topHeight);
+        this.ctx.drawImage(canvas, 0, 0, SPRITE_W, Math.min(SPRITE_H, pillar.topHeight), 0, 0, drawW, pillar.topHeight);
         this.ctx.restore();
 
         this.ctx.drawImage(canvas, 0, 0, SPRITE_W, Math.min(SPRITE_H, botH), drawX, botY, drawW, botH);
       });
     };
 
-    // Keep the beige v3 base asset as fallback for any code path that reads pillarCanvas directly.
     game.assets.pillarCanvas = variants[0];
-    game.__ruinsPillarVariantsV4Installed = true;
-    console.log('[FF-LAB] ruins-pillar-variants-v4-installed');
+    game.__ruinsPillarVariantsV5Installed = true;
+    console.log('[FF-LAB] ruins-pillar-variants-v5-installed');
     return true;
   }
 
