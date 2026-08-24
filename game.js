@@ -27,6 +27,13 @@
             f.src = 'boss-fight-core-v1.js?v=1';
             f.async = false;
             f.onerror = () => console.error('Failed to load Crow King boss fight core override');
+            f.onload = () => {
+              const x = document.createElement('script');
+              x.src = 'w1-fixes-batch-v1.js?v=1';
+              x.async = false;
+              x.onerror = () => console.error('Failed to load World 1 fixes batch');
+              document.head.appendChild(x);
+            };
             document.head.appendChild(f);
           };
           document.head.appendChild(b);
