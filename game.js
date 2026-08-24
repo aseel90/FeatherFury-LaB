@@ -1,48 +1,116 @@
 (() => {
   'use strict';
 
-  const FALLBACK_RUNTIME = 'https://cdn.jsdelivr.net/gh/aseel90/FeatherFury-LaB@5b83840d68ad65939b8efae336afd76c47b7bdc1/game.js';
-  let fallbackStarted = false;
+  let legacyStarted = false;
 
-  const inject = (src, onload, onerror) => {
+  window.__FF_START_LEGACY_PATCH_CHAIN__ = function() {
+    if (legacyStarted) return;
+    legacyStarted = true;
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/gh/aseel90/FeatherFury-LaB@5b83840d68ad65939b8efae336afd76c47b7bdc1/game.js';
+    s.async = false;
+    s.onload = () => {
+      const p = document.createElement('script');
+      p.src = 'ruins-pillars-v3.js?v=1';
+      p.async = false;
+      p.onerror = () => console.error('Failed to load Ruins pillar art override');
+      p.onload = () => {
+        const w = document.createElement('script');
+        w.src = 'cursed-woods-v1.js?v=1';
+        w.async = false;
+        w.onerror = () => console.error('Failed to load Cursed Woods atmosphere override');
+        w.onload = () => {
+          const c = document.createElement('script');
+          c.src = 'cursed-crows-v1.js?v=1';
+          c.async = false;
+          c.onerror = () => console.error('Failed to load Cursed Woods crow art override');
+          c.onload = () => {
+            const b = document.createElement('script');
+            b.src = 'boss-crowking-v1.js?v=1';
+            b.async = false;
+            b.onerror = () => console.error('Failed to load Crow King boss visual override');
+            b.onload = () => {
+              const f = document.createElement('script');
+              f.src = 'boss-fight-core-v1.js?v=1';
+              f.async = false;
+              f.onerror = () => console.error('Failed to load Crow King boss fight core override');
+              f.onload = () => {
+                const x = document.createElement('script');
+                x.src = 'w1-fixes-batch-v1.js?v=1';
+                x.async = false;
+                x.onerror = () => console.error('Failed to load World 1 fixes batch');
+                x.onload = () => {
+                  const a = document.createElement('script');
+                  a.src = 'boss-audio-fix-v2.js?v=2';
+                  a.async = false;
+                  a.onerror = () => console.error('Failed to load dedicated boss audio fixes');
+                  a.onload = () => {
+                    const fa = document.createElement('script');
+                    fa.src = 'w1-final-audio-v1.js?v=1';
+                    fa.async = false;
+                    fa.onerror = () => console.error('Failed to load World 1 final audio');
+                    fa.onload = () => {
+                      const fg = document.createElement('script');
+                      fg.src = 'w1-final-gameplay-v1.js?v=1';
+                      fg.async = false;
+                      fg.onerror = () => console.error('Failed to load World 1 final gameplay');
+                      fg.onload = () => {
+                        const fs = document.createElement('script');
+                        fs.src = 'w1-final-story-v1.js?v=1';
+                        fs.async = false;
+                        fs.onerror = () => console.error('Failed to load World 1 final story');
+                        document.head.appendChild(fs);
+                      };
+                      document.head.appendChild(fg);
+                    };
+                    document.head.appendChild(fa);
+                  };
+                  document.head.appendChild(a);
+                };
+                document.head.appendChild(x);
+              };
+              document.head.appendChild(f);
+            };
+            document.head.appendChild(b);
+          };
+          document.head.appendChild(c);
+        };
+        document.head.appendChild(w);
+      };
+      document.head.appendChild(p);
+    };
+    s.onerror = () => console.error('Failed to load stable LAB game runtime');
+    document.head.appendChild(s);
+  };
+
+  function loadBootstrapScript(src, onload, onerror) {
     const script = document.createElement('script');
     script.src = src;
     script.async = false;
-    script.onload = onload || null;
-    script.onerror = onerror || null;
+    script.onload = onload;
+    script.onerror = onerror;
     document.head.appendChild(script);
-    return script;
-  };
+  }
 
-  const fallback = (reason) => {
-    if (fallbackStarted || window.game) return;
-    fallbackStarted = true;
-    console.error('[FF-LAB] PatchRunner fallback:', reason || 'unknown');
-    inject(FALLBACK_RUNTIME, null, () => console.error('[FF-LAB] Failed to load fallback runtime'));
-  };
+  const params = new URLSearchParams(window.location.search || '');
+  if (params.get('legacyPatches') === '1') {
+    window.__FF_START_LEGACY_PATCH_CHAIN__();
+    return;
+  }
 
-  window.__FF_PATCH_RUNNER_STARTED__ = true;
-
-  inject('patch-runner/patch-runner.js?v=1', () => {
-    inject('featherfury-patches.js?v=1', () => {
-      if (!window.PatchRunner || !window.FEATHERFURY_PATCH_PLAN) {
-        fallback('runner-or-manifest-missing');
-        return;
+  loadBootstrapScript(
+    'patch-runner.js?v=1',
+    () => loadBootstrapScript(
+      'patch-manifest.js?v=1',
+      () => {},
+      () => {
+        console.error('[FeatherFury] Failed to load patch manifest; using legacy loader.');
+        window.__FF_START_LEGACY_PATCH_CHAIN__();
       }
-
-      window.PatchRunner.run(window.FEATHERFURY_PATCH_PLAN)
-        .then(result => {
-          window.__FF_PATCH_RUNNER_RESULT__ = result;
-          if (result.debug) console.log('[FF-LAB] PatchRunner ready', result);
-        })
-        .catch(error => {
-          console.error('[FF-LAB] PatchRunner critical failure', error);
-          fallback(error && error.message ? error.message : 'critical-failure');
-        });
-    }, () => fallback('manifest-load-failed'));
-  }, () => fallback('runner-load-failed'));
-
-  setTimeout(() => {
-    if (!window.game) fallback('startup-timeout');
-  }, 25000);
+    ),
+    () => {
+      console.error('[FeatherFury] Failed to load Patch Runner; using legacy loader.');
+      window.__FF_START_LEGACY_PATCH_CHAIN__();
+    }
+  );
 })();
