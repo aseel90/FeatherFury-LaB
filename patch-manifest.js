@@ -1,6 +1,5 @@
 (() => {
   'use strict';
-
   window.__FF_PATCH_BOOTING__ = true;
   const bootGate = e => {
     if (!window.__FF_PATCH_BOOTING__) return;
@@ -18,7 +17,6 @@
     document.removeEventListener('keydown', bootGate, true);
     document.removeEventListener('touchstart', bootGate, true);
   };
-
   const plan = {
     appId: 'featherfury-lab',
     entries: [
@@ -193,6 +191,13 @@
         dependsOn: ['w3-final-polish-v1'],
         readyTimeout: 3500,
         ready: () => !!window.game?.__w3BalanceVisualV2Installed
+      },
+      {
+        id: 'w3-challenge-audio-v3',
+        src: 'w3-challenge-audio-v3.js?v=1',
+        dependsOn: ['w3-balance-visual-v2'],
+        readyTimeout: 3500,
+        ready: () => !!window.game?.__w3ChallengeAudioV3Installed
       }
     ],
     onCriticalError: async () => {
@@ -202,15 +207,12 @@
       }
     }
   };
-
   window.FEATHERFURY_PATCH_PLAN = plan;
-
   if (!window.PatchRunner) {
     console.error('[FeatherFury] PatchRunner is not available.');
     window.__FF_START_LEGACY_PATCH_CHAIN__?.();
     return;
   }
-
   window.PatchRunner.run(plan).then(() => {
     releaseBootGate();
   }).catch(error => {
