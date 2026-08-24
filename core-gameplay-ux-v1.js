@@ -22,10 +22,8 @@
       #gameHud .hud-coin-badge{grid-column:1!important;justify-self:start!important;align-self:start!important}
       #gameHud .score-container{grid-column:2!important;justify-self:center!important;align-self:start!important;min-width:0!important}
       #gameHud .score-badge,#gameHud .stage-badge{text-align:center!important}
-
       #ffPauseBtn{position:fixed;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));z-index:12000;width:48px;height:48px;border:2px solid #4b5a70;border-radius:15px;background:linear-gradient(180deg,#3e4b62 0%,#2b3548 100%);display:none;align-items:center;justify-content:center;color:#fff;box-shadow:0 5px 0 #182231,0 10px 20px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.16);touch-action:manipulation}
       #ffPauseBtn.show{display:flex} #ffPauseBtn:active{transform:translateY(3px);box-shadow:0 2px 0 #182231,0 6px 12px rgba(0,0,0,.24)} #ffPauseBtn:focus-visible{outline:3px solid #facc15;outline-offset:3px}
-
       #ffPauseOverlay{position:fixed;inset:0;z-index:13000;background:#09131f;display:none;align-items:center;justify-content:center;padding:max(22px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(22px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));overflow:auto}
       #ffPauseOverlay::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 0%,rgba(251,191,36,.08),transparent 31%),linear-gradient(180deg,#0c1825 0%,#09131f 48%,#07101a 100%)}
       #ffPauseOverlay.show{display:flex}
@@ -285,20 +283,20 @@
     const originalGameOver = typeof game.gameOver === 'function' ? game.gameOver.bind(game) : null;
     if (originalGameOver) {
       game.gameOver = function(isVictory = false) {
-        if (isVictory && this.activeWorld === 0 && this.__ffVictoryCine?.phase === 'depart' && !this.__ffVictoryAllowFinish) {
-          return;
-        }
-        if (isVictory && this.activeWorld === 0 && this.state === 'BOSS_OUTRO' && !this.__ffVictoryAllowFinish) {
-          const w = cfg.CANVAS_WIDTH || 360;
-          this.__ffVictoryCine = {
-            phase:'depart', frame:0,
-            birdX:this.bird.x, birdY:this.bird.y,
-            owlX:this.owl.x, owlY:this.owl.y,
-            endX:w + 120
-          };
-          this.state = 'FLY_AWAY';
-          this.bossFeathers = []; this.powerOrbs = [];
-          return;
+        if (isVictory && this.activeWorld === 0 && !this.__ffVictoryAllowFinish) {
+          if (this.state === 'BOSS_OUTRO') {
+            const w = cfg.CANVAS_WIDTH || 360;
+            this.__ffVictoryCine = {
+              phase:'depart', frame:0,
+              birdX:this.bird.x, birdY:this.bird.y,
+              owlX:this.owl.x, owlY:this.owl.y,
+              endX:w + 120
+            };
+            this.state = 'FLY_AWAY';
+            this.bossFeathers = []; this.powerOrbs = [];
+            return;
+          }
+          if (this.state === 'FLY_AWAY' && this.__ffVictoryCine?.phase === 'depart') return;
         }
         return originalGameOver(isVictory);
       };
@@ -341,6 +339,7 @@
         }
 
         if (this.activeWorld === 0 && this.state === 'FLY_AWAY' && cine?.phase === 'depart') {
+          const r = originalUpdate();
           cine.frame++;
           const p = clamp(cine.frame / 90, 0, 1);
           const e = easeInQuad(p);
@@ -355,7 +354,7 @@
             this.__ffVictoryAllowFinish = true;
             originalGameOver(true);
           }
-          return;
+          return r;
         }
 
         return originalUpdate();
