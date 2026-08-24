@@ -137,6 +137,13 @@
         dependsOn: ['w2-audio-v1', 'w2-visuals-v1', 'w2-gameplay-v1'],
         readyTimeout: 3500,
         ready: () => !!window.game?.__w2BossPolishV2Installed
+      },
+      {
+        id: 'w2-boss-ice-v3',
+        src: 'w2-boss-ice-v3.js?v=1',
+        dependsOn: ['w2-boss-polish-v2'],
+        readyTimeout: 3500,
+        ready: () => !!window.game?.__w2BossIceV3Installed
       }
     ],
     onCriticalError: async () => {
