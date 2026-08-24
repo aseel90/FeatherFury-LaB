@@ -99,9 +99,9 @@
   }
 
   loadBootstrapScript(
-    'patch-runner.js?v=1',
+    'patch-runner.js?v=2',
     () => loadBootstrapScript(
-      'patch-manifest.js?v=1',
+      'patch-manifest.js?v=2',
       () => {},
       () => {
         console.error('[FeatherFury] Failed to load patch manifest; using legacy loader.');
