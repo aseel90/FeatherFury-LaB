@@ -19,13 +19,13 @@
         id: 'cursed-crows-v1',
         src: 'cursed-crows-v1.js?v=1',
         dependsOn: ['cursed-woods-v1'],
-        ready: () => !!window.game?.__cursedCrowArtV1Installed
+        ready: () => !!window.game?.__cursedCrowArtV2Installed
       },
       {
         id: 'boss-crowking-v1',
         src: 'boss-crowking-v1.js?v=1',
         dependsOn: ['cursed-crows-v1'],
-        ready: () => !!window.game?.__crowKingVisualV1Installed
+        ready: () => !!window.game?.__crowKingVisualV2Installed
       },
       {
         id: 'boss-fight-core-v1',
