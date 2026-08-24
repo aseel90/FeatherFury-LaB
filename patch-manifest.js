@@ -1,6 +1,24 @@
 (() => {
   'use strict';
 
+  window.__FF_PATCH_BOOTING__ = true;
+  const bootGate = e => {
+    if (!window.__FF_PATCH_BOOTING__) return;
+    if (e && e.cancelable) e.preventDefault();
+    e?.stopImmediatePropagation?.();
+  };
+  document.addEventListener('pointerdown', bootGate, true);
+  document.addEventListener('click', bootGate, true);
+  document.addEventListener('keydown', bootGate, true);
+  document.addEventListener('touchstart', bootGate, { capture: true, passive: false });
+  const releaseBootGate = () => {
+    window.__FF_PATCH_BOOTING__ = false;
+    document.removeEventListener('pointerdown', bootGate, true);
+    document.removeEventListener('click', bootGate, true);
+    document.removeEventListener('keydown', bootGate, true);
+    document.removeEventListener('touchstart', bootGate, true);
+  };
+
   const plan = {
     appId: 'featherfury-lab',
     entries: [
@@ -63,6 +81,13 @@
         src: 'w1-final-story-v1.js?v=1',
         dependsOn: ['stable-runtime'],
         ready: () => !!window.game?.__w1FinalStoryV1Installed
+      },
+      {
+        id: 'core-gameplay-ux-v1',
+        src: 'core-gameplay-ux-v1.js?v=1',
+        dependsOn: ['stable-runtime'],
+        readyTimeout: 3500,
+        ready: () => !!window.game?.__coreGameplayUxV1Installed
       }
     ],
     onCriticalError: async () => {
@@ -81,7 +106,10 @@
     return;
   }
 
-  window.PatchRunner.run(plan).catch(error => {
+  window.PatchRunner.run(plan).then(() => {
+    releaseBootGate();
+  }).catch(error => {
+    releaseBootGate();
     console.error('[FeatherFury] Patch Runner boot failed.', error);
   });
 })();
