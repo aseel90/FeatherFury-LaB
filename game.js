@@ -37,6 +37,27 @@
                 a.src = 'boss-audio-fix-v2.js?v=2';
                 a.async = false;
                 a.onerror = () => console.error('Failed to load dedicated boss audio fixes');
+                a.onload = () => {
+                  const fa = document.createElement('script');
+                  fa.src = 'w1-final-audio-v1.js?v=1';
+                  fa.async = false;
+                  fa.onerror = () => console.error('Failed to load World 1 final audio');
+                  fa.onload = () => {
+                    const fg = document.createElement('script');
+                    fg.src = 'w1-final-gameplay-v1.js?v=1';
+                    fg.async = false;
+                    fg.onerror = () => console.error('Failed to load World 1 final gameplay');
+                    fg.onload = () => {
+                      const fs = document.createElement('script');
+                      fs.src = 'w1-final-story-v1.js?v=1';
+                      fs.async = false;
+                      fs.onerror = () => console.error('Failed to load World 1 final story');
+                      document.head.appendChild(fs);
+                    };
+                    document.head.appendChild(fg);
+                  };
+                  document.head.appendChild(fa);
+                };
                 document.head.appendChild(a);
               };
               document.head.appendChild(x);
