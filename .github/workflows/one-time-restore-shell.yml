@@ -1,0 +1,69 @@
+name: One-time shell restore
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/one-time-restore-shell.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Restore exact shell paths and remove temporary repair code
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          index = Path('index.html')
+          s = index.read_text()
+          old_settings = 'c.24 0 .44.17.47-.41l.36-2.54'
+          new_settings = 'c.24 0 .44.17.47.41l.36-2.54'
+          old_lang = 'c.6-1.11 1.06-2.31 1.38-3.56-1.84-.63-3.37-1.9-4.33-3.56z'
+          new_lang = 'c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56z'
+          assert s.count(old_settings) == 1, 'settings SVG drift pattern not found exactly once'
+          assert s.count(old_lang) == 1, 'language SVG drift pattern not found exactly once'
+          s = s.replace(old_settings, new_settings, 1).replace(old_lang, new_lang, 1)
+          assert old_settings not in s and old_lang not in s
+          assert new_settings in s and new_lang in s
+          index.write_text(s)
+
+          game = Path('game.js')
+          g = game.read_text()
+          g2, n = re.subn(r"\n  // Restore the language icon path exactly; protects against accidental SVG path drift in the shell\.\n  const langIconPath = document\.querySelector\('#lang-svg path'\);\n  if \(langIconPath\) langIconPath\.setAttribute\('d', .*?\);\n", "\n", g, count=1)
+          assert n == 1, 'temporary game SVG repair block not found'
+          game.write_text(g2)
+
+          revive = Path('revive-core-fix-v1.js')
+          r = revive.read_text()
+          r2, n = re.subn(r"\n    const langIconPath = document\.querySelector\('#lang-svg path'\);\n    if \(langIconPath\) langIconPath\.setAttribute\('d', .*?\);", "", r, count=1)
+          assert n == 1, 'temporary revive SVG repair block not found'
+          revive.write_text(r2)
+          PY
+
+          node --check game.js
+          node --check revive-core-fix-v1.js
+          node --check patch-manifest.js
+          grep -q 'game.js?v=2.3.12' index.html
+          grep -q "revive-core-fix-v1.js?v=2" patch-manifest.js
+
+      - name: Commit exact restoration
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo 'No restoration needed.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html game.js revive-core-fix-v1.js
+          git commit -m 'Restore shell SVG paths after cache bust'
+          git push
