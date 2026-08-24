@@ -144,6 +144,13 @@
         dependsOn: ['w2-boss-polish-v2'],
         readyTimeout: 3500,
         ready: () => !!window.game?.__w2BossOrbV4Installed
+      },
+      {
+        id: 'w2-boss-combat-v5',
+        src: 'w2-boss-combat-v5.js?v=1',
+        dependsOn: ['w2-boss-orb-v4'],
+        readyTimeout: 3500,
+        ready: () => !!window.game?.__w2BossCombatV5Installed
       }
     ],
     onCriticalError: async () => {
