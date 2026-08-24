@@ -94,6 +94,13 @@
                                       revive.src = 'revive-core-fix-v1.js?v=1';
                                       revive.async = false;
                                       revive.onerror = () => console.error('Failed to load revive core fix');
+                                      revive.onload = () => {
+                                        const w2BossPolish = document.createElement('script');
+                                        w2BossPolish.src = 'w2-boss-polish-v2.js?v=1';
+                                        w2BossPolish.async = false;
+                                        w2BossPolish.onerror = () => console.error('Failed to load World 2 boss polish v2');
+                                        document.head.appendChild(w2BossPolish);
+                                      };
                                       document.head.appendChild(revive);
                                     };
                                     document.head.appendChild(w2g);
