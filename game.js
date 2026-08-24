@@ -61,7 +61,7 @@
                         fs.onerror = () => console.error('Failed to load World 1 final story');
                         fs.onload = () => {
                           const ux = document.createElement('script');
-                          ux.src = 'core-gameplay-ux-v1.js?v=2';
+                          ux.src = 'core-gameplay-ux-v1.js?v=3';
                           ux.async = false;
                           ux.onerror = () => console.error('Failed to load core gameplay UX patch');
                           document.head.appendChild(ux);
@@ -108,7 +108,7 @@
   loadBootstrapScript(
     'patch-runner.js?v=3',
     () => loadBootstrapScript(
-      'patch-manifest.js?v=4',
+      'patch-manifest.js?v=5',
       () => {},
       () => {
         console.error('[FeatherFury] Failed to load patch manifest; using legacy loader.');

@@ -84,7 +84,7 @@
       },
       {
         id: 'core-gameplay-ux-v1',
-        src: 'core-gameplay-ux-v1.js?v=2',
+        src: 'core-gameplay-ux-v1.js?v=3',
         dependsOn: ['stable-runtime'],
         readyTimeout: 3500,
         ready: () => !!window.game?.__coreGameplayUxV1Installed
