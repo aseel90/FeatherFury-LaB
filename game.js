@@ -74,6 +74,34 @@
                               finalPolish.src = 'world1-final-polish-v1.js?v=1';
                               finalPolish.async = false;
                               finalPolish.onerror = () => console.error('Failed to load World 1 final polish');
+                              finalPolish.onload = () => {
+                                const w2a = document.createElement('script');
+                                w2a.src = 'w2-audio-v1.js?v=1';
+                                w2a.async = false;
+                                w2a.onerror = () => console.error('Failed to load World 2 audio');
+                                w2a.onload = () => {
+                                  const w2v = document.createElement('script');
+                                  w2v.src = 'w2-visuals-v1.js?v=1';
+                                  w2v.async = false;
+                                  w2v.onerror = () => console.error('Failed to load World 2 visuals');
+                                  w2v.onload = () => {
+                                    const w2g = document.createElement('script');
+                                    w2g.src = 'w2-gameplay-v1.js?v=1';
+                                    w2g.async = false;
+                                    w2g.onerror = () => console.error('Failed to load World 2 gameplay');
+                                    w2g.onload = () => {
+                                      const revive = document.createElement('script');
+                                      revive.src = 'revive-core-fix-v1.js?v=1';
+                                      revive.async = false;
+                                      revive.onerror = () => console.error('Failed to load revive core fix');
+                                      document.head.appendChild(revive);
+                                    };
+                                    document.head.appendChild(w2g);
+                                  };
+                                  document.head.appendChild(w2v);
+                                };
+                                document.head.appendChild(w2a);
+                              };
                               document.head.appendChild(finalPolish);
                             };
                             document.head.appendChild(polish);
@@ -122,7 +150,7 @@
   loadBootstrapScript(
     'patch-runner.js?v=3',
     () => loadBootstrapScript(
-      'patch-manifest.js?v=6',
+      'patch-manifest.js?v=7',
       () => {},
       () => {
         console.error('[FeatherFury] Failed to load patch manifest; using legacy loader.');
