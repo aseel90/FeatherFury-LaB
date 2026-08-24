@@ -226,17 +226,20 @@
     const originalGameOver = typeof game.gameOver === 'function' ? game.gameOver.bind(game) : null;
     if (originalGameOver) {
       game.gameOver = function(isVictory = false) {
-        if (isVictory && this.activeWorld === 0 && this.state === 'BOSS_OUTRO' && !this.__ffVictoryAllowFinish) {
-          const w = cfg.CANVAS_WIDTH || 360;
-          this.__ffVictoryCine = {
-            phase:'depart', frame:0,
-            birdX:this.bird.x, birdY:this.bird.y,
-            owlX:this.owl.x, owlY:this.owl.y,
-            endX:w + 120
-          };
-          this.state = 'FLY_AWAY';
-          this.bossFeathers = []; this.powerOrbs = [];
-          return;
+        if (isVictory && this.activeWorld === 0 && !this.__ffVictoryAllowFinish) {
+          if (this.state === 'BOSS_OUTRO') {
+            const w = cfg.CANVAS_WIDTH || 360;
+            this.__ffVictoryCine = {
+              phase:'depart', frame:0,
+              birdX:this.bird.x, birdY:this.bird.y,
+              owlX:this.owl.x, owlY:this.owl.y,
+              endX:w + 120
+            };
+            this.state = 'FLY_AWAY';
+            this.bossFeathers = []; this.powerOrbs = [];
+            return;
+          }
+          if (this.state === 'FLY_AWAY' && this.__ffVictoryCine?.phase === 'depart') return;
         }
         return originalGameOver(isVictory);
       };
