@@ -64,6 +64,13 @@
                           ux.src = 'core-gameplay-ux-v1.js?v=3';
                           ux.async = false;
                           ux.onerror = () => console.error('Failed to load core gameplay UX patch');
+                          ux.onload = () => {
+                            const polish = document.createElement('script');
+                            polish.src = 'pause-hud-polish-v2.js?v=1';
+                            polish.async = false;
+                            polish.onerror = () => console.error('Failed to load pause/HUD polish patch');
+                            document.head.appendChild(polish);
+                          };
                           document.head.appendChild(ux);
                         };
                         document.head.appendChild(fs);

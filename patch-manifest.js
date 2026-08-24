@@ -88,6 +88,13 @@
         dependsOn: ['stable-runtime'],
         readyTimeout: 3500,
         ready: () => !!window.game?.__coreGameplayUxV1Installed
+      },
+      {
+        id: 'pause-hud-polish-v2',
+        src: 'pause-hud-polish-v2.js?v=1',
+        dependsOn: ['stable-runtime'],
+        readyTimeout: 2500,
+        ready: () => !!window.game?.__pauseHudPolishV2Installed
       }
     ],
     onCriticalError: async () => {
