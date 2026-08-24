@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "id": "example-safe-change",
+  "description": "Example only. Copy this file and replace the target/anchors.",
+  "safety": {
+    "maxFileShrinkPercent": 20,
+    "maxFileGrowthPercent": 100
+  },
+  "files": [
+    {
+      "path": "path/to/file.js",
+      "syntax": "js",
+      "operations": [
+        {
+          "type": "replace",
+          "find": "const before = true;",
+          "replace": "const before = false;",
+          "expected": 1
+        }
+      ],
+      "postconditions": [
+        {
+          "contains": "const before = false;",
+          "expected": 1
+        }
+      ]
+    }
+  ]
+}

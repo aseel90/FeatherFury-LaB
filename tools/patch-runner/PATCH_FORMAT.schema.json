@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://featherfury.local/schemas/patch-runner-v1.json",
+  "title": "Patch Runner Manifest v1",
+  "type": "object",
+  "required": ["version", "id", "files"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "description": { "type": "string" },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "maxFileShrinkPercent": { "type": "number", "minimum": 0, "maximum": 100 },
+        "maxFileGrowthPercent": { "type": "number", "minimum": 0 }
+      }
+    },
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["path", "operations"],
+        "additionalProperties": false,
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "expectedSha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+          "syntax": { "enum": ["js"] },
+          "operations": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["type", "find", "replace"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "type": { "const": "replace" },
+                    "find": { "type": "string", "minLength": 1 },
+                    "replace": { "type": "string" },
+                    "expected": { "type": "integer", "minimum": 1 }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["type", "anchor", "content"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "type": { "enum": ["insertAfter", "insertBefore"] },
+                    "anchor": { "type": "string", "minLength": 1 },
+                    "content": { "type": "string" },
+                    "expected": { "type": "integer", "minimum": 1 }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["type", "find"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "type": { "const": "delete" },
+                    "find": { "type": "string", "minLength": 1 },
+                    "expected": { "type": "integer", "minimum": 1 }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["type", "contains"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "type": { "const": "assert" },
+                    "contains": { "type": "string", "minLength": 1 },
+                    "expected": { "type": "integer", "minimum": 1 }
+                  }
+                }
+              ]
+            }
+          },
+          "postconditions": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["contains"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "contains": { "type": "string", "minLength": 1 },
+                    "expected": { "type": "integer", "minimum": 1 }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["notContains"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "notContains": { "type": "string", "minLength": 1 }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}
