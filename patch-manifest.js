@@ -139,11 +139,11 @@
         ready: () => !!window.game?.__w2BossPolishV2Installed
       },
       {
-        id: 'w2-boss-ice-v3',
-        src: 'w2-boss-ice-v3.js?v=1',
+        id: 'w2-boss-orb-v4',
+        src: 'w2-boss-orb-v4.js?v=1',
         dependsOn: ['w2-boss-polish-v2'],
         readyTimeout: 3500,
-        ready: () => !!window.game?.__w2BossIceV3Installed
+        ready: () => !!window.game?.__w2BossOrbV4Installed
       }
     ],
     onCriticalError: async () => {
