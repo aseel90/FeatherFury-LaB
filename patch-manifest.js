@@ -14,54 +14,54 @@
         ready: () => !!window.game
       },
       { id: 'ruins-pillars-v3', src: 'ruins-pillars-v3.js?v=1', dependsOn: ['stable-runtime'] },
-      { id: 'cursed-woods-v1', src: 'cursed-woods-v1.js?v=1', dependsOn: ['ruins-pillars-v3'] },
+      { id: 'cursed-woods-v1', src: 'cursed-woods-v1.js?v=1', dependsOn: ['stable-runtime'] },
       {
         id: 'cursed-crows-v1',
         src: 'cursed-crows-v1.js?v=1',
-        dependsOn: ['cursed-woods-v1'],
+        dependsOn: ['stable-runtime'],
         ready: () => !!window.game?.__cursedCrowArtV2Installed
       },
       {
         id: 'boss-crowking-v1',
         src: 'boss-crowking-v1.js?v=1',
-        dependsOn: ['cursed-crows-v1'],
+        dependsOn: ['stable-runtime'],
         ready: () => !!window.game?.__crowKingVisualV2Installed
       },
       {
         id: 'boss-fight-core-v1',
         src: 'boss-fight-core-v1.js?v=1',
-        dependsOn: ['boss-crowking-v1'],
+        dependsOn: ['stable-runtime'],
         readyTimeout: 3500,
         ready: () => !!window.game?.__bossFightCoreV1Installed
       },
       {
         id: 'w1-fixes-batch-v1',
         src: 'w1-fixes-batch-v1.js?v=1',
-        dependsOn: ['boss-fight-core-v1'],
+        dependsOn: ['stable-runtime'],
         ready: () => !!window.game?.__w1FixesBatchV1Installed
       },
       {
         id: 'boss-audio-fix-v2',
         src: 'boss-audio-fix-v2.js?v=2',
-        dependsOn: ['w1-fixes-batch-v1'],
+        dependsOn: ['stable-runtime'],
         ready: () => !!window.game?.__bossAudioFixV2Installed
       },
       {
         id: 'w1-final-audio-v1',
         src: 'w1-final-audio-v1.js?v=1',
-        dependsOn: ['boss-audio-fix-v2'],
+        dependsOn: ['stable-runtime'],
         ready: () => !!window.game?.__w1FinalAudioV1Installed
       },
       {
         id: 'w1-final-gameplay-v1',
         src: 'w1-final-gameplay-v1.js?v=1',
-        dependsOn: ['w1-final-audio-v1'],
+        dependsOn: ['stable-runtime'],
         ready: () => !!window.game?.__w1FinalGameplayV1Installed
       },
       {
         id: 'w1-final-story-v1',
         src: 'w1-final-story-v1.js?v=1',
-        dependsOn: ['w1-final-gameplay-v1'],
+        dependsOn: ['stable-runtime'],
         ready: () => !!window.game?.__w1FinalStoryV1Installed
       }
     ],
