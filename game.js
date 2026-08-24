@@ -17,6 +17,13 @@
         c.src = 'cursed-crows-v1.js?v=1';
         c.async = false;
         c.onerror = () => console.error('Failed to load Cursed Woods crow art override');
+        c.onload = () => {
+          const b = document.createElement('script');
+          b.src = 'boss-crowking-v1.js?v=1';
+          b.async = false;
+          b.onerror = () => console.error('Failed to load Crow King boss visual override');
+          document.head.appendChild(b);
+        };
         document.head.appendChild(c);
       };
       document.head.appendChild(w);
