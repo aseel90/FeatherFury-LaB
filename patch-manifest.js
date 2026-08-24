@@ -172,6 +172,20 @@
         dependsOn: ['w3-foundation-v1'],
         readyTimeout: 3500,
         ready: () => !!window.game?.__w3WorldPolishV1Installed
+      },
+      {
+        id: 'w3-boss-v1',
+        src: 'w3-boss-v1.js?v=1',
+        dependsOn: ['w3-world-polish-v1'],
+        readyTimeout: 3500,
+        ready: () => !!window.game?.__w3BossV1Installed
+      },
+      {
+        id: 'w3-final-polish-v1',
+        src: 'w3-final-polish-v1.js?v=1',
+        dependsOn: ['w3-boss-v1'],
+        readyTimeout: 3500,
+        ready: () => !!window.game?.__w3FinalPolishV1Installed
       }
     ],
     onCriticalError: async () => {
