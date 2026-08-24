@@ -17,22 +17,33 @@
     const style = document.createElement('style');
     style.id = 'ff-core-gameplay-ux-style';
     style.textContent = `
-      #ffPauseBtn{position:fixed;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));z-index:12000;width:46px;height:46px;border:2px solid rgba(255,255,255,.22);border-radius:14px;background:rgba(15,23,42,.82);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;color:#fff;box-shadow:0 8px 28px rgba(0,0,0,.28);touch-action:manipulation}
-      #ffPauseBtn.show{display:flex} #ffPauseBtn:focus-visible{outline:3px solid #facc15;outline-offset:3px}
-      #ffPauseOverlay{position:fixed;inset:0;z-index:13000;background:#09131f;display:none;align-items:center;justify-content:center;padding:max(20px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));overflow:auto}
-      #ffPauseOverlay::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 0%,rgba(251,191,36,.08),transparent 30%),linear-gradient(180deg,#0c1825 0%,#09131f 45%,#07101a 100%)}
+      /* HUD: keep score truly centered after moving sound control into Pause. */
+      #gameHud .hud-top{display:grid!important;grid-template-columns:1fr auto 1fr!important;align-items:start!important;width:100%!important;position:relative!important}
+      #gameHud .hud-coin-badge{grid-column:1!important;justify-self:start!important;align-self:start!important}
+      #gameHud .score-container{grid-column:2!important;justify-self:center!important;align-self:start!important;min-width:0!important}
+      #gameHud .score-badge,#gameHud .stage-badge{text-align:center!important}
+      #ffPauseBtn{position:fixed;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));z-index:12000;width:48px;height:48px;border:2px solid #4b5a70;border-radius:15px;background:linear-gradient(180deg,#3e4b62 0%,#2b3548 100%);display:none;align-items:center;justify-content:center;color:#fff;box-shadow:0 5px 0 #182231,0 10px 20px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.16);touch-action:manipulation}
+      #ffPauseBtn.show{display:flex} #ffPauseBtn:active{transform:translateY(3px);box-shadow:0 2px 0 #182231,0 6px 12px rgba(0,0,0,.24)} #ffPauseBtn:focus-visible{outline:3px solid #facc15;outline-offset:3px}
+      #ffPauseOverlay{position:fixed;inset:0;z-index:13000;background:#09131f;display:none;align-items:center;justify-content:center;padding:max(22px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(22px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));overflow:auto}
+      #ffPauseOverlay::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 0%,rgba(251,191,36,.08),transparent 31%),linear-gradient(180deg,#0c1825 0%,#09131f 48%,#07101a 100%)}
       #ffPauseOverlay.show{display:flex}
-      #ffPausePanel{position:relative;z-index:1;width:min(92vw,430px);display:flex;flex-direction:column;align-items:stretch;gap:14px;text-align:center}
-      #ffPauseTitle{margin:0 0 4px;font-family:'Tajawal',sans-serif;font-size:clamp(1.45rem,5vw,1.8rem);color:#f1c40f;text-shadow:0 2px 12px rgba(241,196,15,.18)}
-      #ffPausePanel .settings-panel{gap:12px;background:rgba(0,0,0,.5);padding:18px;border-radius:16px;border:2px solid #334155}
-      #ffPausePanel .setting-row{min-height:44px;gap:16px;text-align:start}
-      #ffPauseSoundSlot{display:flex;align-items:center;justify-content:flex-end;min-width:52px}
-      #ffPauseSoundSlot #soundToggleBtn{position:static!important;display:inline-flex!important;width:44px;height:44px;margin:0!important;border-radius:13px;background:rgba(15,23,42,.9)!important;border:1px solid #475569!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);color:#e2e8f0}
-      #ffPauseActions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-      #ffPauseActions .arcade-btn,#ffPauseActions .secondary-btn{width:100%;min-height:48px;margin:0;padding:10px 12px;font-family:'Tajawal',sans-serif;font-size:.95rem;font-weight:800;border-radius:15px}
-      #ffPauseActions [data-action="resume"]{grid-column:1/-1;min-height:54px}
-      #ffPauseActions [data-action="menu"]{grid-column:1/-1}
-      @media(max-width:380px){#ffPauseActions{grid-template-columns:1fr}#ffPauseActions [data-action]{grid-column:1!important}}
+      #ffPausePanel{position:relative;z-index:1;width:min(92vw,430px);display:flex;flex-direction:column;align-items:stretch;gap:16px;text-align:center}
+      #ffPauseTitle{margin:0;color:#f1c40f;font-family:'Tajawal',sans-serif;font-size:clamp(1.6rem,6vw,2rem);font-weight:900;letter-spacing:.2px;text-shadow:0 2px 0 #5d4a00,0 5px 14px rgba(241,196,15,.18)}
+      #ffPauseCard{position:relative;display:flex;flex-direction:column;gap:14px;padding:20px 18px 18px;border:3px solid #334155;border-radius:22px;background:rgba(3,8,14,.84);box-shadow:0 7px 0 #02060a,0 18px 34px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.04)}
+      #ffPauseCard::before{content:"";position:absolute;left:16px;right:16px;top:-3px;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,rgba(241,196,15,.85),transparent)}
+      #ffPausePanel .setting-row{display:flex!important;justify-content:space-between!important;align-items:center!important;gap:16px!important;min-height:52px!important;padding:2px 0!important;color:#e2e8f0!important;font-family:'Tajawal',sans-serif!important;font-size:1rem!important;font-weight:800!important;text-align:start!important}
+      #ffPauseSoundSlot{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:132px;padding:4px 10px;border:2px solid #1f618d;border-radius:25px;background:linear-gradient(135deg,#3498db,#2980b9);box-shadow:0 4px 0 #1a5276,0 6px 14px rgba(0,0,0,.28);color:#fff;cursor:pointer;user-select:none}
+      #ffPauseSoundSlot:active{transform:translateY(3px);box-shadow:0 1px 0 #1a5276}
+      #ffPauseSoundSlot #soundToggleBtn{position:static!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;width:34px!important;height:34px!important;min-width:34px!important;margin:0!important;padding:0!important;border:0!important;border-radius:50%!important;background:transparent!important;box-shadow:none!important;color:#fff!important;pointer-events:auto}
+      #ffPauseSoundState{min-width:68px;text-align:center;color:#fff;font-family:'Tajawal',sans-serif;font-size:.92rem;font-weight:900;line-height:1}
+      #ffPauseDivider{height:1px;background:#334155;margin:2px 0 0}
+      #ffPauseActions{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+      #ffPauseActions button{width:100%;min-height:50px;margin:0;padding:10px 12px;border-radius:18px;font-family:'Tajawal',sans-serif;font-size:.98rem;font-weight:900;color:#fff;cursor:pointer;transition:transform .08s,filter .08s}
+      #ffPauseActions [data-action="resume"]{grid-column:1/-1;min-height:56px;background:linear-gradient(135deg,#3498db,#2980b9);border:2px solid #1f618d;box-shadow:0 5px 0 #1a5276,0 8px 16px rgba(0,0,0,.28)}
+      #ffPauseActions [data-action="restart"],#ffPauseActions [data-action="settings"]{background:linear-gradient(180deg,#475569,#334155);border:2px solid #253449;box-shadow:0 4px 0 #172231,0 7px 14px rgba(0,0,0,.25)}
+      #ffPauseActions [data-action="menu"]{grid-column:1/-1;background:linear-gradient(180deg,#263548,#1c2938);border:2px solid #111c29;box-shadow:0 4px 0 #0b121c,0 7px 14px rgba(0,0,0,.24);color:#e2e8f0}
+      #ffPauseActions button:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.55)!important} #ffPauseActions button:focus-visible{outline:3px solid #facc15;outline-offset:3px}
+      @media(max-width:380px){#ffPausePanel{width:min(94vw,360px)}#ffPauseCard{padding:17px 14px 15px}#ffPauseActions{grid-template-columns:1fr}#ffPauseActions [data-action]{grid-column:1!important}}
       #ffPerfHud{position:fixed;left:max(8px,env(safe-area-inset-left));top:max(8px,env(safe-area-inset-top));z-index:14000;display:none;pointer-events:none;background:rgba(2,6,23,.78);border:1px solid rgba(255,255,255,.13);border-radius:9px;padding:6px 8px;color:#e2e8f0;font:600 10px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre;text-shadow:0 1px 2px #000}
       #ffPerfHud.show{display:block}
     `;
@@ -49,26 +60,41 @@
     pauseOverlay.innerHTML = `
       <div id="ffPausePanel" role="dialog" aria-modal="true" aria-labelledby="ffPauseTitle">
         <h2 id="ffPauseTitle">إيقاف مؤقت</h2>
-        <div class="settings-panel">
+        <div id="ffPauseCard">
           <div class="setting-row">
-            <span id="ffPauseSoundLabel">الصوت</span>
-            <div id="ffPauseSoundSlot"></div>
+            <span id="ffPauseSoundLabel">المؤثرات الصوتية</span>
+            <div id="ffPauseSoundSlot" role="button" tabindex="0" aria-label="Toggle sound">
+              <span id="ffPauseSoundState">مفعل</span>
+            </div>
           </div>
-        </div>
-        <div id="ffPauseActions">
-          <button type="button" class="arcade-btn" data-action="resume">متابعة</button>
-          <button type="button" class="secondary-btn" data-action="restart">إعادة اللعب</button>
-          <button type="button" class="secondary-btn" data-action="settings">الإعدادات</button>
-          <button type="button" class="arcade-btn return-btn" data-action="menu">القائمة الرئيسية</button>
+          <div id="ffPauseDivider"></div>
+          <div id="ffPauseActions">
+            <button type="button" data-action="resume">متابعة</button>
+            <button type="button" data-action="restart">إعادة اللعب</button>
+            <button type="button" data-action="settings">الإعدادات</button>
+            <button type="button" data-action="menu">القائمة الرئيسية</button>
+          </div>
         </div>
       </div>`;
     document.body.append(pauseBtn, pauseOverlay);
 
     const existingSoundToggle = document.getElementById('soundToggleBtn');
     const pauseSoundSlot = pauseOverlay.querySelector('#ffPauseSoundSlot');
+    const pauseSoundState = pauseOverlay.querySelector('#ffPauseSoundState');
     if (existingSoundToggle && pauseSoundSlot) {
-      pauseSoundSlot.appendChild(existingSoundToggle);
+      pauseSoundSlot.insertBefore(existingSoundToggle, pauseSoundState || null);
       existingSoundToggle.setAttribute('aria-label', game.lang === 'ar' ? 'تشغيل أو كتم الصوت' : 'Toggle sound');
+    }
+    const updateSoundState = () => {
+      const ar = game.lang === 'ar';
+      const off = !!game.sound?.muted || game.sound?.sfxEnabled === false;
+      if (pauseSoundState) pauseSoundState.textContent = ar ? (off ? 'مكتوم' : 'مفعل') : (off ? 'Muted' : 'Enabled');
+      if (pauseSoundSlot) pauseSoundSlot.setAttribute('aria-pressed', off ? 'false' : 'true');
+    };
+    if (existingSoundToggle) existingSoundToggle.addEventListener('click', () => setTimeout(updateSoundState, 0));
+    if (pauseSoundSlot) {
+      pauseSoundSlot.addEventListener('click', e => { if (e.target !== existingSoundToggle && !e.target.closest?.('#soundToggleBtn')) existingSoundToggle?.click(); });
+      pauseSoundSlot.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); existingSoundToggle?.click(); } });
     }
 
     // Temporary LAB testing price. Restore the final value after boss/revive QA.
@@ -82,12 +108,14 @@
     const updatePauseLabels = () => {
       const ar = game.lang === 'ar';
       const labels = ar
-        ? { title:'إيقاف مؤقت', sound:'الصوت', resume:'متابعة', restart:'إعادة اللعب', settings:'الإعدادات', menu:'القائمة الرئيسية' }
-        : { title:'Paused', sound:'Sound', resume:'Resume', restart:'Restart', settings:'Settings', menu:'Main Menu' };
+        ? { title:'إيقاف مؤقت', sound:'المؤثرات الصوتية', resume:'متابعة', restart:'إعادة اللعب', settings:'الإعدادات', menu:'القائمة الرئيسية' }
+        : { title:'Paused', sound:'Sound Effects', resume:'Resume', restart:'Restart', settings:'Settings', menu:'Main Menu' };
       pauseOverlay.querySelector('#ffPauseTitle').textContent = labels.title;
       const soundLabel = pauseOverlay.querySelector('#ffPauseSoundLabel');
       if (soundLabel) soundLabel.textContent = labels.sound;
       if (existingSoundToggle) existingSoundToggle.setAttribute('aria-label', ar ? 'تشغيل أو كتم الصوت' : 'Toggle sound');
+      if (pauseSoundSlot) pauseSoundSlot.setAttribute('aria-label', ar ? 'تشغيل أو كتم المؤثرات الصوتية' : 'Toggle sound effects');
+      updateSoundState();
       Object.keys(labels).forEach(k => {
         const b = pauseOverlay.querySelector(`[data-action="${k}"]`);
         if (b) b.textContent = labels[k];
