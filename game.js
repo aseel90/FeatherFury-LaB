@@ -22,6 +22,13 @@
           b.src = 'boss-crowking-v1.js?v=1';
           b.async = false;
           b.onerror = () => console.error('Failed to load Crow King boss visual override');
+          b.onload = () => {
+            const f = document.createElement('script');
+            f.src = 'boss-fight-core-v1.js?v=1';
+            f.async = false;
+            f.onerror = () => console.error('Failed to load Crow King boss fight core override');
+            document.head.appendChild(f);
+          };
           document.head.appendChild(b);
         };
         document.head.appendChild(c);
