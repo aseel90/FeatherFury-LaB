@@ -14,7 +14,7 @@
         ready: () => !!window.game
       },
       { id: 'ruins-pillars-v3', src: 'ruins-pillars-v3.js?v=1', dependsOn: ['stable-runtime'] },
-      { id: 'cursed-woods-v1', src: 'cursed-woods-v1.js?v=1', dependsOn: ['stable-runtime'] },
+      { id: 'cursed-woods-v1', src: 'cursed-woods-v1.js?v=2', dependsOn: ['stable-runtime'] },
       {
         id: 'cursed-crows-v1',
         src: 'cursed-crows-v1.js?v=1',
