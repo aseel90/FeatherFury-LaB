@@ -170,7 +170,7 @@
       let r;
       try { r = priorUpdateBoss(); } finally { if(s){ s.playFlap=flap; s.playLaunch=launch; s.playSmash=smash; s.playBossScream=oldCry; } }
       const afterCount = Array.isArray(this.bossFeathers) ? this.bossFeathers.length : 0;
-      if (afterCount > beforeCount) this.sound?.playBossFeatherWhoosh?.(this.boss.enraged ? 1.08 : 0.95);
+      // boss-audio-fix-v2 already emits the dedicated feather whoosh; do not double-trigger it here.
       if (oldState !== this.boss.state) {
         if (this.boss.state === 'DASH_PREP') this.sound?.playBossDashPrep?.();
         if (this.boss.state === 'DASHING') this.sound?.playBossDash?.();
