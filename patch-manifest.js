@@ -95,6 +95,13 @@
         dependsOn: ['stable-runtime'],
         readyTimeout: 2500,
         ready: () => !!window.game?.__pauseHudPolishV2Installed
+      },
+      {
+        id: 'world1-final-polish-v1',
+        src: 'world1-final-polish-v1.js?v=1',
+        dependsOn: ['stable-runtime'],
+        readyTimeout: 2500,
+        ready: () => !!window.game?.__world1FinalPolishV1Installed
       }
     ],
     onCriticalError: async () => {

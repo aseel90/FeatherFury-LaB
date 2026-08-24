@@ -69,6 +69,13 @@
                             polish.src = 'pause-hud-polish-v2.js?v=1';
                             polish.async = false;
                             polish.onerror = () => console.error('Failed to load pause/HUD polish patch');
+                            polish.onload = () => {
+                              const finalPolish = document.createElement('script');
+                              finalPolish.src = 'world1-final-polish-v1.js?v=1';
+                              finalPolish.async = false;
+                              finalPolish.onerror = () => console.error('Failed to load World 1 final polish');
+                              document.head.appendChild(finalPolish);
+                            };
                             document.head.appendChild(polish);
                           };
                           document.head.appendChild(ux);
@@ -115,7 +122,7 @@
   loadBootstrapScript(
     'patch-runner.js?v=3',
     () => loadBootstrapScript(
-      'patch-manifest.js?v=5',
+      'patch-manifest.js?v=6',
       () => {},
       () => {
         console.error('[FeatherFury] Failed to load patch manifest; using legacy loader.');
