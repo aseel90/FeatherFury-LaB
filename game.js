@@ -16,7 +16,7 @@
       p.onerror = () => console.error('Failed to load Ruins pillar art override');
       p.onload = () => {
         const w = document.createElement('script');
-        w.src = 'cursed-woods-v1.js?v=1';
+        w.src = 'cursed-woods-v1.js?v=2';
         w.async = false;
         w.onerror = () => console.error('Failed to load Cursed Woods atmosphere override');
         w.onload = () => {
@@ -59,6 +59,13 @@
                         fs.src = 'w1-final-story-v1.js?v=1';
                         fs.async = false;
                         fs.onerror = () => console.error('Failed to load World 1 final story');
+                        fs.onload = () => {
+                          const ux = document.createElement('script');
+                          ux.src = 'core-gameplay-ux-v1.js?v=1';
+                          ux.async = false;
+                          ux.onerror = () => console.error('Failed to load core gameplay UX patch');
+                          document.head.appendChild(ux);
+                        };
                         document.head.appendChild(fs);
                       };
                       document.head.appendChild(fg);
@@ -99,9 +106,9 @@
   }
 
   loadBootstrapScript(
-    'patch-runner.js?v=2',
+    'patch-runner.js?v=3',
     () => loadBootstrapScript(
-      'patch-manifest.js?v=2',
+      'patch-manifest.js?v=3',
       () => {},
       () => {
         console.error('[FeatherFury] Failed to load patch manifest; using legacy loader.');
