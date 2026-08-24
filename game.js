@@ -7,6 +7,13 @@
     p.src = 'ruins-pillars-v3.js?v=1';
     p.async = false;
     p.onerror = () => console.error('Failed to load Ruins pillar art override');
+    p.onload = () => {
+      const w = document.createElement('script');
+      w.src = 'cursed-woods-v1.js?v=1';
+      w.async = false;
+      w.onerror = () => console.error('Failed to load Cursed Woods atmosphere override');
+      document.head.appendChild(w);
+    };
     document.head.appendChild(p);
   };
   s.onerror = () => console.error('Failed to load stable LAB game runtime');
