@@ -273,10 +273,14 @@
 
     function queueThreeShotBurst(g, s) {
       if (s.burstQueue.length || !g.boss?.active || g.boss.state === 'EXPLODING') return;
+
+      // The bird only dodges vertically. Snapshot its Y once per burst so the
+      // three shots form a readable pattern instead of re-tracking every move.
+      const lockedY = clamp(g.bird.y, 54, GROUND() - 42);
       s.burstQueue = [
-        { delay: 0, offset: -74 },
-        { delay: 5, offset: 0 },
-        { delay: 10, offset: 74 }
+        { delay: 0,  targetY: lockedY - 112 },
+        { delay: 10, targetY: lockedY },
+        { delay: 20, targetY: lockedY + 112 }
       ];
     }
 
@@ -295,8 +299,9 @@
       for (const item of due) {
         const startX = g.boss.x - 28;
         const startY = g.boss.y - 44;
-        const vx = -8.15;
-        const targetY = clamp(g.bird.y + item.offset, 24, GROUND() - 28);
+        // Slower travel gives a fixed-X player enough time to move up/down.
+        const vx = -5.85;
+        const targetY = clamp(item.targetY, 34, GROUND() - 32);
         const vy = ballisticVy(startX, startY, targetY, vx);
         g.snowballs.push({
           x: startX,
