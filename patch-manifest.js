@@ -49,7 +49,7 @@
       { id:'w3-balance-visual-v2',src:'w3-balance-visual-v2.js?v=1',dependsOn:['w3-final-polish-v1'],readyTimeout:3500,ready:()=>!!window.game?.__w3BalanceVisualV2Installed },
       { id:'w3-challenge-audio-v3',src:'w3-challenge-audio-v3.js?v=1',dependsOn:['w3-balance-visual-v2'],readyTimeout:3500,ready:()=>!!window.game?.__w3ChallengeAudioV3Installed },
       { id:'w3-final-balance-v4',src:'w3-final-balance-v4.js?v=1',dependsOn:['w3-challenge-audio-v3'],readyTimeout:4000,ready:()=>!!window.game?.__w3FinalBalanceV4Installed },
-      { id:'w3-critical-fix-v5',src:'w3-critical-fix-v5.js?v=1',dependsOn:['w3-final-balance-v4'],readyTimeout:3000,ready:()=>!!window.game?.__w3CriticalFixV5Installed }
+      { id:'w3-critical-fix-v6',src:'w3-critical-fix-v6.js?v=1',dependsOn:['w3-final-balance-v4'],readyTimeout:3000,ready:()=>!!window.game?.__w3CriticalFixV6Installed }
     ],
     onCriticalError: async () => { if (typeof window.__FF_START_LEGACY_PATCH_CHAIN__ === 'function') { console.warn('[FeatherFury] Patch Runner critical failure; starting legacy loader fallback.'); window.__FF_START_LEGACY_PATCH_CHAIN__(); } }
   };
