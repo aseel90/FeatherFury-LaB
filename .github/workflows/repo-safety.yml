@@ -1,0 +1,85 @@
+name: Repository Safety Checks
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: JavaScript syntax check
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t files < <(find . -type f -name '*.js' \
+            -not -path './node_modules/*' \
+            -not -path './.git/*' | sort)
+          for file in "${files[@]}"; do
+            echo "Checking $file"
+            node --check "$file"
+          done
+
+      - name: Critical file truncation guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          check_min_size() {
+            local file="$1"
+            local min="$2"
+            if [ ! -f "$file" ]; then
+              echo "::error::$file is missing"
+              exit 1
+            fi
+            local size
+            size=$(wc -c < "$file")
+            echo "$file = $size bytes (minimum $min)"
+            if [ "$size" -lt "$min" ]; then
+              echo "::error::$file looks unexpectedly small ($size bytes)"
+              exit 1
+            fi
+          }
+
+          check_min_size "index.html" 1000
+          check_min_size "game.js" 250
+          check_min_size "lab-ui.js" 5000
+          check_min_size "lab-ui.css" 5000
+
+      - name: Detect suspicious large shrink on pull requests
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          base="origin/${{ github.base_ref }}"
+
+          for file in index.html game.js lab-ui.js lab-ui.css; do
+            [ -f "$file" ] || continue
+            if git cat-file -e "$base:$file" 2>/dev/null; then
+              old=$(git cat-file -s "$base:$file")
+              new=$(wc -c < "$file")
+              echo "$file: $old -> $new bytes"
+              if [ "$old" -ge 1000 ] && [ $((new * 100)) -lt $((old * 55)) ]; then
+                echo "::error::$file shrank by more than 45%; review for accidental truncation"
+                exit 1
+              fi
+            fi
+          done
+
+      - name: Summary
+        run: echo "Repository safety checks passed."
