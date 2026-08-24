@@ -39,25 +39,12 @@
     document.head.appendChild(style);
 
     const soundToggle = document.getElementById('soundToggleBtn');
-    panel.innerHTML = `
-      <h2 id="ffPauseTitle">إيقاف مؤقت</h2>
-      <div id="ffPauseCard">
-        <div class="setting-row"><span id="ffPauseSoundLabel">المؤثرات الصوتية</span><div id="ffPauseSoundSlot" role="button" tabindex="0" aria-label="Toggle sound"><span id="ffPauseSoundState">مفعل</span></div></div>
-        <div class="setting-row"><span id="ffPauseResumeLabel">متابعة اللعب</span><button type="button" class="ffPausePill" data-action="resume">متابعة</button></div>
-        <div class="setting-row"><span id="ffPauseRestartLabel">إعادة المحاولة</span><button type="button" class="ffPausePill" data-action="restart">إعادة</button></div>
-        <div class="setting-row"><span id="ffPauseSettingsLabel">إعدادات اللعبة</span><button type="button" class="ffPausePill" data-action="settings">فتح</button></div>
-        <div class="setting-row ffPauseDangerRow"><span id="ffPauseMenuLabel">العودة للقائمة</span><button type="button" class="ffPausePill ffPauseDanger" data-action="menu">القائمة</button></div>
-      </div>`;
+    panel.innerHTML = `<h2 id="ffPauseTitle">إيقاف مؤقت</h2><div id="ffPauseCard"><div class="setting-row"><span id="ffPauseSoundLabel">المؤثرات الصوتية</span><div id="ffPauseSoundSlot" role="button" tabindex="0" aria-label="Toggle sound"><span id="ffPauseSoundState">مفعل</span></div></div><div class="setting-row"><span id="ffPauseResumeLabel">متابعة اللعب</span><button type="button" class="ffPausePill" data-action="resume">متابعة</button></div><div class="setting-row"><span id="ffPauseRestartLabel">إعادة المحاولة</span><button type="button" class="ffPausePill" data-action="restart">إعادة</button></div><div class="setting-row"><span id="ffPauseSettingsLabel">إعدادات اللعبة</span><button type="button" class="ffPausePill" data-action="settings">فتح</button></div><div class="setting-row ffPauseDangerRow"><span id="ffPauseMenuLabel">العودة للقائمة</span><button type="button" class="ffPausePill ffPauseDanger" data-action="menu">القائمة</button></div></div>`;
 
     const soundSlot = document.getElementById('ffPauseSoundSlot');
     const soundState = document.getElementById('ffPauseSoundState');
     if (soundToggle && soundSlot) soundSlot.insertBefore(soundToggle, soundState);
-    const refreshSound = () => {
-      const ar = game.lang === 'ar';
-      const off = !!game.sound?.muted || game.sound?.sfxEnabled === false;
-      if (soundState) soundState.textContent = ar ? (off ? 'مكتوم' : 'مفعل') : (off ? 'Muted' : 'Enabled');
-      soundSlot?.setAttribute('aria-pressed', off ? 'false' : 'true');
-    };
+    const refreshSound = () => { const ar = game.lang === 'ar'; const off = !!game.sound?.muted || game.sound?.sfxEnabled === false; if (soundState) soundState.textContent = ar ? (off ? 'مكتوم' : 'مفعل') : (off ? 'Muted' : 'Enabled'); soundSlot?.setAttribute('aria-pressed', off ? 'false' : 'true'); };
     refreshSound();
     soundToggle?.addEventListener('click', () => setTimeout(refreshSound, 0));
     soundSlot?.addEventListener('click', e => { if (e.target === soundToggle || e.target.closest?.('#soundToggleBtn')) return; soundToggle?.click(); });
@@ -72,10 +59,7 @@
       refreshSound();
     };
     let lastLang = game.lang;
-    const langWatch = setInterval(() => {
-      if (!document.body.contains(panel)) { clearInterval(langWatch); return; }
-      if (game.lang !== lastLang) { lastLang = game.lang; syncLanguage(); }
-    }, 300);
+    const langWatch = setInterval(() => { if (!document.body.contains(panel)) { clearInterval(langWatch); return; } if (game.lang !== lastLang) { lastLang = game.lang; syncLanguage(); } }, 300);
     syncLanguage();
 
     game.__pauseHudPolishV2Installed = true;
