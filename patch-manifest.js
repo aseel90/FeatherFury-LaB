@@ -186,6 +186,13 @@
         dependsOn: ['w3-boss-v1'],
         readyTimeout: 3500,
         ready: () => !!window.game?.__w3FinalPolishV1Installed
+      },
+      {
+        id: 'w3-balance-visual-v2',
+        src: 'w3-balance-visual-v2.js?v=1',
+        dependsOn: ['w3-final-polish-v1'],
+        readyTimeout: 3500,
+        ready: () => !!window.game?.__w3BalanceVisualV2Installed
       }
     ],
     onCriticalError: async () => {
