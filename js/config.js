@@ -98,7 +98,7 @@ const I18N = {
     w2_winText: 'You completed Frostbite Peaks!',
     // World 3
     w3_storyL1: 'The storm rages around the Thunder Spire...', w3_storyL2: 'Lord Voltbat prepares for the final showdown!',
-    w3_bossL1: 'You dare challenge me after defeating my allies?', w3_bossL2: 'My thunderbolts will stop your journey here!',
+    w3_bossL1: 'You dare challenge me after defeating my allies?', w3_bossL2: 'My thunderbolts will stop your journey!',
     w3_owlL1: 'Congratulations! The guardian feathers are safe and the bat lord is defeated!', w3_owlL2: 'Yet magma stirs in the distant volcanic valley.. Prepare for upcoming worlds!',
     w3_winText: 'You completed Storm Spire!',
     w3_stage1: 'Storm Spire', w3_stage2: 'Charged Clouds', w3_bossStage: 'Lord Voltbat!'
