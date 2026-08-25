@@ -25,6 +25,21 @@
     for (const src of legacyPatches) await loadScript(src);
   };
 
+  window.__FF_START_FAYRO_PREVIEW__ = async function() {
+    if (legacyStarted) return;
+    legacyStarted = true;
+    const runtimeOk = await loadScript(stableRuntime);
+    if (!runtimeOk) return;
+    const fayroPreviewPatches = [
+      'assets/fayro/fayro-frame-idle-v1.js?v=1',
+      'assets/fayro/fayro-frame-flap-up-v1.js?v=1',
+      'assets/fayro/fayro-frame-flap-down-v1.js?v=1',
+      'assets/fayro/fayro-frame-glide-v1.js?v=1',
+      'fayro-player-v1.js?v=1'
+    ];
+    for (const src of fayroPreviewPatches) await loadScript(src);
+  };
+
   const langIconPath = document.querySelector('#lang-svg path');
   if (langIconPath) {
     const d = langIconPath.getAttribute('d') || '';
@@ -32,6 +47,10 @@
   }
 
   const params = new URLSearchParams(window.location.search || '');
+  if (params.get('fayroPreview') === '1') {
+    window.__FF_START_FAYRO_PREVIEW__();
+    return;
+  }
   if (params.get('legacyPatches') === '1') {
     window.__FF_START_LEGACY_PATCH_CHAIN__();
     return;
