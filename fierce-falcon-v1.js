@@ -3,10 +3,6 @@
 
   const VERSION = 'fierce-falcon-v1';
   const baseDrawBirdSkin = window.drawBirdSkin;
-  const img = new Image();
-  img.decoding = 'async';
-  img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAACwCAYAAAD5dR9jAAABK2lDQ1BBZG9iZSBSR0IgKDE5OTgpAAAokZWPv0rDUBSHvxtFxaFWCOLgcCdRUGzVwV4q1IbaNKQpFUu6ufQLIOLg4Cg4+QIiDj6Cn6Cz4Cg4ODpL0uk2r6w8OO7H+eecwOENiaK6W4HBNNM7IgsiWm6TiK8H4QQ+/7E/OkfK1OUwAxhBQ0y6YsG3PHKb7tYqf3QcBQjOO5xwEQKxmWOeInid8VNzhG8ciowG5OeI4mwiDeJo4iiuYxXxOI1hZ7nMcVnQYM7wimuYSx0EVGm6O1Lo4q5EqeJxVleXvyF45uXrZ4yNeXfNKrKFGEhGxJBBqKKKKEVRQZ1VEF0nED7Qe4P8zY3/SS5FkGMWkRrDB0l0O8P8H/zdI1DQnqcXcC0EMT7T5j9O9GAVaD4Z9ryG+uAecf4fJM2h34RoAqUeW+wO8daO9kZ1SAhjtELgAxuY9MFA6xJ6pC3L/5zvH7n8HtD+1L9x1oVnQAAAAlwSFlzAAALEwAACxMBAJqcGAAAIABJREFUeJzs/XecXVWd9//v3Jl5z5mZ3Uwmk4QkIYQOISQhLUiAAAVxUVHwIiIqCoIiiLjxAXFxxhXFcQXF/V3+FARxv4iK4oIiuAjSO5RAkA4pCZDOZDJ9z3Pn3v39cWdnZnIymUzOvJ/368U5s7O7O+eec+4551zP43me53ke53me53ke53me53ke53me53ke53me53ke53me53ke53me53ke53me53ke53me53ke53me53ke53me53ke53me53ke53me53ke53me53ke53me53ke53me53ke53me53ke53me53ke53me53ke53me53me53ke53me53ke53me53ke53me53ke53me53ke53me53ke53me53ke53me53ke53me53ke53me53ke53me53ke53ke9/8BfQxjucqv5jMAAAAASUVORK5CYII=';
-
   const stateByCtx = new WeakMap();
   const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
@@ -17,6 +13,13 @@
       stateByCtx.set(ctx, state);
     }
     return state;
+  }
+
+  function polygon(ctx, points) {
+    ctx.beginPath();
+    ctx.moveTo(points[0][0], points[0][1]);
+    for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
+    ctx.closePath();
   }
 
   function drawPredatorFever(ctx, w, h, now) {
@@ -52,33 +55,119 @@
     ctx.restore();
   }
 
+  function drawFalconArt(ctx) {
+    const outline = '#120b08';
+    const brown = '#7c3f1d';
+    const brownHi = '#a65d2b';
+    const brownDark = '#3b2115';
+    const band = '#241710';
+    const cream = '#e6c28f';
+    const gold = '#fbbf24';
+    const goldDark = '#d97706';
+
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.fillStyle = brownDark;
+    ctx.strokeStyle = outline;
+    ctx.lineWidth = 2.1;
+    polygon(ctx, [[-16,-4],[-25,-9],[-23,-2],[-17,1]]); ctx.fill(); ctx.stroke();
+    polygon(ctx, [[-17,1],[-25,5],[-22,10],[-14,4]]); ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = brown;
+    polygon(ctx, [[-15,6],[-22,9],[-17,11],[-22,14],[-13,13],[-9,8]]); ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = brown;
+    ctx.strokeStyle = outline;
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    ctx.ellipse(0, 1, 17.5, 14.3, -0.02, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+
+    ctx.save();
+    ctx.globalAlpha = 0.42;
+    ctx.fillStyle = brownHi;
+    ctx.beginPath();
+    ctx.ellipse(-4, -5, 11, 6.5, -0.18, Math.PI, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.fillStyle = cream;
+    ctx.beginPath();
+    ctx.moveTo(-2, 12.4);
+    ctx.bezierCurveTo(2.5, 5.8, 10.5, 5.1, 16.5, 7.1);
+    ctx.bezierCurveTo(13.2, 12.5, 6.7, 15.2, -2, 12.4);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#5f2e17';
+    ctx.globalAlpha = 0.72;
+    ctx.beginPath(); ctx.ellipse(-7, 4, 1.9, 3.2, 0.25, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(-2.5, 5.3, 1.8, 3.0, 0.3, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = 1;
+
+    ctx.fillStyle = brown;
+    ctx.strokeStyle = outline;
+    ctx.lineWidth = 2.1;
+    polygon(ctx, [[-10,-11],[-12,-18],[-5,-14],[-4,-20],[2,-14],[5,-19],[8,-11]]);
+    ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = band;
+    ctx.strokeStyle = outline;
+    ctx.lineWidth = 1.9;
+    ctx.beginPath();
+    ctx.moveTo(-15,-7.6);
+    ctx.quadraticCurveTo(1,-11,15,-7.4);
+    ctx.lineTo(15.8,-3.0);
+    ctx.quadraticCurveTo(1,-5.2,-15,-3.4);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = gold;
+    ctx.strokeStyle = outline;
+    ctx.lineWidth = 1.2;
+    polygon(ctx, [[3,-8.5],[13,-6.5],[8,-4.4],[4,-5.4],[1,-6.6]]);
+    ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = outline;
+    ctx.lineWidth = 1.7;
+    ctx.beginPath();
+    ctx.moveTo(5,-5.8);
+    ctx.quadraticCurveTo(10,-5.0,13,-2.9);
+    ctx.quadraticCurveTo(10.3,2.0,6.1,1.1);
+    ctx.quadraticCurveTo(3.5,-0.4,5,-5.8);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = outline;
+    ctx.beginPath(); ctx.arc(9.8,-1.1,1.15,0,Math.PI*2); ctx.fill();
+
+    ctx.fillStyle = gold;
+    ctx.strokeStyle = outline;
+    ctx.lineWidth = 1.8;
+    polygon(ctx, [[14,-1.8],[21,1.3],[14,2.2]]); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = goldDark;
+    polygon(ctx, [[14,2.2],[20,1.3],[16.2,5.1],[13,3.3]]); ctx.fill(); ctx.stroke();
+  }
+
   function drawFalcon(ctx, x, y, rotation, scale = 1, inFever = false) {
     const now = performance.now();
     const state = getVisualState(ctx, now);
     const dt = clamp(now - state.lastTime, 0, 50);
     state.lastTime = now;
-
     const targetRotation = clamp((Number.isFinite(rotation) ? rotation : 0) * 0.46, -0.11, 0.20);
     const easing = 1 - Math.exp(-dt / 72);
     state.rotation += (targetRotation - state.rotation) * easing;
-
     const calm = Math.abs(targetRotation) < 0.055 && !inFever;
     const hoverY = calm ? Math.sin(now * 0.0062) * 0.48 : 0;
     const w = 43;
-    const h = w * (176 / 192);
+    const h = 39;
 
     ctx.save();
     ctx.translate(x, y + hoverY);
     ctx.scale(scale, scale);
     ctx.rotate(state.rotation);
-
     if (inFever) drawPredatorFever(ctx, w, h, now);
-
-    if (img.complete && img.naturalWidth) {
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(img, -w * 0.5, -h * 0.5, w, h);
-    }
+    drawFalconArt(ctx);
     ctx.restore();
   }
 
@@ -107,19 +196,10 @@
     window.game.__falconLaunchFxWrapped = true;
   }
 
-  const markReady = () => {
-    if (window.game) {
-      window.game.__fierceFalconV1Installed = true;
-      try { window.game.updatePreview?.(); } catch (_) {}
-      try { window.game.renderShop?.(); } catch (_) {}
-    }
-    window.__FF_FIERCE_FALCON_V1__ = VERSION;
-  };
-
-  if (img.complete) markReady();
-  else {
-    img.onload = markReady;
-    img.onerror = markReady;
-    setTimeout(markReady, 900);
+  if (window.game) {
+    window.game.__fierceFalconV1Installed = true;
+    try { window.game.updatePreview?.(); } catch (_) {}
+    try { window.game.renderShop?.(); } catch (_) {}
   }
+  window.__FF_FIERCE_FALCON_V1__ = VERSION;
 })();
