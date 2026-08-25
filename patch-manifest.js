@@ -25,7 +25,7 @@
       { id:'fayro-frame-flap-up-v1',src:'assets/fayro/fayro-frame-flap-up-v1.js?v=1',dependsOn:['stable-runtime'] },
       { id:'fayro-frame-flap-down-v1',src:'assets/fayro/fayro-frame-flap-down-v1.js?v=1',dependsOn:['stable-runtime'] },
       { id:'fayro-frame-glide-v1',src:'assets/fayro/fayro-frame-glide-v1.js?v=1',dependsOn:['stable-runtime'] },
-      { id:'fayro-player-v1',src:'fayro-player-v1.js?v=1',dependsOn:['fayro-frame-idle-v1','fayro-frame-flap-up-v1','fayro-frame-flap-down-v1','fayro-frame-glide-v1'],readyTimeout:2500,ready:()=>!!window.game?.__fayroPlayerV1Installed },
+      { id:'fayro-player-v1',src:'fayro-player-v1.js?v=2',dependsOn:['fayro-frame-idle-v1','fayro-frame-flap-up-v1','fayro-frame-flap-down-v1','fayro-frame-glide-v1'],readyTimeout:2500,ready:()=>!!window.game?.__fayroPlayerV2Installed },
       { id:'ruins-pillars-v3',src:'ruins-pillars-v3.js?v=1',dependsOn:['stable-runtime'] },
       { id:'cursed-woods-v1',src:'cursed-woods-v1.js?v=2',dependsOn:['stable-runtime'] },
       { id:'cursed-crows-v1',src:'cursed-crows-v1.js?v=1',dependsOn:['stable-runtime'],ready:()=>!!window.game?.__cursedCrowArtV2Installed },
