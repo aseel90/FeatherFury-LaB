@@ -49,11 +49,13 @@ const I18N = {
       'تلميح: في قتال الزعيم، اجمع كرات الطاقة الزرقاء لضربه!',
       'تلميح: يمكنك اختيار وتغيير مظهر طائرك من المتجر!'
     ],
+    // World 2
     w2_storyL1: 'رياح الصقيع تهب من قمم الجبال الباردة..', w2_storyL2: 'إمبراطور الجليد استعد بعد هزيمة ملك الغربان!',
     w2_bossL1: 'سمعت أنك هزمت ملك الغربان..', w2_bossL2: 'لكن صقيع الجبال سيوقف تقدمك هنا!',
     w2_owlL1: 'أحسنت! تم تحرير نسر الجبال..', w2_owlL2: 'بقي زعيمهم لورد خفافيش الرعد في قمة البرج!',
     w2_stage1: 'قمم الصقيع', w2_stage2: 'وادي الانهيار', w2_bossStage: 'إمبراطور الجليد!',
     w2_winText: 'لقد أكملت مرحلة قمم الصقيع بنجاح!',
+    // World 3
     w3_storyL1: 'العاصفة تشتد حول برج الرعد...', w3_storyL2: 'لورد الخفافيش يستعد للمواجهة الحاسمة!',
     w3_bossL1: 'تجرؤ على مواجهتي بعد هزيمة حلفائي؟', w3_bossL2: 'صواعق البرق ستنهي محاولتك هنا!',
     w3_owlL1: 'تهانينا! استعدنا ريشات الحماية وأحبطت خطة لورد الخفافيش!', w3_owlL2: 'لكن حمم البراكين البعيدة بدأت تثور.. استعد للمغامرات القادمة!',
@@ -88,13 +90,15 @@ const I18N = {
       'HINT: Collect blue Energy Orbs to attack the Boss!',
       'HINT: Unlock new skins in the Shop!'
     ],
+    // World 2
     w2_storyL1: 'Freezing winds blow from the mountain peaks..', w2_storyL2: 'The Ice Emperor prepared his defenses after the Crow King fell!',
     w2_bossL1: 'I heard you defeated the Crow King..', w2_bossL2: 'The freezing cold will stop you here!',
     w2_owlL1: 'Well done! The Mountain Eagle is saved..', w2_owlL2: 'Only Lord Voltbat remains at the Storm Spire!',
     w2_stage1: 'Frostbite Peaks', w2_stage2: 'Avalanche Valley', w2_bossStage: 'Ice Emperor!',
     w2_winText: 'You completed Frostbite Peaks!',
+    // World 3
     w3_storyL1: 'The storm rages around the Thunder Spire...', w3_storyL2: 'Lord Voltbat prepares for the final showdown!',
-    w3_bossL1: 'You dare challenge me after defeating my allies?', w3_bossL2: 'My thunderbolts will stop your journey!',
+    w3_bossL1: 'You dare challenge me after defeating my allies?', w3_bossL2: 'My thunderbolts will stop your journey here!',
     w3_owlL1: 'Congratulations! The guardian feathers are safe and the bat lord is defeated!', w3_owlL2: 'Yet magma stirs in the distant volcanic valley.. Prepare for upcoming worlds!',
     w3_winText: 'You completed Storm Spire!',
     w3_stage1: 'Storm Spire', w3_stage2: 'Charged Clouds', w3_bossStage: 'Lord Voltbat!'
@@ -102,19 +106,21 @@ const I18N = {
 };
 const STAGE_COLORS = {
   storm: ['#0f172a', '#1e293b'],
-  1: { top: [52, 152, 219], bot: [133, 193, 233] },
-  2: { top: [192, 57, 43], bot: [230, 126, 34] },
-  3: { top: [15, 23, 42], bot: [51, 65, 85] },
-  STORY: { top: [17, 24, 39], bot: [31, 41, 55] },
-  BOSS: { top: [30, 0, 0], bot: [10, 0, 0] },
-  'w2_1': { top: [30, 58, 138], bot: [59, 130, 246] },
-  'w2_2': { top: [71, 85, 105], bot: [148, 163, 184] },
-  'w2_BOSS': { top: [15, 23, 42], bot: [30, 64, 175] },
-  'w2_STORY': { top: [20, 30, 60], bot: [40, 60, 100] },
-  'w3_1': { top: [15, 23, 42], bot: [30, 58, 138] },
-  'w3_2': { top: [30, 27, 75], bot: [76, 29, 149] },
-  'w3_BOSS': { top: [10, 10, 30], bot: [30, 10, 60] },
-  'w3_STORY': { top: [15, 23, 42], bot: [59, 130, 246] }
+  1: { top: [52, 152, 219], bot: [133, 193, 233] }, // Day
+  2: { top: [192, 57, 43], bot: [230, 126, 34] },   // Sunset
+  3: { top: [15, 23, 42], bot: [51, 65, 85] },      // Night
+  STORY: { top: [17, 24, 39], bot: [31, 41, 55] },  // Dark Cage
+  BOSS: { top: [30, 0, 0], bot: [10, 0, 0] },       // Bloody Red
+  // World 2: Ice
+  'w2_1': { top: [30, 58, 138], bot: [59, 130, 246] },   // Frozen Night
+  'w2_2': { top: [71, 85, 105], bot: [148, 163, 184] },  // Storm Grey
+  'w2_BOSS': { top: [15, 23, 42], bot: [30, 64, 175] },  // Dark Aurora
+  'w2_STORY': { top: [20, 30, 60], bot: [40, 60, 100] }, // Frozen Dark
+  // World 3: Storm
+  'w3_1': { top: [15, 23, 42], bot: [30, 58, 138] },      // Charged Night
+  'w3_2': { top: [30, 27, 75], bot: [76, 29, 149] },      // Purple Storm
+  'w3_BOSS': { top: [10, 10, 30], bot: [30, 10, 60] },    // Thunder Spire
+  'w3_STORY': { top: [15, 23, 42], bot: [59, 130, 246] }  // Electric Horizon
 };
 
 const SKINS = {
