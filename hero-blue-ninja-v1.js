@@ -2,6 +2,7 @@
   'use strict';
 
   const VERSION = 'hero-blue-ninja-v1';
+  const baseDrawBirdSkin = window.drawBirdSkin;
 
   function path(ctx, points) {
     ctx.beginPath();
@@ -24,15 +25,17 @@
   }
 
   function drawBirdSkinV1(ctx, skinKey, x, y, rotation, wingCycle, scale = 1, inFever = false) {
-    const source = (typeof SKINS !== 'undefined' && (SKINS[skinKey] || SKINS.classic)) || {};
-    const isClassic = skinKey === 'classic' || !skinKey;
-    const body = isClassic ? '#1677e8' : (source.body || '#1677e8');
-    const bodyDark = isClassic ? '#0c4fb5' : (source.wing || '#0c4fb5');
-    const wing = isClassic ? '#1266d1' : (source.wing || bodyDark);
-    const beak = isClassic ? '#fbbf24' : (source.beak || '#fbbf24');
+    const key = skinKey || 'classic';
+    if (key !== 'classic' && typeof baseDrawBirdSkin === 'function') {
+      return baseDrawBirdSkin(ctx, key, x, y, rotation, wingCycle, scale, inFever);
+    }
+
+    const body = '#1677e8';
+    const bodyDark = '#0c4fb5';
+    const wing = '#1266d1';
+    const beak = '#fbbf24';
     const band = '#0c1836';
     const outline = '#07152f';
-
     const flap = Math.max(-1, Math.min(1, Number.isFinite(wingCycle) ? wingCycle : 0));
     const glide = !inFever && Math.abs(flap) < 0.08 && rotation > 0.22;
 
@@ -64,8 +67,7 @@
     ctx.strokeStyle = outline;
     ctx.lineWidth = 1.6;
     path(ctx, [[-12,1],[-18,-3],[-16,2],[-21,5],[-13,7]]);
-    ctx.fill();
-    ctx.stroke();
+    ctx.fill(); ctx.stroke();
 
     if (glide) {
       ctx.save();
@@ -74,8 +76,7 @@
       ctx.strokeStyle = outline;
       ctx.lineWidth = 1.7;
       path(ctx, [[1,-3],[-15,-6],[-10,-1],[-17,2],[-7,5],[2,5],[6,1]]);
-      ctx.fill();
-      ctx.stroke();
+      ctx.fill(); ctx.stroke();
       ctx.restore();
     } else {
       drawWing(ctx, flap, wing);
@@ -86,10 +87,9 @@
     ctx.lineWidth = 2.2;
     ctx.beginPath();
     ctx.ellipse(0, 1, 15, 13, -0.06, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
+    ctx.fill(); ctx.stroke();
 
-    ctx.fillStyle = isClassic ? '#0e61c9' : bodyDark;
+    ctx.fillStyle = '#0e61c9';
     ctx.globalAlpha = 0.35;
     ctx.beginPath();
     ctx.ellipse(-2, 6, 10, 5, 0, 0, Math.PI);
@@ -100,69 +100,34 @@
     ctx.strokeStyle = outline;
     ctx.lineWidth = 1.8;
     path(ctx, [[-8,-10],[-12,-19],[-4,-14],[-4,-22],[2,-14],[5,-19],[6,-10]]);
-    ctx.fill();
-    ctx.stroke();
+    ctx.fill(); ctx.stroke();
 
     ctx.fillStyle = band;
     ctx.strokeStyle = outline;
     ctx.lineWidth = 1.5;
     path(ctx, [[-13,-9],[10,-8],[12,-5],[7,-4],[-13,-6]]);
-    ctx.fill();
-    ctx.stroke();
-
+    ctx.fill(); ctx.stroke();
     ctx.beginPath();
     ctx.ellipse(-13,-7,2.4,2.2,0,0,Math.PI*2);
-    ctx.fill();
-    ctx.stroke();
-    path(ctx, [[-14,-8],[-21,-12],[-18,-6],[-14,-6]]);
-    ctx.fill();
-    ctx.stroke();
-    path(ctx, [[-14,-6],[-21,-3],[-17,0],[-13,-5]]);
-    ctx.fill();
-    ctx.stroke();
+    ctx.fill(); ctx.stroke();
+    path(ctx, [[-14,-8],[-21,-12],[-18,-6],[-14,-6]]); ctx.fill(); ctx.stroke();
+    path(ctx, [[-14,-6],[-21,-3],[-17,0],[-13,-5]]); ctx.fill(); ctx.stroke();
 
     ctx.fillStyle = '#ffffff';
     ctx.strokeStyle = outline;
-    ctx.lineWidth = 1.7;
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
-    ctx.moveTo(3,-5);
-    ctx.quadraticCurveTo(8,-4,12,-2);
-    ctx.quadraticCurveTo(9,4,4,3);
-    ctx.quadraticCurveTo(1,1,3,-5);
+    ctx.moveTo(5,-7);
+    ctx.quadraticCurveTo(10,-6,13,-3);
+    ctx.quadraticCurveTo(9,2,5,0);
+    ctx.quadraticCurveTo(3,-2,5,-7);
     ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
+    ctx.fill(); ctx.stroke();
 
     ctx.fillStyle = beak;
     ctx.strokeStyle = outline;
-    ctx.lineWidth = 1.7;
-    path(ctx, [[11,-1],[18,2],[11,5]]);
-    ctx.fill();
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(12,2);
-    ctx.lineTo(17,2);
-    ctx.stroke();
-
-    if (!inFever && Math.abs(flap) < 0.18 && rotation < 0.18) {
-      ctx.strokeStyle = beak;
-      ctx.lineWidth = 2.2;
-      ctx.beginPath();
-      ctx.moveTo(-5,12); ctx.lineTo(-5,15); ctx.lineTo(-8,16);
-      ctx.moveTo(4,12); ctx.lineTo(4,15); ctx.lineTo(7,16);
-      ctx.stroke();
-    }
-
-    if (inFever) {
-      ctx.save();
-      ctx.globalAlpha = 0.38;
-      ctx.strokeStyle = '#e0f2fe';
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.arc(0, 0, 20, -2.2, 2.2);
-      ctx.stroke();
-      ctx.restore();
-    }
+    ctx.lineWidth = 1.5;
+    path(ctx, [[13,-2],[20,1],[13,3]]); ctx.fill(); ctx.stroke();
 
     ctx.restore();
   }
