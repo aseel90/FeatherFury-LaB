@@ -1,0 +1,38 @@
+name: One-time exact index restore V7
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/one-time-index-restore-v7.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore exact known-good shell and keep V7 cache bust
+        shell: bash
+        run: |
+          git show 4961886fe36ad72c34d777f713605ced2e764f02:index.html > index.html
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text()
+          assert 'game.js?v=2.3.12' in s
+          s = s.replace('game.js?v=2.3.12', 'game.js?v=2.3.13', 1)
+          p.write_text(s)
+          PY
+          git diff --exit-code 4961886fe36ad72c34d777f713605ced2e764f02 -- index.html >/dev/null || true
+      - name: Commit restored shell
+        shell: bash
+        run: |
+          if git diff --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Restore exact LAB shell for W2 V7'
+          git push
