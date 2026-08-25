@@ -125,11 +125,11 @@ const STAGE_COLORS = {
 
 const SKINS = {
   classic: { id: 'classic', name_ar: 'العصفور الكلاسيكي', name_en: 'Classic Hero', price: 0, body: '#f1c40f', wing: '#ffffff', belly: '#e67e22', beak: '#e74c3c', maskColor: '#e74c3c', acc: 'none', bodyType: 'normal' },
-  pigeon: { id: 'pigeon', name_ar: 'الحمامة النينجا', name_en: 'Ninja Pigeon', price: 15, body: '#f8fafc', wing: '#cbd5e1', belly: '#94a3b8', beak: '#f59e0b', maskColor: '#000000', acc: 'ninja', bodyType: 'fat' },
-  falcon: { id: 'falcon', name_ar: 'الصقر الجارح', name_en: 'Fierce Falcon', price: 35, body: '#78350f', wing: '#451a03', belly: '#d6d3d1', beak: '#fbbf24', maskColor: '#2563eb', acc: 'scar', bodyType: 'muscle' },
-  phoenix: { id: 'phoenix', name_ar: 'فينيق اللهب', name_en: 'Flame Phoenix', price: 60, body: '#ef4444', wing: '#f59e0b', belly: '#f97316', beak: '#1e293b', maskColor: '#10b981', acc: 'flame', bodyType: 'normal' },
-  cyber: { id: 'cyber', name_ar: 'مقاتل السايبورغ', name_en: 'Cyber Fighter', price: 100, body: '#334155', wing: '#06b6d4', belly: '#1e293b', beak: '#3b82f6', maskColor: '#f43f5e', acc: 'visor', bodyType: 'muscle' },
-  ghost: { id: 'ghost', name_ar: 'طائر الشبح', name_en: 'Ghost Bird', price: 150, body: '#e0e7ff', wing: '#c7d2fe', belly: '#a5b4fc', beak: '#818cf8', maskColor: '#4f46e5', acc: 'aura', bodyType: 'slim' },
-  king: { id: 'king', name_ar: 'الملك الذهبي', name_en: 'Golden King', price: 300, body: '#fbbf24', wing: '#f59e0b', belly: '#d97706', beak: '#b45309', maskColor: '#78350f', acc: 'crown', bodyType: 'fat' },
-  eagle: { id: 'eagle', name_ar: 'نسر الجبال', name_en: 'Mountain Eagle', price: 9999, body: '#451a03', wing: '#78350f', belly: '#fef3c7', beak: '#f59e0b', maskColor: '#451a03', acc: 'aura', bodyType: 'muscle' }
+  pigeon: { id: 'pigeon', name_ar: 'الحمامة النينجا', name_en: 'Ninja Pigeon', price: 1, body: '#f8fafc', wing: '#cbd5e1', belly: '#94a3b8', beak: '#f59e0b', maskColor: '#000000', acc: 'ninja', bodyType: 'fat' },
+  falcon: { id: 'falcon', name_ar: 'الصقر الجارح', name_en: 'Fierce Falcon', price: 1, body: '#7c3f1d', wing: '#3b2115', belly: '#e6c28f', beak: '#fbbf24', maskColor: '#f59e0b', acc: 'scar', bodyType: 'muscle' },
+  phoenix: { id: 'phoenix', name_ar: 'فينيق اللهب', name_en: 'Flame Phoenix', price: 1, body: '#ef4444', wing: '#f59e0b', belly: '#f97316', beak: '#1e293b', maskColor: '#10b981', acc: 'flame', bodyType: 'normal' },
+  cyber: { id: 'cyber', name_ar: 'مقاتل السايبورغ', name_en: 'Cyber Fighter', price: 1, body: '#334155', wing: '#06b6d4', belly: '#1e293b', beak: '#3b82f6', maskColor: '#f43f5e', acc: 'visor', bodyType: 'muscle' },
+  ghost: { id: 'ghost', name_ar: 'طائر الشبح', name_en: 'Ghost Bird', price: 1, body: '#e0e7ff', wing: '#c7d2fe', belly: '#a5b4fc', beak: '#818cf8', maskColor: '#4f46e5', acc: 'aura', bodyType: 'slim' },
+  king: { id: 'king', name_ar: 'الملك الذهبي', name_en: 'Golden King', price: 1, body: '#fbbf24', wing: '#f59e0b', belly: '#d97706', beak: '#b45309', maskColor: '#78350f', acc: 'crown', bodyType: 'fat' },
+  eagle: { id: 'eagle', name_ar: 'نسر الجبال', name_en: 'Mountain Eagle', price: 1, body: '#451a03', wing: '#78350f', belly: '#fef3c7', beak: '#f59e0b', maskColor: '#451a03', acc: 'aura', bodyType: 'muscle' }
 };
