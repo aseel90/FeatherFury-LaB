@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Feather Fury — Dark Forest Obstacles Preview</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#070b0a}
+iframe{border:0;width:100%;height:100%;display:block;background:#070b0a}
+</style>
+</head>
+<body>
+<iframe id="preview" src="../procedural-obstacles-preview/?v=5" allow="fullscreen"></iframe>
+<script>
+(() => {
+  const frame = document.getElementById('preview');
+  frame.addEventListener('load', () => {
+    const w = frame.contentWindow;
+    const d = frame.contentDocument;
+    if (!w || !d) return;
+
+    const style = d.createElement('style');
+    style.textContent = `
+      html,body{background:#080d0b!important;color:#eee9f2!important}
+      body{background:
+        radial-gradient(circle at 75% 8%,rgba(104,62,145,.12),transparent 24%),
+        linear-gradient(#070d0b,#0c1411 55%,#090c0a)!important}
+      .card{background:#0d1411!important;border-color:#273328!important;box-shadow:0 12px 35px rgba(0,0,0,.32),inset 0 0 30px rgba(77,40,100,.035)}
+      .toolbar{background:linear-gradient(#080d0b 78%,rgba(8,13,11,0))!important}
+      button{background:#121a16!important;border-color:#3d4b41!important}
+      button.active{background:#281d31!important;border-color:#9b66ca!important}
+      .title strong{color:#ded9e8!important}
+      .sub,.legend,.seed{color:#8e9b91!important}
+      .ff-dark-wrap{position:relative;display:block;width:100%;border-radius:10px;overflow:hidden;background:#07100d}
+      .ff-dark-wrap>canvas:first-child{position:relative;z-index:1;filter:saturate(.88) contrast(1.08) brightness(.84)}
+      .ff-dark-overlay{position:absolute;inset:0;width:100%!important;height:100%!important;z-index:2;pointer-events:none;border-radius:10px}
+    `;
+    d.head.appendChild(style);
+
+    const originals = [...d.querySelectorAll('.card canvas')];
+    const overlays = [];
+
+    originals.forEach((canvas,index) => {
+      if (canvas.parentElement.classList.contains('ff-dark-wrap')) return;
+      const wrap = d.createElement('div');
+      wrap.className = 'ff-dark-wrap';
+      canvas.parentNode.insertBefore(wrap,canvas);
+      wrap.appendChild(canvas);
+
+      const overlay = d.createElement('canvas');
+      overlay.className = 'ff-dark-overlay';
+      overlay.width = 360;
+      overlay.height = 640;
+      wrap.appendChild(overlay);
+      overlays.push({canvas:overlay,ctx:overlay.getContext('2d'),index});
+    });
+
+    function fog(ctx,y,h,t,phase,alpha,color){
+      ctx.save();
+      ctx.globalAlpha=alpha;
+      ctx.fillStyle=color;
+      ctx.beginPath();
+      ctx.moveTo(-30,y+h*.45);
+      for(let x=-30;x<=390;x+=26){
+        const wave=Math.sin(x*.025+t*.45+phase)*7+Math.cos(x*.014-t*.31+phase)*4;
+        ctx.quadraticCurveTo(x+13,y+wave,x+26,y+h*.45+wave*.4);
+      }
+      ctx.lineTo(390,y+h);
+      ctx.lineTo(-30,y+h);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function vines(ctx,t,phase){
+      ctx.save();
+      ctx.strokeStyle='rgba(23,35,29,.58)';
+      ctx.lineCap='round';
+      for(let i=0;i<7;i++){
+        const x=18+i*56;
+        const sway=Math.sin(t*.8+i+phase)*3;
+        ctx.lineWidth=1.7+(i%2)*.8;
+        ctx.beginPath();
+        ctx.moveTo(x,-5);
+        ctx.bezierCurveTo(x+sway,25,x-8+sway,58,x+3+sway,92+(i%3)*12);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function spores(ctx,t,index){
+      for(let i=0;i<11;i++){
+        const x=18+i*31+Math.sin(t*.55+i*1.9+index)*7;
+        const y=92+(i%5)*72+Math.cos(t*.75+i+index*.7)*12;
+        const purple=i%3!==0;
+        ctx.save();
+        ctx.globalAlpha=.24+(i%3)*.07;
+        ctx.shadowColor=purple?'rgba(183,104,255,.9)':'rgba(121,221,157,.75)';
+        ctx.shadowBlur=5+(i%2)*3;
+        ctx.fillStyle=purple?'rgba(205,145,255,.8)':'rgba(143,230,172,.7)';
+        ctx.beginPath();
+        ctx.arc(x,y,1.1+(i%2)*.55,0,Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function eyes(ctx,x,y,t,phase){
+      const blink=(Math.sin(t*2.2+phase)+1)*.5<.09?.2:1;
+      ctx.save();
+      ctx.globalAlpha=.42;
+      ctx.shadowColor='rgba(188,104,255,.95)';
+      ctx.shadowBlur=7;
+      ctx.fillStyle='rgba(226,174,255,.9)';
+      ctx.beginPath();
+      ctx.ellipse(x-4.5,y,2.1,1.35*blink,0,0,Math.PI*2);
+      ctx.ellipse(x+4.5,y,2.1,1.35*blink,0,0,Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function vignette(ctx){
+      const g=ctx.createRadialGradient(180,300,155,180,300,355);
+      g.addColorStop(0,'rgba(0,0,0,0)');
+      g.addColorStop(.72,'rgba(2,7,5,.04)');
+      g.addColorStop(1,'rgba(0,3,2,.42)');
+      ctx.fillStyle=g;
+      ctx.fillRect(0,0,360,640);
+    }
+
+    function draw(now){
+      const t=now*.001;
+      overlays.forEach(({ctx,index})=>{
+        ctx.clearRect(0,0,360,640);
+        vines(ctx,t,index*.6);
+        fog(ctx,128,38,t,index*.5,.075,'#6d4a83');
+        fog(ctx,432,46,t,-index*.8,.08,'#4e4164');
+        fog(ctx,510,34,t,index*.4,.09,'#244334');
+        spores(ctx,t,index);
+        eyes(ctx,45+(index%2)*248,395+(index%3)*18,t,index*1.1);
+        vignette(ctx);
+      });
+      w.requestAnimationFrame(draw);
+    }
+    w.requestAnimationFrame(draw);
+  });
+})();
+</script>
+</body>
+</html>
