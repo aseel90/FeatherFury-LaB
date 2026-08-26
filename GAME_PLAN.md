@@ -11,7 +11,7 @@ Once a system works correctly and its visual/gameplay direction is approved, it 
 - Reference files and artwork are used for visual direction and ideas. Their design language is rebuilt inside FeatherFury's approved runtime rather than copy-pasted as a second system.
 - Solved systems remain untouched while another system is being completed.
 
-## World 1 — status
+## World 1 — COMPLETE / FROZEN
 
 ### Approved / locked
 
@@ -27,7 +27,7 @@ Once a system works correctly and its visual/gameplay direction is approved, it 
 - Do not alter bird physics, hitboxes, scoring, boss logic, HUD, revive, audio or story while finishing the World 1 visual polish.
 - Existing World 1 fixes and wrappers must continue to operate around the background renderer.
 
-### Final remaining task
+### Final approved visual direction
 
 **World 1 classic background restoration + final polish — APPROVED DIRECTION**
 
@@ -86,6 +86,26 @@ World 1 is **COMPLETE** when all of the following are true:
 6. No unrelated World 1 system changed during visual polish.
 
 After this gate is passed, World 1 is frozen for feature work. Only reported bugs should reopen it.
+
+**Completion record — 2026-08-27**
+
+- Visual direction approved by the project owner.
+- Final dialogue/ground layering fix is included in the approved World 1 runtime.
+- World 1 completion gate is considered PASSED.
+- Status: **COMPLETE / FROZEN**. Reopen only for a concrete regression or bug report.
+
+## World 2 — AUDIT / OPEN
+
+World 2 is now the active development target. No World 2 visual system is locked yet; first changes should follow an audit-and-approve cycle similar to World 1.
+
+Current runtime stack observed during the initial audit:
+
+- Core World 2 boss module: `js/world2.js`.
+- Environment visuals: `w2-visuals-v1.js`.
+- World 2 gameplay/story flow: `w2-gameplay-v1.js`.
+- Frost audio identity: `w2-audio-v1.js`.
+- Emperor Penguin boss is currently layered through `w2-boss-polish-v2.js`, `w2-boss-orb-v7.js`, `w2-v7-compat-v1.js`, `w2-boss-combat-v6.js`, `w2-boss-tuning-v8.js`, and `w2-boss-phase2-relief-v9.js`.
+- Until the World 2 direction is approved, prefer targeted refinement over introducing additional parallel boss/background systems.
 
 ## Next-work rule
 
