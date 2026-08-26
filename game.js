@@ -7,6 +7,8 @@
   const originalDrawBirdSkin = window.drawBirdSkin;
   window.__FF_ORIGINAL_DRAW_BIRD_SKIN__ = window.__FF_ORIGINAL_DRAW_BIRD_SKIN__ || originalDrawBirdSkin;
 
+  // Keep the UI locked until the authoritative patch set is fully installed.
+  // This prevents the player from entering World 1 while legacy visuals are still loading.
   const bootstrapGate = e => {
     if (bootstrapReleased) return;
     if (e && e.cancelable) e.preventDefault();
