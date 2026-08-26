@@ -1,10 +1,39 @@
 (() => {
   'use strict';
 
+  const ENV_ASSET_KEYS = ['mountains','pines','avalanche','ground','obstacleTop','obstacleBottom'];
+  const envAssetState = { started: false, ready: false, images: Object.create(null), failed: [] };
+
+  function ensureEnvironmentAssets() {
+    if (envAssetState.ready) return true;
+    const data = window.__FF_W2_ENV_ASSET_DATA_V1__;
+    if (!data) return false;
+    if (envAssetState.started) return false;
+    envAssetState.started = true;
+    let pending = ENV_ASSET_KEYS.length;
+    const finish = () => {
+      pending--;
+      if (pending <= 0) {
+        envAssetState.ready = true;
+        window.__FF_W2_ENV_IMAGES_V1__ = envAssetState.images;
+      }
+    };
+    ENV_ASSET_KEYS.forEach(key => {
+      const img = new Image();
+      img.decoding = 'async';
+      img.onload = finish;
+      img.onerror = () => { envAssetState.failed.push(key); finish(); };
+      img.src = data[key];
+      envAssetState.images[key] = img;
+    });
+    return false;
+  }
+
   function install() {
     const game = window.game;
     if (!game) return false;
     if (game.__w2VisualsV1Installed) return true;
+    if (!ensureEnvironmentAssets()) return false;
 
     const C = window.CONFIG || {};
     const W = () => C.CANVAS_WIDTH || 360;
@@ -17,7 +46,8 @@
       travel: 0,
       stageBlend: 0,
       bossBlend: 0,
-      flakes: Array.from({length:64}, (_,i) => ({
+      lastFrame: null,
+      flakes: Array.from({length:72}, (_,i) => ({
         x: (i * 71.13) % 421,
         y: (i * 97.73) % 653,
         s: 0.65 + ((i * 17) % 13) / 10,
@@ -25,59 +55,30 @@
         a: 0.28 + ((i * 7) % 8) / 12
       }))
     };
+    const assets = envAssetState.images;
 
-    function drawMountainBand(ctx, travel, baseY, spacing, height, alpha, fill, speedFactor, jagged = 0.22) {
-      const off = mod(travel * speedFactor, spacing);
-      const count = Math.ceil(W() / spacing) + 3;
-      ctx.save();
-      ctx.globalAlpha = alpha;
-      ctx.fillStyle = fill;
-      ctx.beginPath();
-      ctx.moveTo(-spacing, H());
-      for (let i = -1; i < count; i++) {
-        const idx = i + Math.floor((travel * speedFactor) / spacing);
-        const x = i * spacing - off;
-        const wave = Math.sin(idx * 1.73) * jagged + Math.sin(idx * 0.61) * 0.08;
-        const peak = baseY - height * (0.72 + wave);
-        ctx.lineTo(x, baseY);
-        ctx.lineTo(x + spacing * 0.48, peak);
-        ctx.lineTo(x + spacing, baseY);
+    function advanceEnvironment() {
+      const frame = Number(game.frame) || 0;
+      if (bg.lastFrame === frame) return;
+      bg.lastFrame = frame;
+      const targetStage = game.score >= (C.STAGE1_END || 15) ? 1 : 0;
+      const targetBoss = game.boss?.active || ['BOSS_WARNING','BOSS_INTRO','BOSS_OUTRO','FLY_AWAY'].includes(game.state) ? 1 : 0;
+      bg.stageBlend += (targetStage - bg.stageBlend) * 0.025;
+      bg.bossBlend += (targetBoss - bg.bossBlend) * 0.035;
+      if (!game.__ffPaused) {
+        const speed = game.state === 'STORY' ? 1.05 : (game.feverActive ? (C.SPEED_FEVER || 4.5) : (C.W2_SPEED || 2.2));
+        bg.travel += speed;
       }
-      ctx.lineTo(W() + spacing, H());
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
     }
 
-    function drawCliffs(ctx, travel, alpha) {
-      const spacing = 118;
-      const off = mod(travel * 0.28, spacing);
-      const baseY = groundY() - 16;
+    function drawTiledImage(ctx, img, travel, y, drawH, alpha, speedFactor, xShift = 0) {
+      if (!img || !img.complete || !img.naturalWidth) return;
+      const scale = drawH / img.naturalHeight;
+      const drawW = img.naturalWidth * scale;
+      const off = mod(travel * speedFactor + xShift, drawW);
       ctx.save();
       ctx.globalAlpha = alpha;
-      for (let i = -1; i < Math.ceil(W()/spacing)+2; i++) {
-        const idx = i + Math.floor((travel * 0.28) / spacing);
-        const x = i * spacing - off;
-        const h = 78 + (Math.sin(idx * 2.2) + 1) * 25;
-        ctx.fillStyle = idx % 2 ? '#26384c' : '#31465c';
-        ctx.beginPath();
-        ctx.moveTo(x, baseY);
-        ctx.lineTo(x + 14, baseY - h * 0.72);
-        ctx.lineTo(x + 38, baseY - h);
-        ctx.lineTo(x + 62, baseY - h * 0.66);
-        ctx.lineTo(x + 89, baseY - h * 0.9);
-        ctx.lineTo(x + spacing, baseY);
-        ctx.closePath();
-        ctx.fill();
-        ctx.fillStyle = 'rgba(226,232,240,.38)';
-        ctx.beginPath();
-        ctx.moveTo(x + 38, baseY - h);
-        ctx.lineTo(x + 24, baseY - h * .68);
-        ctx.lineTo(x + 47, baseY - h * .76);
-        ctx.lineTo(x + 59, baseY - h * .58);
-        ctx.closePath();
-        ctx.fill();
-      }
+      for (let x = -off - drawW; x < W() + drawW; x += drawW) ctx.drawImage(img, x, y, drawW, drawH);
       ctx.restore();
     }
 
@@ -105,115 +106,127 @@
       ctx.restore();
     }
 
-    function drawFrostBackground(ctx) {
-      const targetStage = game.score >= (C.STAGE1_END || 15) ? 1 : 0;
-      const targetBoss = game.boss?.active || ['BOSS_WARNING','BOSS_INTRO','BOSS_OUTRO','FLY_AWAY'].includes(game.state) ? 1 : 0;
-      bg.stageBlend += (targetStage - bg.stageBlend) * 0.025;
-      bg.bossBlend += (targetBoss - bg.bossBlend) * 0.035;
-      if (!game.__ffPaused) {
-        const speed = game.state === 'STORY' ? 1.05 : (game.feverActive ? (C.SPEED_FEVER || 4.5) : (C.W2_SPEED || 2.2));
-        bg.travel += speed;
-      }
-
-      drawAurora(ctx, 0.12 + bg.bossBlend * 0.9);
-      drawMountainBand(ctx, bg.travel, groundY()-34, 164, 180, 0.30 + bg.bossBlend*.1, '#0b1f3a', 0.055, .18);
-      drawMountainBand(ctx, bg.travel, groundY()-22, 126, 132, 0.42, '#17345a', 0.11, .22);
-      drawMountainBand(ctx, bg.travel, groundY()-10, 94, 92, 0.46 * (1-bg.stageBlend*.35), '#315a7a', 0.18, .18);
-      drawCliffs(ctx, bg.travel, 0.18 + bg.stageBlend * 0.72);
-
-      const fogAlpha = 0.08 + bg.stageBlend * 0.16;
+    function drawNearIceCliffs(ctx, alpha) {
+      const spacing = 150;
+      const off = mod(bg.travel * .24, spacing);
+      const baseY = groundY() - 4;
       ctx.save();
-      const fog = ctx.createLinearGradient(0, groundY()-105, 0, groundY()+5);
-      fog.addColorStop(0, 'rgba(226,232,240,0)');
-      fog.addColorStop(1, `rgba(226,232,240,${fogAlpha})`);
-      ctx.fillStyle = fog;
-      ctx.fillRect(0, groundY()-110, W(), 120);
-      ctx.restore();
-
-      const snowCount = Math.round(28 + bg.stageBlend * 24 - bg.bossBlend * 16);
-      ctx.save();
-      for (let i = 0; i < snowCount; i++) {
-        const f = bg.flakes[i];
-        const x = mod(f.x - bg.travel * f.d * (1 + bg.stageBlend*.35), W()+60) - 30;
-        const y = mod(f.y + game.frame * (0.75 + f.s * .38), groundY()-10);
-        ctx.globalAlpha = f.a * (0.75 + bg.stageBlend*.2);
-        ctx.fillStyle = '#f8fafc';
+      ctx.globalAlpha = alpha;
+      for (let i = -1; i < Math.ceil(W()/spacing)+2; i++) {
+        const idx = i + Math.floor((bg.travel * .24) / spacing);
+        const x = i * spacing - off;
+        const h = 58 + (Math.sin(idx * 1.9) + 1) * 20;
+        ctx.fillStyle = idx % 2 ? '#20394a' : '#28485b';
         ctx.beginPath();
-        ctx.arc(x, y, clamp(f.s, .8, 2.3), 0, Math.PI*2);
+        ctx.moveTo(x, baseY);
+        ctx.lineTo(x + 22, baseY - h * .65);
+        ctx.lineTo(x + 48, baseY - h);
+        ctx.lineTo(x + 82, baseY - h * .58);
+        ctx.lineTo(x + 112, baseY - h * .82);
+        ctx.lineTo(x + spacing, baseY);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = 'rgba(218,242,250,.28)';
+        ctx.beginPath();
+        ctx.moveTo(x + 48, baseY - h);
+        ctx.lineTo(x + 31, baseY - h * .62);
+        ctx.lineTo(x + 59, baseY - h * .72);
+        ctx.lineTo(x + 73, baseY - h * .53);
+        ctx.closePath();
         ctx.fill();
       }
       ctx.restore();
     }
 
-    function makePillarVariant(kind) {
-      const c = document.createElement('canvas');
-      c.width = 80; c.height = 600;
-      const ctx = c.getContext('2d');
-      const palettes = [
-        ['#14324f','#2563a6','#9bd8ff','#214f7a'],
-        ['#23344a','#4b6a86','#dbeafe','#31495f'],
-        ['#111827','#24425e','#72b6d8','#16293b'],
-        ['#263445','#456179','#bfe7ff','#2c526e']
-      ];
-      const p = palettes[kind % palettes.length];
-      const grad = ctx.createLinearGradient(8,0,72,0);
-      grad.addColorStop(0,p[0]); grad.addColorStop(.28,p[1]); grad.addColorStop(.52,p[2]); grad.addColorStop(.72,p[1]); grad.addColorStop(1,p[0]);
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.moveTo(12,0); ctx.lineTo(68,0); ctx.lineTo(72,600); ctx.lineTo(8,600); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = 'rgba(255,255,255,.12)'; ctx.fillRect(24,0,10,600);
-      ctx.strokeStyle = kind===2 ? 'rgba(96,165,250,.55)' : 'rgba(255,255,255,.34)';
-      ctx.lineWidth = 1.4;
-      for (let i=0;i<11;i++) {
-        const y = 38 + i*49 + ((kind*17+i*23)%29);
-        const x = 18 + ((i*13+kind*9)%39);
-        ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x + ((i%2)?16:-13), y+18); ctx.lineTo(x+((i%3)-1)*9,y+32); ctx.stroke();
+    function drawFrostBackground(ctx) {
+      advanceEnvironment();
+      drawAurora(ctx, 0.06 + bg.stageBlend * 0.08 + bg.bossBlend * 0.92);
+
+      // Image layers stay transparent so the core World 2 sky can change at 15 and at boss entry.
+      drawTiledImage(ctx, assets.mountains, bg.travel, groundY() - 300, 300, .62 + bg.bossBlend*.08, .045);
+      drawTiledImage(ctx, assets.pines, bg.travel, groundY() - 238, 238, .50 * (1 - bg.stageBlend*.20), .105, 170);
+      drawTiledImage(ctx, assets.avalanche, bg.travel, groundY() - 178, 178, bg.stageBlend * (.48 + bg.bossBlend*.12), .16, 90);
+      drawNearIceCliffs(ctx, .12 + bg.stageBlend * .38);
+
+      const fogAlpha = 0.07 + bg.stageBlend * 0.14 + bg.bossBlend * .03;
+      ctx.save();
+      const fog = ctx.createLinearGradient(0, groundY()-130, 0, groundY()+4);
+      fog.addColorStop(0, 'rgba(226,242,248,0)');
+      fog.addColorStop(1, `rgba(226,242,248,${fogAlpha})`);
+      ctx.fillStyle = fog;
+      ctx.fillRect(0, groundY()-135, W(), 140);
+      ctx.restore();
+
+      const snowCount = Math.round(28 + bg.stageBlend * 30 - bg.bossBlend * 12);
+      ctx.save();
+      for (let i = 0; i < snowCount; i++) {
+        const f = bg.flakes[i];
+        const x = mod(f.x - bg.travel * f.d * (1 + bg.stageBlend*.42), W()+60) - 30;
+        const y = mod(f.y + game.frame * (0.72 + f.s * (.38 + bg.stageBlend*.14)), groundY()-10);
+        ctx.globalAlpha = f.a * (0.72 + bg.stageBlend*.24);
+        ctx.fillStyle = '#f8fafc';
+        ctx.beginPath();
+        ctx.arc(x, y, clamp(f.s, .8, 2.4), 0, Math.PI*2);
+        ctx.fill();
       }
-      if (kind === 1) {
-        ctx.fillStyle = 'rgba(241,245,249,.72)';
-        for (let y=52;y<590;y+=84) ctx.beginPath(),ctx.ellipse(42,y,28,7,.05,0,Math.PI*2),ctx.fill();
-      }
-      if (kind === 2) {
-        ctx.shadowBlur=9; ctx.shadowColor='#38bdf8'; ctx.strokeStyle='rgba(56,189,248,.5)'; ctx.lineWidth=2;
-        ctx.beginPath(); ctx.moveTo(36,20); ctx.lineTo(46,110); ctx.lineTo(32,190); ctx.lineTo(48,270); ctx.lineTo(35,360); ctx.lineTo(44,450); ctx.stroke(); ctx.shadowBlur=0;
-      }
-      if (kind === 3) {
-        ctx.fillStyle='rgba(15,23,42,.28)';
-        for (let y=70;y<580;y+=120) { ctx.fillRect(10,y,60,12); ctx.fillStyle='rgba(219,234,254,.32)'; ctx.fillRect(13,y+2,54,3); ctx.fillStyle='rgba(15,23,42,.28)'; }
-      }
-      ctx.fillStyle = p[2];
-      ctx.shadowBlur = 8; ctx.shadowColor = '#60a5fa';
-      ctx.beginPath();
-      ctx.moveTo(0,27); ctx.lineTo(7,2); ctx.lineTo(17,20); ctx.lineTo(28,-4); ctx.lineTo(38,18); ctx.lineTo(44,-7); ctx.lineTo(51,18); ctx.lineTo(62,0); ctx.lineTo(71,21); ctx.lineTo(80,5); ctx.lineTo(80,28); ctx.closePath(); ctx.fill();
-      ctx.shadowBlur=0;
-      ctx.fillStyle='rgba(255,255,255,.28)';ctx.fillRect(5,21,70,3);
-      return c;
+      ctx.restore();
     }
 
-    game.__w2PillarVariants = [0,1,2,3].map(makePillarVariant);
-    game.__w2PillarSeq = 0;
+    function drawObstacleImage(ctx, img, x, y, w, h, kind) {
+      if (!img || !img.complete || !img.naturalWidth || h <= 1) return;
+      const srcW = img.naturalWidth, srcH = img.naturalHeight;
+      const capSrc = Math.min(140, srcH * .22);
+      const capDraw = Math.min(92, Math.max(46, h * .28));
+      if (h <= capDraw + 8) {
+        ctx.drawImage(img, 0, 0, srcW, srcH, x, y, w, h);
+        return;
+      }
+      if (kind === 'top') {
+        const bodySrcH = srcH - capSrc;
+        ctx.drawImage(img, 0, 0, srcW, bodySrcH, x, y, w, h - capDraw);
+        ctx.drawImage(img, 0, bodySrcH, srcW, capSrc, x, y + h - capDraw, w, capDraw);
+      } else {
+        ctx.drawImage(img, 0, 0, srcW, capSrc, x, y, w, capDraw);
+        ctx.drawImage(img, 0, capSrc, srcW, srcH - capSrc, x, y + capDraw, w, h - capDraw);
+      }
+    }
+
     const originalDrawPillars = typeof game.drawPillars === 'function' ? game.drawPillars.bind(game) : null;
     if (originalDrawPillars) {
       game.drawPillars = function() {
         if (this.activeWorld !== 1) return originalDrawPillars();
         drawFrostBackground(this.ctx);
         const gap = C.W2_GAP_SIZE || 146;
+        const visualW = 112;
         this.pillars.forEach(p => {
           if (p.smashed) return;
-          if (p.__w2Variant == null) p.__w2Variant = (this.__w2PillarSeq++) % this.__w2PillarVariants.length;
-          const canvas = this.__w2PillarVariants[p.__w2Variant];
           const botY = p.topHeight + gap;
           const botH = H() - (C.GROUND_HEIGHT || 70) - botY;
-          const drawW = 80;
-          const drawX = p.x - (drawW - p.width) / 2;
-          this.ctx.save();
-          this.ctx.translate(drawX, p.topHeight);
-          this.ctx.scale(1,-1);
-          this.ctx.drawImage(canvas,0,0,80,Math.min(600,p.topHeight),0,0,drawW,p.topHeight);
-          this.ctx.restore();
-          this.ctx.drawImage(canvas,0,0,80,Math.min(600,botH),drawX,botY,drawW,botH);
+          const drawX = p.x - (visualW - p.width) / 2;
+          drawObstacleImage(this.ctx, assets.obstacleTop, drawX, 0, visualW, Math.max(1,p.topHeight), 'top');
+          drawObstacleImage(this.ctx, assets.obstacleBottom, drawX, botY, visualW, Math.max(1,botH), 'bottom');
         });
       };
+    }
+
+    function drawFrozenGround(g) {
+      const img = assets.ground;
+      if (!img || !img.complete || !img.naturalWidth) return;
+      advanceEnvironment();
+      const ctx = g.ctx;
+      const gh = Number(C.GROUND_HEIGHT) || 70;
+      const gy = H() - gh;
+      const scale = gh / img.naturalHeight;
+      const tileW = img.naturalWidth * scale;
+      const off = mod(bg.travel * .96, tileW);
+      ctx.save();
+      for (let x = -off - tileW; x < W() + tileW; x += tileW) ctx.drawImage(img, x, gy, tileW, gh);
+      // thin frost highlight glues the art to gameplay without changing collision geometry
+      ctx.globalAlpha = .58;
+      ctx.strokeStyle = '#d9f5ff';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0,gy+.5); ctx.lineTo(W(),gy+.5); ctx.stroke();
+      ctx.restore();
     }
 
     window.drawPenguinMinion = function(ctx,x,y,frame) {
@@ -289,6 +302,8 @@
       game.draw = function() {
         const result = originalDraw();
         if (this.activeWorld !== 1) return result;
+        const dialogueScene = ['STORY','BOSS_INTRO','BOSS_OUTRO'].includes(this.state);
+        if (!dialogueScene) drawFrozenGround(this);
         const ctx = this.ctx;
         this.icicles.forEach(ice => {
           if (ice.state === 'WARN' || ice.__w2WarnTimer > 0) {
@@ -318,7 +333,19 @@
     }
 
     game.__w2VisualsV1Installed = true;
-    console.log('[FF-LAB] w2-visuals-v1-installed');
+    window.__FF_W2_ENVIRONMENT_ART_V1__ = {
+      version: 'world2-environment-art-v1',
+      imageAssets: true,
+      backgroundImageLayers: 3,
+      groundImageTile: true,
+      obstacleImageAssets: true,
+      gameplayGeometryChanged: false,
+      hitboxesChanged: false,
+      gapChanged: false,
+      groundHeightChanged: false,
+      failedAssets: envAssetState.failed.slice()
+    };
+    console.log('[FF-LAB] w2-visuals-v1-environment-art-installed');
     return true;
   }
 
