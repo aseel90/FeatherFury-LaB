@@ -119,3 +119,23 @@ If a core-file edit is required, protect the working version first and verify th
 6. **No merge until validation.** Keep the change isolated until the target behavior is verified; if browser preview limitations require merge for testing, the branch must contain only one isolated change and the pre-change commit SHA must be retained as the immediate rollback point.
 7. **Rollback point first.** Record the source commit SHA used to create the branch so the exact previous state can be restored.
 8. **Do not fix forward across multiple screens.** If a new regression appears, stop the current change, restore the last good state for the affected file/screen, then address the regression in its own branch.
+
+## 12. Approved-system lock / no re-experimenting
+
+`GAME_PLAN.md` is the product-development source of truth for systems that have already been approved.
+
+When a visual/gameplay system is marked **APPROVED / LOCKED**:
+
+1. Keep the same implementation approach for future refinement of that system.
+2. Do not replace it with a new rendering technique, library, asset pipeline, physics model, or experimental architecture merely to try another approach.
+3. Improve the approved system incrementally: proportions, art quality, tuning, layering, animation polish, performance and bug fixes are allowed inside the same approach.
+4. A technique change requires explicit user approval before implementation.
+5. Never reopen a solved system while completing an unrelated item. Preserve approved obstacles, collisions, character behavior and UI unless the task explicitly targets them.
+6. Reference artwork/code supplied for visual direction is a design reference: adapt its visual language into the approved FeatherFury system rather than copy-pasting it as a parallel runtime.
+
+### World 1 current lock
+
+- **Cursed Woods obstacles: APPROVED / LOCKED.** Keep `world1-cursed-obstacles-v5.js` and its image-based trimmed-asset + stable collision/movement approach. Do not redesign or replace it while polishing the background.
+- **Cursed Woods background renderer: APPROVED TECHNIQUE.** Continue using the existing Canvas 2D `drawRuinsBackground` patch path in `cursed-woods-v1.js`; no WebGL, DOM/CSS background layer, new engine, or parallel renderer for this task.
+- **Current final task for World 1:** background visual polish only. Gameplay geometry, obstacles, collisions, bird behavior, HUD and boss systems are out of scope.
+- After the background is visually approved and regression-checked, mark **World 1 complete** and stop feature experimentation on it unless a specific bug is reported.
