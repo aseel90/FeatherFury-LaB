@@ -24,45 +24,43 @@ Once a system works correctly and its visual/gameplay direction is approved, it 
 
 **World 1 gameplay systems — PRESERVE**
 
-- Do not alter bird physics, hitboxes, obstacle gaps, scoring, boss logic, HUD, revive, audio or story while finishing the background.
+- Do not alter bird physics, hitboxes, scoring, boss logic, HUD, revive, audio or story while finishing the World 1 visual polish.
 - Existing World 1 fixes and wrappers must continue to operate around the background renderer.
 
 ### Final remaining task
 
-**Cursed Woods background + ground — FINAL ART LOCK**
+**World 1 classic background restoration + final polish — APPROVED DIRECTION**
 
 Approved implementation path:
 
-- Canvas 2D only.
-- Existing `game.drawRuinsBackground` patch chain.
-- Existing background work remains in `cursed-woods-v1.js`, but the authoritative final visual owner is `world1-final-art-lock-v1.js`, loaded last so older compatibility patches cannot overwrite the approved art.
-- `world1-final-art-lock-v1.js` uses the same Canvas 2D patch architecture already used by World 1; it is not a new renderer or parallel engine.
-- Deterministic seeded scenery for stable tree identities.
-- Layered parallax inside the existing renderer.
-- No DOM/CSS background, WebGL, external runtime, new game engine or parallel rendering system.
-- The supplied forest reference is a visual-design reference only; build the FeatherFury version inside the existing renderer.
-- Background scope covers **all playable World 1 forest sections from score 0 onward**; the outer forest starts lighter/readable and progressively becomes denser and more cursed toward the deep forest.
+- Canvas 2D only; keep the existing Feather Fury renderer and patch architecture.
+- Restore the stable runtime sky gradient as the visible background owner. Do **not** paint an opaque replacement sky over it.
+- This restores the built-in World 1 palette transitions: opening stage, the score-15 stage transition, and the boss palette.
+- The discarded dense full-screen violet background is no longer the authoritative World 1 visual.
+- Add only lightweight forest atmosphere over the original changing sky: classic ruins, layered trees, watching eyes and rolling fog.
+- Keep the gameplay corridor readable and keep atmosphere behind gameplay objects/HUD.
+- No WebGL, DOM/CSS background, new engine or external runtime.
 
-Target visual result:
+**Ground — APPROVED**
 
-- A dense cursed forest rather than sparse Y-shaped silhouettes.
-- Organic crooked trunks with varied branch structures and rooted bases.
-- Multiple depth layers with a distant canopy wall, far/mid/near trees and controlled parallax.
-- Dark violet night palette matching the approved purple-cracked obstacle art.
-- Moon/cloud depth, layered fog, ground haze, hanging vines and restrained cursed particles.
-- Keep the gameplay corridor readable and keep atmospheric effects behind gameplay objects/HUD.
-- Mobile performance remains a priority: fixed small scene counts, Canvas primitives, no heavy filters or new dependencies.
+- Keep the approved dark organic soil / roots / stones / restrained purple flora design.
+- Ground art must scroll from an **unwrapped cumulative distance** reconstructed from the engine's wrapped `groundOffset`.
+- Never seed ground identities from frame buckets or directly treat the 0..23 wrapped offset as total travel.
+- `GROUND_HEIGHT`, floor collision and bird physics remain unchanged.
 
-**Approved concept target — LOCKED**
+**Cursed Woods obstacles — APPROVED / LOCKED ART + TUNED LAYOUT**
 
-The concept sheet approved in chat is the visual source of truth for World 1. Do not invent a new art direction after this point.
+- Keep `world1-cursed-obstacles-v5.js`, its image assets, stable movement method and hitbox width.
+- Keep the currently approved passage opening at `144` logical px; this refinement targets spacing **between obstacle pairs** rather than narrowing the vertical passage again.
+- World 1 normal obstacle cadence target: `112` frames (World 1 only; other worlds remain unchanged).
+- The first-stage obstacle openings must use a deterministic varied-height sequence so the opening does not repeatedly appear at the same vertical level.
+- After the opening stage, existing movement/randomization rules continue normally.
 
-- Background: rich violet moonlight, dense overhead canopy, crooked rooted trees, multiple forest depth layers, distant ruined arches, layered fog, undergrowth, hanging vines, restrained glowing spores/eyes, and a readable gameplay corridor.
-- Ground: replace the brown/yellow diagonal placeholder with dark organic soil, an irregular rocky top edge, hanging roots, buried stones, and small purple mushrooms/crystals/plants.
-- Ground visuals may extend a few pixels around the surface for art only, but `GROUND_HEIGHT`, floor collision, bird physics and obstacle geometry stay unchanged.
-- Approved obstacle images stay LOCKED and must visually sit inside/against the new ground rather than being redesigned.
-- Approved 2026-08-26 refinement: reduce the World 1 obstacle opening slightly from `154` to `144` logical px. This is a gap-size tune only; obstacle art, hitbox width, movement model and collision method stay on the approved V5 system.
-- Ground motion rule: ground rocks/roots/top-edge/flora must use deterministic world-space identities derived from `groundOffset`, not frame-bucket reseeding. This prevents visible popping and keeps scrolling continuous.
+**Crow minions — VISIBILITY POLISH**
+
+- Keep the current crow size, AI and hitbox.
+- Increase separation from the forest with a slightly lighter blue-gray charcoal body, a thin cool rim light and a clearer red enemy eye.
+- Do not add a large halo or bright white outline.
 
 ### World 1 completion gate
 
@@ -70,10 +68,10 @@ World 1 is **COMPLETE** when all of the following are true:
 
 1. The final Cursed Woods background and ground are visually approved.
 2. Approved obstacles still look grounded and move correctly.
-3. Collision behavior is unchanged.
+3. Collision behavior remains aligned with the visible obstacles.
 4. Start Mission and World 1 play without runtime errors.
-5. The background patch loads from the repository without a stale-cache mismatch.
-6. No unrelated World 1 system changed during background polish.
+5. The final patches load from the repository without a stale-cache mismatch.
+6. No unrelated World 1 system changed during visual polish.
 
 After this gate is passed, World 1 is frozen for feature work. Only reported bugs should reopen it.
 
