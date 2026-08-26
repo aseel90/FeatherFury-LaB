@@ -23,6 +23,7 @@
       { id:'stable-runtime',kind:'core',critical:true,src:'https://cdn.jsdelivr.net/gh/aseel90/FeatherFury-LaB@5b83840d68ad65939b8efae336afd76c47b7bdc1/game.js',timeout:16000,readyTimeout:4000,ready:()=>!!window.game },
       { id:'ruins-pillars-v3',src:'ruins-pillars-v3.js?v=1',dependsOn:['stable-runtime'] },
       { id:'cursed-woods-v1',src:'cursed-woods-v1.js?v=4',dependsOn:['stable-runtime'],ready:()=>!!window.game?.__cursedWoodsAtmosphereV4Installed },
+      { id:'world1-background-scope-v1',src:'world1-background-scope-v1.js?v=1',dependsOn:['cursed-woods-v1'],ready:()=>!!window.game?.__world1BackgroundScopeV1Installed },
       { id:'cursed-crows-v1',src:'cursed-crows-v1.js?v=1',dependsOn:['stable-runtime'],ready:()=>!!window.game?.__cursedCrowArtV2Installed },
       { id:'boss-crowking-v1',src:'boss-crowking-v1.js?v=1',dependsOn:['stable-runtime'],ready:()=>!!window.game?.__crowKingVisualV2Installed },
       { id:'boss-fight-core-v1',src:'boss-fight-core-v1.js?v=1',dependsOn:['stable-runtime'],readyTimeout:3500,ready:()=>!!window.game?.__bossFightCoreV1Installed },

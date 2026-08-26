@@ -40,6 +40,7 @@ Approved implementation path:
 - Layered parallax inside the existing renderer.
 - No DOM/CSS background, WebGL, external runtime, new game engine or parallel rendering system.
 - The supplied forest reference is a visual-design reference only; build the FeatherFury version inside the existing renderer.
+- Background scope covers **all playable World 1 forest sections from score 0 onward**; the outer forest starts lighter/readable and progressively becomes denser and more cursed toward the deep forest.
 
 Target visual result:
 
