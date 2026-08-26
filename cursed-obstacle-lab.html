@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Feather Fury — Cursed Woods Obstacle Lab</title>
+  <style>
+    :root{
+      --bg:#0b1220; --panel:#111a2d; --panel2:#16233b; --text:#eef3ff; --muted:#9bb0d3;
+      --accent:#8b5cf6; --accent2:#22c55e; --warn:#f59e0b; --line:#263553;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans Arabic",sans-serif;
+      background: radial-gradient(circle at 50% -20%, #203255 0%, #0d1526 45%, #09101d 100%);
+      color:var(--text);
+    }
+    .wrap{max-width:1200px; margin:0 auto; padding:24px 16px 48px}
+    .hero{display:flex; flex-wrap:wrap; gap:16px; align-items:flex-start; justify-content:space-between; margin-bottom:20px}
+    .hero h1{margin:0 0 8px; font-size:clamp(24px,4vw,38px)}
+    .hero p{margin:0; color:var(--muted); line-height:1.7; max-width:760px}
+    .badge{display:inline-block; padding:8px 12px; border-radius:999px; background:#1c2844; color:#c7d6f7; border:1px solid #32456c; font-size:13px}
+    .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px}
+    .card{
+      background:linear-gradient(180deg,var(--panel) 0%, var(--panel2) 100%);
+      border:1px solid var(--line); border-radius:18px; overflow:hidden;
+      box-shadow:0 10px 30px rgba(0,0,0,.18);
+    }
+    .canvas-wrap{padding:14px 14px 4px}
+    canvas{width:100%; aspect-ratio:9/14; background:linear-gradient(180deg,#14203a 0%,#0c1528 55%,#07111f 100%); border-radius:14px; display:block}
+    .content{padding:14px}
+    h3{margin:0 0 8px; font-size:20px}
+    .subtitle{color:#d5def4; font-size:14px; margin:0 0 10px}
+    ul{margin:0; padding:0 18px 0 0; color:var(--muted); line-height:1.8; font-size:14px}
+    li{margin:0 0 4px}
+    .actions{display:flex; gap:10px; align-items:center; margin-top:14px}
+    button{cursor:pointer; border:none; border-radius:12px; padding:11px 14px; font-weight:700; font-size:14px}
+    .pick{background:var(--accent); color:white}
+    .ghost{background:#1b2741; color:#dbe7ff; border:1px solid #32456c}
+    .picked{display:none; color:#dcfce7; background:#12311d; border:1px solid #1f6d3e; padding:8px 10px; border-radius:10px; font-size:13px}
+    .card.active .picked{display:inline-block}
+    .card.active{outline:2px solid rgba(139,92,246,.7)}
+    .footer{margin-top:24px; padding:16px; background:#10192d; border:1px solid var(--line); border-radius:16px; color:var(--muted); line-height:1.8}
+    .code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; color:#fff; background:#0e1526; padding:2px 6px; border-radius:8px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <div class="badge">Feather Fury — الغابة الملعونة</div>
+        <h1>صفحة اختيار أشكال العوائق</h1>
+        <p>
+          هنا 4 اقتراحات لعوائق Procedural جديدة بدل الصور المشوهة. كل الخيارات تحافظ على نفس فكرة اللعب، لكن تختلف في السيلويت والإحساس البصري.
+          اختر الشكل الأنسب، وبعدها نطبقه داخل اللعبة ونبني عليه الحركة والتصادم النهائيين.
+        </p>
+      </div>
+      <div class="badge">المقياس المعروض: محاكاة شاشة موبايل</div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="footer">
+      <strong>كيف تختار؟</strong><br>
+      ركز على 4 أشياء: وضوح حافة الطيران، إحساس “جذع ملعون” وليس أنبوب، ثبات الشكل بصريًا، وملاءمته للعالم الأول.
+      عند الضغط على <span class="code">اختر هذا</span> سيُحفظ اختيارك محليًا داخل الصفحة حتى لا يضيع أثناء التصفح.
+    </div>
+  </div>
+
+  <script>
+    const options = [
+      {
+        id:'A',
+        name:'الجذع الملتوي النظيف',
+        subtitle:'الأوضح للّعب — مرشحي الأول',
+        bullets:['ساق عضوية واضحة مع عقد كبيرة','حافة الفتحة نظيفة جدًا','تفاصيل قليلة حتى لا تتشوه','مناسب للثابت والمتحرك'],
+        type:'cleanTwist'
+      },
+      {
+        id:'B',
+        name:'الجذع المشقوق بالرون',
+        subtitle:'هوية لعنة أوضح',
+        bullets:['شق بنفسجي مدمج داخل اللحاء','نتوءات بسيطة على الجوانب','أغمق وأكثر عدوانية','أوضح من الصور السابقة'],
+        type:'runedSplit'
+      },
+      {
+        id:'C',
+        name:'الجذر الشوكي',
+        subtitle:'أخطر بصريًا لكن يحتاج حذرًا',
+        bullets:['فروع قصيرة تشبه الأشواك','إحساس غابة ملعونة قوي','يلزم ضبط صارم حتى لا يربك اللاعب','أفضل قرب المرحلة الثانية'],
+        type:'thornRoot'
+      },
+      {
+        id:'D',
+        name:'الطوطم الأطلالي',
+        subtitle:'يمزج الغابة مع الأطلال',
+        bullets:['خشب داكن + كتل أطلال صغيرة','روح العالم القديم مع الشكل الجديد','أثقل بصريًا من الباقي','قد يناسب أعماق الغابة أكثر'],
+        type:'ruinTotem'
+      }
+    ];
+
+    const grid = document.getElementById('grid');
+    const saved = localStorage.getItem('ff_obstacle_choice');
+
+    function makeCard(opt){
+      const card = document.createElement('div');
+      card.className = 'card' + (saved===opt.id ? ' active':'');
+      card.innerHTML = `
+        <div class="canvas-wrap"><canvas width="360" height="560"></canvas></div>
+        <div class="content">
+          <h3>${opt.id} — ${opt.name}</h3>
+          <p class="subtitle">${opt.subtitle}</p>
+          <ul>${opt.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>
+          <div class="actions">
+            <button class="pick">اختر هذا</button>
+            <button class="ghost">معاينة</button>
+            <span class="picked">تم اختياره</span>
+          </div>
+        </div>`;
+      const canvas = card.querySelector('canvas');
+      const ctx = canvas.getContext('2d');
+      drawDemo(ctx,opt.type);
+      card.querySelector('.pick').onclick = ()=>{
+        localStorage.setItem('ff_obstacle_choice', opt.id);
+        document.querySelectorAll('.card').forEach(c=>c.classList.remove('active'));
+        card.classList.add('active');
+      };
+      card.querySelector('.ghost').onclick = ()=> animatePreview(ctx,opt.type);
+      return card;
+    }
+
+    options.forEach(opt=>grid.appendChild(makeCard(opt)));
+
+    function bg(ctx){
+      const g = ctx.createLinearGradient(0,0,0,560);
+      g.addColorStop(0,'#172749');
+      g.addColorStop(.45,'#101b33');
+      g.addColorStop(1,'#08111f');
+      ctx.fillStyle = g; ctx.fillRect(0,0,360,560);
+      ctx.fillStyle='rgba(197, 181, 255, 0.08)';
+      ctx.beginPath(); ctx.arc(284,72,34,0,Math.PI*2); ctx.fill();
+      for(let i=0;i<5;i++){
+        ctx.fillStyle=`rgba(20,30,50,${0.4+i*0.05})`;
+        ctx.beginPath();
+        ctx.moveTo(i*90,560); ctx.lineTo(i*90+20,310); ctx.lineTo(i*90+55,560); ctx.closePath(); ctx.fill();
+      }
+      ctx.fillStyle='#1b2a1f'; ctx.fillRect(0,498,360,62);
+      ctx.strokeStyle='rgba(127,255,183,.18)'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(0,498); ctx.quadraticCurveTo(140,489,360,500); ctx.stroke();
+    }
+
+    function drawBird(ctx){
+      ctx.save();
+      ctx.translate(144,250);
+      ctx.scale(1.02,1.02);
+      ctx.fillStyle='#41a3ff'; ctx.strokeStyle='#102545'; ctx.lineWidth=4;
+      ctx.beginPath(); ctx.ellipse(0,0,24,20,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle='#fff'; ctx.beginPath(); ctx.ellipse(6,-4,10,8,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle='#102545'; ctx.beginPath(); ctx.arc(9,-4,3,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#f7b733'; ctx.beginPath(); ctx.moveTo(18,1); ctx.lineTo(34,7); ctx.lineTo(18,12); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.strokeStyle='#102545'; ctx.lineWidth=5; ctx.beginPath(); ctx.moveTo(-6,-10); ctx.lineTo(10,-14); ctx.stroke();
+      ctx.restore();
+    }
+
+    function barkFill(ctx, path, colors=['#34281f','#473528','#2a1f18']){
+      ctx.save();
+      ctx.fillStyle = colors[0]; ctx.fill(path);
+      ctx.strokeStyle = '#1b140f'; ctx.lineWidth = 4; ctx.stroke(path);
+      ctx.clip(path);
+      for(let i=0;i<10;i++){
+        ctx.strokeStyle = i%2 ? colors[1] : colors[2];
+        ctx.lineWidth = 5 + (i%3);
+        ctx.beginPath();
+        const x = 6 + i*18;
+        ctx.moveTo(x,0);
+        ctx.bezierCurveTo(x-14,55,x+10,130,x-3,220);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawTop(ctx, type, yBottom=184){
+      const x=246, w=72, bottom=yBottom;
+      const p = new Path2D();
+      if(type==='cleanTwist'){
+        p.moveTo(x+10,0); p.lineTo(x+w-10,0);
+        p.bezierCurveTo(x+w-2,40,x+w-16,92,x+w-4,bottom-34);
+        p.bezierCurveTo(x+w-11,bottom-12,x+50,bottom-2,x+36,bottom);
+        p.bezierCurveTo(x+22,bottom-2,x+11,bottom-13,x+4,bottom-34);
+        p.bezierCurveTo(x+16,92,x+2,40,x+10,0); p.closePath();
+        barkFill(ctx,p);
+      } else if(type==='runedSplit'){
+        p.moveTo(x+12,0); p.lineTo(x+w-8,0);
+        p.bezierCurveTo(x+w+4,35,x+w-6,105,x+w-2,bottom-30);
+        p.bezierCurveTo(x+w-10,bottom-8,x+48,bottom-3,x+34,bottom);
+        p.bezierCurveTo(x+20,bottom-2,x+8,bottom-10,x+2,bottom-30);
+        p.bezierCurveTo(x+8,105,x-2,35,x+12,0); p.closePath();
+        barkFill(ctx,p,['#2f231d','#50362c','#241a16']);
+        ctx.save(); ctx.strokeStyle='#b495ff'; ctx.lineWidth=5; ctx.beginPath();
+        ctx.moveTo(x+38,50); ctx.bezierCurveTo(x+24,84,x+52,118,x+36,150); ctx.stroke(); ctx.restore();
+      } else if(type==='thornRoot'){
+        p.moveTo(x+14,0); p.lineTo(x+w-12,0);
+        p.bezierCurveTo(x+w+2,35,x+w-10,110,x+w-6,bottom-28);
+        p.bezierCurveTo(x+w-14,bottom-12,x+50,bottom-3,x+36,bottom);
+        p.bezierCurveTo(x+18,bottom-1,x+9,bottom-9,x+3,bottom-28);
+        p.bezierCurveTo(x+8,110,x-4,35,x+14,0); p.closePath();
+        barkFill(ctx,p,['#30251c','#4d3729','#261d17']);
+        thorn(ctx,x+6,92,-1); thorn(ctx,x+w-8,118,1); thorn(ctx,x+8,145,-1);
+      } else if(type==='ruinTotem'){
+        p.moveTo(x+14,0); p.lineTo(x+w-10,0);
+        p.bezierCurveTo(x+w+2,30,x+w-5,105,x+w-2,bottom-26);
+        p.bezierCurveTo(x+w-8,bottom-8,x+50,bottom-4,x+36,bottom);
+        p.bezierCurveTo(x+21,bottom-2,x+9,bottom-11,x+3,bottom-26);
+        p.bezierCurveTo(x+6,104,x-2,30,x+14,0); p.closePath();
+        barkFill(ctx,p,['#33271f','#4a382d','#281d18']);
+        stone(ctx,x-8,78,20,22); stone(ctx,x+w-8,136,22,24);
+      }
+      mist(ctx, x+w/2, bottom-24, 50);
+    }
+
+    function drawBottom(ctx, type, yTop=346){
+      const x=246, w=72, y=yTop, bottom=498;
+      const p = new Path2D();
+      if(type==='cleanTwist'){
+        p.moveTo(x+34,y); p.bezierCurveTo(x+24,y+2,x+13,y+12,x+4,y+32);
+        p.bezierCurveTo(x+10,90+y-bottom,x+2,bottom-30,x+10,bottom);
+        p.lineTo(x+w-10,bottom);
+        p.bezierCurveTo(x+w-2,bottom-28,x+w-10,90+y-bottom,x+w-3,y+32);
+        p.bezierCurveTo(x+w-12,y+10,x+48,y+2,x+34,y); p.closePath();
+        barkFill(ctx,p);
+      } else if(type==='runedSplit'){
+        p.moveTo(x+35,y); p.bezierCurveTo(x+23,y+1,x+12,y+11,x+3,y+28);
+        p.bezierCurveTo(x+12,bottom-120,x+0,bottom-34,x+9,bottom);
+        p.lineTo(x+w-8,bottom);
+        p.bezierCurveTo(x+w,bottom-34,x+w-11,bottom-120,x+w-3,y+28);
+        p.bezierCurveTo(x+w-12,y+12,x+49,y+2,x+35,y); p.closePath();
+        barkFill(ctx,p,['#2f231d','#50362c','#241a16']);
+        ctx.save(); ctx.strokeStyle='#b495ff'; ctx.lineWidth=5; ctx.beginPath();
+        ctx.moveTo(x+42,y+24); ctx.bezierCurveTo(x+54,y+58,x+24,y+86,x+40,y+118); ctx.stroke(); ctx.restore();
+      } else if(type==='thornRoot'){
+        p.moveTo(x+35,y); p.bezierCurveTo(x+21,y+2,x+11,y+12,x+2,y+30);
+        p.bezierCurveTo(x+10,bottom-122,x+2,bottom-36,x+10,bottom);
+        p.lineTo(x+w-10,bottom);
+        p.bezierCurveTo(x+w-2,bottom-36,x+w-10,bottom-122,x+w-4,y+30);
+        p.bezierCurveTo(x+w-11,y+12,x+49,y+2,x+35,y); p.closePath();
+        barkFill(ctx,p,['#30251c','#4d3729','#261d17']);
+        thorn(ctx,x+6,y+54,-1); thorn(ctx,x+w-7,y+84,1); thorn(ctx,x+8,y+114,-1);
+      } else if(type==='ruinTotem'){
+        p.moveTo(x+35,y); p.bezierCurveTo(x+22,y+2,x+12,y+12,x+3,y+30);
+        p.bezierCurveTo(x+10,bottom-122,x+2,bottom-38,x+8,bottom);
+        p.lineTo(x+w-8,bottom);
+        p.bezierCurveTo(x+w-2,bottom-38,x+w-9,bottom-122,x+w-4,y+30);
+        p.bezierCurveTo(x+w-10,y+12,x+48,y+2,x+35,y); p.closePath();
+        barkFill(ctx,p,['#33271f','#4a382d','#281d18']);
+        stone(ctx,x-6,y+54,19,20); stone(ctx,x+w-7,bottom-38,24,22);
+      }
+      mist(ctx, x+w/2, y+28, 52);
+    }
+
+    function thorn(ctx,x,y,dir){
+      ctx.save(); ctx.fillStyle='#2a1e19'; ctx.strokeStyle='#16100d'; ctx.lineWidth=3;
+      ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+18*dir,y+8); ctx.lineTo(x+5*dir,y+18); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
+    }
+    function stone(ctx,x,y,w,h){
+      ctx.save(); ctx.fillStyle='#5b6270'; ctx.strokeStyle='#353b45'; ctx.lineWidth=3;
+      ctx.beginPath(); ctx.moveTo(x+3,y); ctx.lineTo(x+w-3,y+2); ctx.lineTo(x+w,y+h-4); ctx.lineTo(x+4,y+h); ctx.lineTo(x,y+6); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
+    }
+    function mist(ctx,x,y,r){
+      const g = ctx.createRadialGradient(x,y,8,x,y,r);
+      g.addColorStop(0,'rgba(181,145,255,0.20)'); g.addColorStop(.55,'rgba(141,92,246,0.08)'); g.addColorStop(1,'rgba(141,92,246,0)');
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+    }
+
+    function drawDemo(ctx,type){
+      ctx.clearRect(0,0,360,560);
+      bg(ctx);
+      drawTop(ctx,type,190);
+      drawBottom(ctx,type,345);
+      drawBird(ctx);
+    }
+
+    function animatePreview(ctx,type){
+      let t=0;
+      cancelAnimationFrame(ctx._raf||0);
+      function frame(){
+        t+=1;
+        ctx.clearRect(0,0,360,560);
+        bg(ctx);
+        const drift = Math.sin(t/18)*10;
+        drawTop(ctx,type,190+drift);
+        drawBottom(ctx,type,345+drift);
+        ctx.save(); ctx.translate(0, Math.sin(t/10)*2); drawBird(ctx); ctx.restore();
+        ctx._raf = requestAnimationFrame(frame);
+        if(t>160) cancelAnimationFrame(ctx._raf);
+      }
+      frame();
+    }
+  </script>
+</body>
+</html>
