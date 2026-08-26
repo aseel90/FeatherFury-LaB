@@ -112,9 +112,6 @@
       ctx.quadraticCurveTo(x + 69, baseY - towerH + 4, x + 36, baseY - towerH + 25);
       ctx.closePath();
       ctx.fill();
-
-      ctx.clearRect(x + 24, baseY - towerH * 0.62, 5, 8);
-      ctx.clearRect(x + 105, baseY - towerH * 0.34, 4, 7);
     }
     ctx.restore();
 
@@ -277,6 +274,16 @@
     const title = document.getElementById('worldTitle');
     if (title && game.currentWorldIndex === 0) {
       title.textContent = game.lang === 'en' ? 'Cursed Woods' : 'الغابة الملعونة';
+    }
+
+    const isWorld1 = game.activeWorld === 0 || game.currentWorldIndex === 0;
+    const stage = document.getElementById('stageDisplay');
+    if (stage && isWorld1 && !game.boss?.active && !['BOSS_WARNING', 'BOSS_INTRO', 'BOSS_OUTRO', 'FLY_AWAY'].includes(game.state)) {
+      try {
+        const cfg = window.CONFIG || {};
+        const deep = (Number(game.score) || 0) >= (Number(cfg.STAGE1_END) || 15);
+        stage.textContent = deep ? I18N[game.lang].stage2 : I18N[game.lang].stage1;
+      } catch (_) {}
     }
   }
 
