@@ -94,6 +94,8 @@
     const game = window.game;
     const state = game?.state || '';
     const leaving = state === 'FLY_AWAY';
+    const dialogue = game?.activeWorld === 0 && state === 'BOSS_OUTRO' && game?.__ffVictoryCine?.phase === 'dialogue';
+    const talking = dialogue && !game?.storyCompleted;
     const cfg = window.CONFIG || {};
     const canvasW = Number(cfg.CANVAS_WIDTH) || 480;
     const spawnX = canvasW + 100;
@@ -107,10 +109,12 @@
     const tuck = Math.sin(frame * 0.07) * 0.8;
     const introScale = state === 'BOSS_OUTRO' ? 0.90 + introProgress * 0.10 : 1;
     const exitTilt = leaving ? -0.08 : 0;
+    const dialogueTilt = dialogue ? Math.sin(frame * 0.038) * 0.035 : 0;
+    const talkPulse = talking ? (0.5 + Math.sin(frame * 0.48) * 0.5) : 0;
 
     ctx.save();
     ctx.translate(x, y + hover);
-    ctx.rotate(exitTilt);
+    ctx.rotate(exitTilt + dialogueTilt);
     ctx.scale(introScale * breathe, introScale * breathe);
 
     if (state === 'BOSS_OUTRO') ctx.globalAlpha *= 0.58 + introProgress * 0.42;
@@ -225,9 +229,21 @@
     ctx.beginPath();
     ctx.moveTo(-6.5, -8);
     ctx.quadraticCurveTo(0, -12, 6.5, -8);
-    ctx.lineTo(0, 4.5);
+    ctx.lineTo(0, 4.5 + talkPulse * 3.2);
     ctx.closePath();
     pathFillStroke(ctx, beak, '#4a260c', 1.8);
+
+    if (talking) {
+      ctx.save();
+      ctx.globalAlpha = 0.28 + talkPulse * 0.42;
+      ctx.strokeStyle = '#7c2d12';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(-2.8, -1 + talkPulse * 1.2);
+      ctx.quadraticCurveTo(0, 0.8 + talkPulse * 1.8, 2.8, -1 + talkPulse * 1.2);
+      ctx.stroke();
+      ctx.restore();
+    }
 
     ctx.strokeStyle = 'rgba(255,239,213,.28)';
     ctx.lineWidth = 1.1;
