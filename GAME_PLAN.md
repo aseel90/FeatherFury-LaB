@@ -61,6 +61,8 @@ The concept sheet approved in chat is the visual source of truth for World 1. Do
 - Ground: replace the brown/yellow diagonal placeholder with dark organic soil, an irregular rocky top edge, hanging roots, buried stones, and small purple mushrooms/crystals/plants.
 - Ground visuals may extend a few pixels around the surface for art only, but `GROUND_HEIGHT`, floor collision, bird physics and obstacle geometry stay unchanged.
 - Approved obstacle images stay LOCKED and must visually sit inside/against the new ground rather than being redesigned.
+- Approved 2026-08-26 refinement: reduce the World 1 obstacle opening slightly from `154` to `144` logical px. This is a gap-size tune only; obstacle art, hitbox width, movement model and collision method stay on the approved V5 system.
+- Ground motion rule: ground rocks/roots/top-edge/flora must use deterministic world-space identities derived from `groundOffset`, not frame-bucket reseeding. This prevents visible popping and keeps scrolling continuous.
 
 ### World 1 completion gate
 
