@@ -4,7 +4,7 @@
 
   function install() {
     const game = window.game;
-    const cfg = window.CONFIG || null;
+    const cfg = typeof CONFIG !== 'undefined' ? CONFIG : (window.CONFIG || null);
     if (!game || !game.ctx || typeof game.draw !== 'function' || !cfg) return false;
     if (game.__ffW1GroundGapPolishV1Installed) return true;
 
