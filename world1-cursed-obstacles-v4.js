@@ -27,14 +27,15 @@
     if (assets.ready || assets.failed || assets.loading) return;
     assets.loading = true;
     try {
-      const [top, bottom] = await Promise.all([
-        Promise.all(SOURCES.top.map(loadImage)),
-        Promise.all(SOURCES.bottom.map(loadImage))
+      const [topSettled, bottomSettled] = await Promise.all([
+        Promise.allSettled(SOURCES.top.map(loadImage)),
+        Promise.allSettled(SOURCES.bottom.map(loadImage))
       ]);
-      assets.top = top;
-      assets.bottom = bottom;
-      assets.ready = top.length > 0 && bottom.length > 0;
-      console.log('[FF-LAB] world1-cursed-obstacles-v4-assets-ready');
+      assets.top = topSettled.filter(r => r.status === 'fulfilled').map(r => r.value);
+      assets.bottom = bottomSettled.filter(r => r.status === 'fulfilled').map(r => r.value);
+      assets.ready = assets.top.length > 0 && assets.bottom.length > 0;
+      if (!assets.ready) throw new Error('No usable top/bottom obstacle image pair');
+      console.log(`[FF-LAB] world1-cursed-obstacles-v4-assets-ready top=${assets.top.length} bottom=${assets.bottom.length}`);
     } catch (err) {
       assets.failed = true;
       console.warn('[FF-LAB] world1-cursed-obstacles-v4-assets-failed', err);
@@ -143,7 +144,7 @@
 
     game.__ffW1CursedObstaclesV4Installed = true;
     window.__FF_W1_CURSED_OBSTACLES_V4__ = {
-      version: 'world1-cursed-obstacles-v4',
+      version: 'world1-cursed-obstacles-v4.1',
       visual: 'image-based-cursed-woods-sprites',
       responsive: 'pillar-geometry-relative',
       variants: SOURCES.top.length + SOURCES.bottom.length,
