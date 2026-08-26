@@ -187,45 +187,70 @@
       ctx.restore();
     }
 
+    function redrawDialogueOverlay(g) {
+      const ctx = g.ctx;
+      const width = Number(cfg.CANVAS_WIDTH) || 360;
+      const height = Number(cfg.CANVAS_HEIGHT) || 640;
+      const boxW = width - 24;
+      const boxH = 145;
+      const boxX = 12;
+      const boxY = height - boxH - 15;
+      const r = 14;
+
+      ctx.save();
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.985)';
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(boxX, boxY, boxW, boxH, r);
+      else ctx.rect(boxX, boxY, boxW, boxH);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(boxX + 4, boxY + 4, boxW - 8, boxH - 8, r - 3);
+      else ctx.rect(boxX + 4, boxY + 4, boxW - 8, boxH - 8);
+      ctx.stroke();
+
+      ctx.font = 'bold 13.5px "Tajawal", "Changa", sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      let curY = boxY + 28;
+      if (g.storyText1 && typeof g.drawWrappedDialogueText === 'function') {
+        curY = g.drawWrappedDialogueText(ctx, g.storyText1, width / 2, curY, boxW - 20, 20);
+      }
+      if (g.storyText2 && typeof g.drawWrappedDialogueText === 'function') {
+        curY += 4;
+        curY = g.drawWrappedDialogueText(ctx, g.storyText2, width / 2, curY, boxW - 20, 20);
+      }
+
+      if (g.storyCompleted) {
+        ctx.font = 'bold 12.5px "Tajawal", "Changa", sans-serif';
+        ctx.fillStyle = '#f1c40f';
+        const dict = typeof I18N !== 'undefined' ? I18N[g.lang] : null;
+        const actionText = g.state === 'STORY'
+          ? (dict?.tapToLaunch || (g.lang === 'en' ? 'Tap to launch' : 'اضغط للانطلاق'))
+          : (dict?.tapToContinue || (g.lang === 'en' ? 'Tap to continue' : 'اضغط للمتابعة'));
+        if (Math.sin((Number(g.frame) || 0) * .1) > 0) ctx.fillText(actionText, width / 2, boxY + boxH - 12);
+      }
+      ctx.restore();
+    }
+
     game.draw = function(...args) {
       const result = priorDraw(...args);
       if (this.activeWorld === 0 && this.ctx) {
         const dialogueScene = this.state === 'STORY' || this.state === 'BOSS_INTRO' || this.state === 'BOSS_OUTRO';
-        if (dialogueScene) {
-          // The core renderer draws dialogue after its own ground. Our custom ground is a final
-          // visual pass, so clip out the dialogue panel area to keep the panel above the floor.
-          const ctx = this.ctx;
-          const width = Number(cfg.CANVAS_WIDTH) || 360;
-          const height = Number(cfg.CANVAS_HEIGHT) || 640;
-          const groundHeight = Number(cfg.GROUND_HEIGHT) || 95;
-          const groundY = height - groundHeight;
-          const boxW = width - 24;
-          const boxH = 145;
-          const boxX = 12;
-          const boxY = height - boxH - 15;
-          const pad = 4;
-          const cutX = Math.max(0, boxX - pad);
-          const cutRight = Math.min(width, boxX + boxW + pad);
-          const cutBottom = Math.min(height, boxY + boxH + pad);
-
-          ctx.save();
-          ctx.beginPath();
-          if (cutX > 0) ctx.rect(0, groundY, cutX, groundHeight);
-          if (cutRight < width) ctx.rect(cutRight, groundY, width - cutRight, groundHeight);
-          if (cutBottom < height) ctx.rect(cutX, Math.max(groundY, cutBottom), cutRight - cutX, height - Math.max(groundY, cutBottom));
-          ctx.clip();
-          drawSmoothGround(this);
-          ctx.restore();
-        } else {
-          drawSmoothGround(this);
-        }
+        drawSmoothGround(this);
+        if (dialogueScene) redrawDialogueOverlay(this);
       }
       return result;
     };
 
     game.__ffW1GroundObstaclePolishV2Installed = true;
     window.__FF_W1_GROUND_OBSTACLE_POLISH_V2__ = {
-      version: 'world1-ground-obstacle-polish-v2.1',
+      version: 'world1-ground-obstacle-polish-v2.2',
       gapSize: GAP,
       horizontalSpacingTuned: true,
       spawnNormal: W1_SPAWN_NORMAL,
@@ -235,7 +260,8 @@
       hitboxWidthChanged: false,
       groundHeightChanged: false,
       birdPhysicsChanged: false,
-      dialogueLayerSafe: true
+      dialogueLayerSafe: true,
+      dialogueFinalPass: true
     };
     console.log('[FF-LAB] world1-ground-obstacle-polish-v2-installed');
     return true;
