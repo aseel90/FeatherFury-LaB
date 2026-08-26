@@ -141,10 +141,8 @@
     function drawFrostBackground(ctx) {
       advanceEnvironment();
       drawAurora(ctx, 0.06 + bg.stageBlend * 0.08 + bg.bossBlend * 0.92);
-
-      // Image layers stay transparent so the core World 2 sky can change at 15 and at boss entry.
       drawTiledImage(ctx, assets.mountains, bg.travel, groundY() - 300, 300, .62 + bg.bossBlend*.08, .045);
-      drawTiledImage(ctx, assets.pines, bg.travel, groundY() - 238, 238, .50 * (1 - bg.stageBlend*.20), .105, 170);
+      drawTiledImage(ctx, assets.pines, bg.travel, groundY() - 246, 242, .54 * (1 - bg.stageBlend*.16), .105, 170);
       drawTiledImage(ctx, assets.avalanche, bg.travel, groundY() - 178, 178, bg.stageBlend * (.48 + bg.bossBlend*.12), .16, 90);
       drawNearIceCliffs(ctx, .12 + bg.stageBlend * .38);
 
@@ -216,14 +214,18 @@
       const ctx = g.ctx;
       const gh = Number(C.GROUND_HEIGHT) || 70;
       const gy = H() - gh;
-      const scale = gh / img.naturalHeight;
-      const tileW = img.naturalWidth * scale;
+      const overhang = 12;
+      const drawH = gh + overhang;
+      const drawY = gy - overhang;
+      const scale = drawH / img.naturalHeight;
+      const tileW = Math.max(1, Math.ceil(img.naturalWidth * scale));
       const off = mod(bg.travel * .96, tileW);
       ctx.save();
-      for (let x = -off - tileW; x < W() + tileW; x += tileW) ctx.drawImage(img, x, gy, tileW, gh);
-      // thin frost highlight glues the art to gameplay without changing collision geometry
-      ctx.globalAlpha = .58;
-      ctx.strokeStyle = '#d9f5ff';
+      for (let x = Math.floor(-off - tileW); x < W() + tileW; x += tileW) {
+        ctx.drawImage(img, x, drawY, tileW + 1, drawH);
+      }
+      ctx.globalAlpha = .42;
+      ctx.strokeStyle = '#eefcff';
       ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(0,gy+.5); ctx.lineTo(W(),gy+.5); ctx.stroke();
       ctx.restore();
@@ -334,7 +336,7 @@
 
     game.__w2VisualsV1Installed = true;
     window.__FF_W2_ENVIRONMENT_ART_V1__ = {
-      version: 'world2-environment-art-v1',
+      version: 'world2-environment-art-v1.1-ground-pine-polish',
       imageAssets: true,
       backgroundImageLayers: 3,
       groundImageTile: true,
@@ -343,6 +345,9 @@
       hitboxesChanged: false,
       gapChanged: false,
       groundHeightChanged: false,
+      pineBasesGrounded: true,
+      legacyGroundCapCovered: true,
+      groundTileSeamOverlap: true,
       failedAssets: envAssetState.failed.slice()
     };
     console.log('[FF-LAB] w2-visuals-v1-environment-art-installed');
