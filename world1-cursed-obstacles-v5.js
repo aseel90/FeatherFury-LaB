@@ -214,7 +214,6 @@
       const groundY = (Number(CFG.CANVAS_HEIGHT) || 640) - (Number(CFG.GROUND_HEIGHT) || 95);
       this.pillars.forEach(p => {
         if (!p || p.smashed) return;
-        normalizePillar(p, this);
         const topH = p.topHeight;
         const bottomY = topH + gap;
         const bottomH = Math.max(0, groundY - bottomY);
