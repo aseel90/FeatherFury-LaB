@@ -72,7 +72,7 @@
       { id:'world1-cursed-obstacle-bottom-final',src:'world1-cursed-obstacle-asset-bottom-a.js?v=2',dependsOn:['world1-cursed-obstacle-top-final'] },
       { id:'world1-cursed-obstacles-v5-final',src:'world1-cursed-obstacles-v5.js?v=1',dependsOn:['world1-cursed-obstacle-bottom-final'],readyTimeout:3500,ready:()=>!!window.game?.__ffW1CursedObstaclesV5Installed },
       { id:'world1-classic-enhanced-background-v1-final',src:'world1-classic-enhanced-background-v1.js?v=1',dependsOn:['world1-cursed-obstacles-v5-final'],readyTimeout:3500,ready:()=>!!window.game?.__ffW1ClassicEnhancedBgV1Installed },
-      { id:'world1-ground-obstacle-polish-v2-final',src:'world1-ground-obstacle-polish-v2.js?v=1',dependsOn:['world1-classic-enhanced-background-v1-final'],readyTimeout:3500,ready:()=>!!window.game?.__ffW1GroundObstaclePolishV2Installed }
+      { id:'world1-ground-obstacle-polish-v2-final',src:'world1-ground-obstacle-polish-v2.js?v=2',dependsOn:['world1-classic-enhanced-background-v1-final'],readyTimeout:3500,ready:()=>!!window.game?.__ffW1GroundObstaclePolishV2Installed }
     ],
     onCriticalError: async () => { if (typeof window.__FF_START_LEGACY_PATCH_CHAIN__ === 'function') { console.warn('[FeatherFury] Patch Runner critical failure; starting legacy loader fallback.'); await window.__FF_START_LEGACY_PATCH_CHAIN__(); } }
   };
