@@ -22,23 +22,29 @@
 
   const pines = svg(`
   <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="320" viewBox="0 0 1024 320">
-    <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#15384d"/><stop offset="1" stop-color="#0c2636"/></linearGradient></defs>
-    <path fill="#17384b" opacity=".72" d="M0 320v-54l66-42 64 33 86-69 88 76 70-49 91 58 72-67 83 55 85-61 92 73 79-50 128 69v48z"/>
-    <g fill="url(#g)" stroke="#214b61" stroke-width="2">
-      <g transform="translate(20 55)"><path d="M24 0L0 61h13L0 88h15L0 121h48L33 88h15L34 61h14z"/><path fill="#bcdce9" opacity=".5" d="M24 0L10 35h27zM17 55L5 77h38z"/></g>
+    <defs>
+      <linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#173b50"/><stop offset="1" stop-color="#0a2534"/></linearGradient>
+      <linearGradient id="ridge" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d9eef5" stop-opacity=".68"/><stop offset="1" stop-color="#5f8fa4" stop-opacity=".26"/></linearGradient>
+    </defs>
+    <path fill="#17384b" opacity=".58" d="M0 320v-44l66-33 64 24 86-55 88 60 70-39 91 47 72-52 83 44 85-48 92 57 79-39 128 54v44z"/>
+    <g fill="url(#g)" stroke="#214b61" stroke-width="2" transform="translate(0 70)">
+      <g transform="translate(20 55)"><path d="M24 0L0 61h13L0 88h15L0 121h48L33 88h15L34 61h14z"/><path fill="#cbe6ef" opacity=".52" d="M24 0L10 35h27zM17 55L5 77h38z"/></g>
       <g transform="translate(90 92) scale(.82)"><path d="M24 0L0 61h13L0 88h15L0 121h48L33 88h15L34 61h14z"/></g>
-      <g transform="translate(152 31) scale(1.08)"><path d="M24 0L0 61h13L0 88h15L0 121h48L33 88h15L34 61h14z"/><path fill="#d9eef5" opacity=".48" d="M24 0L11 34h26zM17 56L6 77h37z"/></g>
+      <g transform="translate(152 31) scale(1.08)"><path d="M24 0L0 61h13L0 88h15L0 121h48L33 88h15L34 61h14z"/><path fill="#e0f1f6" opacity=".5" d="M24 0L11 34h26zM17 56L6 77h37z"/></g>
       <g transform="translate(235 70) scale(.92)"><path d="M24 0L0 61h13L0 88h15L0 121h48L33 88h15L34 61h14z"/></g>
-      <g transform="translate(305 42) scale(1.13)"><path d="M24 0L0 61h13L0 88h15L0 121h48L33 88h15L34 61h14z"/><path fill="#d9eef5" opacity=".5" d="M24 0L11 34h26z"/></g>
+      <g transform="translate(305 42) scale(1.13)"><path d="M24 0L0 61h13L0 88h15L0 121h48L33 88h15L34 61h14z"/><path fill="#e0f1f6" opacity=".52" d="M24 0L11 34h26z"/></g>
       <g transform="translate(397 63)"><path d="M24 0L0 61h13L0 88h15L0 121h48L33 88h15L34 61h14z"/></g>
-      <g transform="translate(471 35) scale(1.12)"><path d="M24 0L0 61h13L0 88h15L0 121h48L33 88h15L34 61h14z"/><path fill="#d9eef5" opacity=".48" d="M24 0L11 34h26z"/></g>
+      <g transform="translate(471 35) scale(1.12)"><path d="M24 0L0 61h13L0 88h15L0 121h48L33 88h15L34 61h14z"/><path fill="#e0f1f6" opacity=".5" d="M24 0L11 34h26z"/></g>
       <g transform="translate(562 74) scale(.9)"><path d="M24 0L0 61h13L0 88h15L0 121h48L33 88h15L34 61h14z"/></g>
       <g transform="translate(631 40) scale(1.07)"><path d="M24 0L0 61h13L0 88h15L0 121h48L33 88h15L34 61h14z"/></g>
       <g transform="translate(721 64)"><path d="M24 0L0 61h13L0 88h15L0 121h48L33 88h15L34 61h14z"/></g>
-      <g transform="translate(798 30) scale(1.15)"><path d="M24 0L0 61h13L0 88h15L0 121h48L33 88h15L34 61h14z"/><path fill="#d9eef5" opacity=".5" d="M24 0L11 34h26z"/></g>
+      <g transform="translate(798 30) scale(1.15)"><path d="M24 0L0 61h13L0 88h15L0 121h48L33 88h15L34 61h14z"/><path fill="#e0f1f6" opacity=".52" d="M24 0L11 34h26z"/></g>
       <g transform="translate(901 72) scale(.92)"><path d="M24 0L0 61h13L0 88h15L0 121h48L33 88h15L34 61h14z"/></g>
       <g transform="translate(970 48) scale(1.02)"><path d="M24 0L0 61h13L0 88h15L0 121h48L33 88h15L34 61h14z"/></g>
     </g>
+    <path fill="#31586b" opacity=".72" d="M0 320v-42l70-13 61 9 64-16 70 13 82-18 74 14 71-9 81 14 78-17 73 14 84-12 73 16 83-14 60 11v50z"/>
+    <path fill="url(#ridge)" d="M0 285l69-12 63 8 64-15 70 13 81-17 75 13 70-10 81 15 78-18 74 14 84-12 73 16 82-13 60 10v43H0z"/>
+    <path fill="#eef8fb" opacity=".74" d="M0 284l69-11 63 8 64-14 70 12 81-16 75 12 70-9 81 14 78-17 74 13 84-11 73 15 82-12 60 9v8l-61-6-81 13-72-14-85 12-74-12-78 16-80-13-71 8-75-11-80 15-70-11-64 13-63-7-69 10z"/>
   </svg>`);
 
   const avalanche = svg(`
@@ -56,13 +62,25 @@
   </svg>`);
 
   const ground = svg(`
-  <svg xmlns="http://www.w3.org/2000/svg" width="512" height="128" viewBox="0 0 512 128">
-    <defs><linearGradient id="r" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#1c3448"/><stop offset="1" stop-color="#101e2c"/></linearGradient><linearGradient id="i" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#bceafa"/><stop offset="1" stop-color="#69b9da"/></linearGradient></defs>
-    <rect width="512" height="128" fill="url(#r)"/><path fill="url(#i)" d="M0 10l32-2 32 4 32-5 32 7 32-4 32 2 32-3 32 4 32-2 32 2 32-4 32 6 32-8 32 7 32-4v43H0z"/>
-    <path fill="#f0f9fd" d="M0 0h512v11l-32-1-32 4-32-7-32 8-32-6-32 4-32-2-32 2-32-4-32 3-32-2-32 4-32-7-32 5-32-4-32 2z"/>
-    <path stroke="#2f7ca2" stroke-width="2" fill="none" opacity=".85" d="M80 43l12 14-7 15 18 14M181 43l14 13-9 15 19 17M315 43l13 14-8 15 17 15M431 43l14 13-8 16 18 15"/>
-    <g fill="#263d50"><ellipse cx="55" cy="104" rx="9" ry="4"/><ellipse cx="152" cy="92" rx="6" ry="3"/><ellipse cx="269" cy="109" rx="12" ry="5"/><ellipse cx="378" cy="95" rx="8" ry="4"/><ellipse cx="486" cy="112" rx="10" ry="4"/></g>
-    <g fill="#8ce5fa"><path d="M35 46l5-13 5 13z"/><path d="M144 48l5-16 6 16z"/><path d="M260 46l5-14 5 14z"/><path d="M381 48l5-17 6 17z"/><path d="M494 46l5-14 5 14z"/></g>
+  <svg xmlns="http://www.w3.org/2000/svg" width="768" height="160" viewBox="0 0 768 160">
+    <defs>
+      <linearGradient id="rock" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#183247"/><stop offset="1" stop-color="#081826"/></linearGradient>
+      <linearGradient id="ice" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#bfeefa"/><stop offset=".46" stop-color="#72c6df"/><stop offset="1" stop-color="#347fa2"/></linearGradient>
+      <linearGradient id="deep" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2c6e8e" stop-opacity=".72"/><stop offset="1" stop-color="#183e58" stop-opacity=".18"/></linearGradient>
+    </defs>
+    <rect width="768" height="160" fill="url(#rock)"/>
+    <path fill="url(#ice)" d="M0 23l38-4 35 3 45-7 39 7 46-4 42 5 44-6 48 6 42-4 46 5 44-8 42 7 49-4 43 5 45-7 43 6 47-5 40 4v72H0z"/>
+    <path fill="#f6fcfe" d="M0 8l38-3 35 4 45-6 39 7 46-4 42 5 44-6 48 6 42-4 46 5 44-7 42 7 49-4 43 5 45-7 43 6 47-5 40 4v18l-40-4-47 5-43-6-45 7-43-5-49 4-42-7-44 7-46-5-42 4-48-6-44 6-42-5-46 4-39-7-45 6-35-4-38 3z"/>
+    <path fill="#d8f2f9" opacity=".82" d="M0 26l45-2 32 5 43-7 39 6 49-4 37 6 47-7 45 6 43-4 46 6 43-8 43 7 51-5 40 6 48-7 40 6 49-5 38 4v20H0z"/>
+    <path fill="url(#deep)" d="M0 74l52-7 46 8 58-10 50 8 61-6 58 8 55-9 54 9 61-7 51 8 60-10 55 8 58-7 49 7 52-8 50 7v26H0z"/>
+    <g stroke="#257493" stroke-width="2.4" fill="none" opacity=".78">
+      <path d="M75 55l17 15-9 16 17 17"/><path d="M203 52l14 14-8 16 19 18"/><path d="M353 57l16 13-10 17 18 16"/><path d="M506 52l13 16-8 15 18 19"/><path d="M654 55l17 14-9 16 16 16"/>
+    </g>
+    <g stroke="#8fdcf0" stroke-width="1.2" fill="none" opacity=".42">
+      <path d="M129 39l10 8 14-6"/><path d="M280 42l12 7 13-6"/><path d="M430 39l11 8 15-5"/><path d="M594 42l12 7 14-6"/>
+    </g>
+    <g fill="#20394d" opacity=".94"><ellipse cx="57" cy="128" rx="13" ry="5"/><ellipse cx="166" cy="116" rx="8" ry="4"/><ellipse cx="285" cy="137" rx="15" ry="6"/><ellipse cx="407" cy="120" rx="10" ry="4"/><ellipse cx="542" cy="136" rx="14" ry="5"/><ellipse cx="686" cy="118" rx="9" ry="4"/></g>
+    <g fill="#75d8ef" opacity=".72"><path d="M30 98l6-15 6 15z"/><path d="M146 94l6-18 7 18z"/><path d="M267 99l6-15 6 15z"/><path d="M391 95l6-17 7 17z"/><path d="M514 98l6-16 6 16z"/><path d="M635 95l7-18 7 18z"/><path d="M746 98l6-15 6 15z"/></g>
   </svg>`);
 
   const obstacleTop = svg(`
