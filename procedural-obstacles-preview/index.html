@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>Feather Fury Procedural Obstacles Preview</title>
+  <style>
+    html,body{margin:0;min-height:100%;background:#0d1110;color:#eee;font-family:system-ui,-apple-system,sans-serif}
+    #status{display:grid;place-items:center;min-height:100vh;padding:24px;text-align:center;line-height:1.5}
+  </style>
+</head>
+<body>
+  <div id="status">Loading Feather Fury procedural obstacle preview…</div>
+  <script>
+  (async()=>{
+    const htmlUrl='https://raw.githubusercontent.com/aseel90/FeatherFury/procedural-obstacle-preview/lab/procedural-obstacles/index.html';
+    const jsUrl='https://raw.githubusercontent.com/aseel90/FeatherFury/procedural-obstacle-preview/lab/procedural-obstacles/procedural-obstacles.js';
+    try{
+      let html=await (await fetch(htmlUrl,{cache:'no-store'})).text();
+      html=html.replace('./procedural-obstacles.js',jsUrl);
+      document.open();
+      document.write(html);
+      document.close();
+    }catch(err){
+      document.getElementById('status').textContent='Preview failed to load: '+err.message;
+    }
+  })();
+  </script>
+</body>
+</html>
