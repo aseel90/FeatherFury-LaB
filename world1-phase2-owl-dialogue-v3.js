@@ -5,7 +5,7 @@
 
   function install() {
     const game = window.game;
-    if (!game || typeof game.updateBoss !== 'function' || typeof game.update !== 'function') return false;
+    if (!game || typeof game.updateBoss !== 'function') return false;
     if (game.__ffWorld1Phase2OwlDialogueV3Installed) return true;
 
     const priorUpdateBoss = game.updateBoss.bind(game);
@@ -23,25 +23,8 @@
       return priorUpdateBoss(...args);
     };
 
-    const priorUpdate = game.update.bind(game);
-    game.update = function(...args) {
-      const result = priorUpdate(...args);
-
-      const dialogue = this.activeWorld === 0 && this.state === 'BOSS_OUTRO' && this.__ffVictoryCine?.phase === 'dialogue';
-      if (dialogue && this.owl) {
-        const cfg = window.CONFIG || {};
-        const w = Number(cfg.CANVAS_WIDTH) || 480;
-        const h = Number(cfg.CANVAS_HEIGHT) || 640;
-        const boxTop = h - 160;
-        const targetX = w - 70;
-        const targetY = boxTop - 5;
-
-        this.owl.x += (targetX - this.owl.x) * 0.14;
-        this.owl.y += (targetY - this.owl.y) * 0.14;
-      }
-
-      return result;
-    };
+    // Dialogue positioning is intentionally delegated to the final responsive owl layer.
+    // Keeping it here caused two systems to pull the same real owl toward different targets.
 
     const priorReset = typeof game.reset === 'function' ? game.reset.bind(game) : null;
     if (priorReset) {
@@ -53,9 +36,9 @@
 
     game.__ffWorld1Phase2OwlDialogueV3Installed = true;
     window.__FF_WORLD1_PHASE2_OWL_DIALOGUE_V3__ = {
-      version: 'world1-phase2-owl-dialogue-v3',
+      version: 'world1-phase2-owl-dialogue-v3.1',
       phase2Relief: 1 / 9,
-      owlDialoguePlacement: 'behind-dialogue-right'
+      owlDialoguePlacement: 'delegated-to-responsive-layer'
     };
     console.log('[FF-LAB] world1-phase2-owl-dialogue-v3-installed');
     return true;
