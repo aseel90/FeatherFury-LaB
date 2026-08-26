@@ -107,6 +107,18 @@ Current runtime stack observed during the initial audit:
 - Emperor Penguin boss is currently layered through `w2-boss-polish-v2.js`, `w2-boss-orb-v7.js`, `w2-v7-compat-v1.js`, `w2-boss-combat-v6.js`, `w2-boss-tuning-v8.js`, and `w2-boss-phase2-relief-v9.js`.
 - Until the World 2 direction is approved, prefer targeted refinement over introducing additional parallel boss/background systems.
 
+### World 2 environment art v1 — IMPLEMENTED / AWAITING VISUAL APPROVAL
+
+Current active scope is background + ground + obstacles only. Boss/gameplay tuning remains out of scope.
+
+- User-approved direction: generated image assets are allowed and should be used for the World 2 environment.
+- Asset payload: `w2-environment-assets-v1.js` stores the generated SVG image layers locally in-repository as embedded image data; there are no external runtime asset dependencies.
+- Background owner remains `w2-visuals-v1.js`, upgraded in-place rather than adding a parallel environment renderer.
+- Background uses transparent generated image layers for far frost mountains, snowy pines and stage-2 avalanche debris. The core World 2 sky remains visible so score-15 and boss palette transitions are preserved.
+- Ground uses a seamless generated frozen-ground image tile driven by the same continuous World 2 visual travel; `GROUND_HEIGHT` and collision are unchanged.
+- Obstacles use generated top/bottom ice-cliff images while preserving the existing pillar positions, passage gap and collision widths.
+- Status is **AWAITING VISUAL APPROVAL**. Do not lock these World 2 environment assets until the project owner tests them in-game.
+
 ## Next-work rule
 
 At the start of every future task, check this file first. If the target system is marked APPROVED / LOCKED, refine its current implementation instead of testing a new technique.
