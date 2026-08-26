@@ -29,13 +29,14 @@ Once a system works correctly and its visual/gameplay direction is approved, it 
 
 ### Final remaining task
 
-**Cursed Woods background — FINAL POLISH ONLY**
+**Cursed Woods background + ground — FINAL ART LOCK**
 
 Approved implementation path:
 
 - Canvas 2D only.
 - Existing `game.drawRuinsBackground` patch chain.
-- Main file: `cursed-woods-v1.js`.
+- Existing background work remains in `cursed-woods-v1.js`, but the authoritative final visual owner is `world1-final-art-lock-v1.js`, loaded last so older compatibility patches cannot overwrite the approved art.
+- `world1-final-art-lock-v1.js` uses the same Canvas 2D patch architecture already used by World 1; it is not a new renderer or parallel engine.
 - Deterministic seeded scenery for stable tree identities.
 - Layered parallax inside the existing renderer.
 - No DOM/CSS background, WebGL, external runtime, new game engine or parallel rendering system.
@@ -52,11 +53,20 @@ Target visual result:
 - Keep the gameplay corridor readable and keep atmospheric effects behind gameplay objects/HUD.
 - Mobile performance remains a priority: fixed small scene counts, Canvas primitives, no heavy filters or new dependencies.
 
+**Approved concept target — LOCKED**
+
+The concept sheet approved in chat is the visual source of truth for World 1. Do not invent a new art direction after this point.
+
+- Background: rich violet moonlight, dense overhead canopy, crooked rooted trees, multiple forest depth layers, distant ruined arches, layered fog, undergrowth, hanging vines, restrained glowing spores/eyes, and a readable gameplay corridor.
+- Ground: replace the brown/yellow diagonal placeholder with dark organic soil, an irregular rocky top edge, hanging roots, buried stones, and small purple mushrooms/crystals/plants.
+- Ground visuals may extend a few pixels around the surface for art only, but `GROUND_HEIGHT`, floor collision, bird physics and obstacle geometry stay unchanged.
+- Approved obstacle images stay LOCKED and must visually sit inside/against the new ground rather than being redesigned.
+
 ### World 1 completion gate
 
 World 1 is **COMPLETE** when all of the following are true:
 
-1. The final Cursed Woods background is visually approved.
+1. The final Cursed Woods background and ground are visually approved.
 2. Approved obstacles still look grounded and move correctly.
 3. Collision behavior is unchanged.
 4. Start Mission and World 1 play without runtime errors.
