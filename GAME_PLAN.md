@@ -62,6 +62,18 @@ Approved implementation path:
 - Increase separation from the forest with a slightly lighter blue-gray charcoal body, a thin cool rim light and a clearer red enemy eye.
 - Do not add a large halo or bright white outline.
 
+### World 1 runtime ownership — CLEAN / LOCKED
+
+The modern World 1 stack must be installed **before gameplay is unlocked**. The player must never enter while an older visual patch is still active.
+
+- Authoritative background: `world1-classic-enhanced-background-v1.js`.
+- Authoritative ground + obstacle layout polish: `world1-ground-obstacle-polish-v2.js`.
+- Authoritative obstacle renderer/art: `world1-cursed-obstacles-v5.js` + the approved top/bottom assets.
+- Authoritative small-crow art: `crow-minions-ingame-v3.js` followed by `world1-crow-contrast-v1.js`.
+- `cursed-woods-v1.js`, `world1-background-scope-v1.js`, `cursed-crows-v1.js`, `world1-final-art-lock-v1.js`, and `world1-ground-gap-polish-v1.js` are **RETIRED from runtime loading**. They may remain in Git history/repository for rollback only.
+- Final World 1 visual patches belong in `patch-manifest.js`; do not load a second World 1 visual stack after the patch runner releases its boot gate.
+- Both normal boot and legacy fallback must keep input blocked until the authoritative stack is fully loaded. No visible old-background → new-background swap is acceptable.
+
 ### World 1 completion gate
 
 World 1 is **COMPLETE** when all of the following are true:
