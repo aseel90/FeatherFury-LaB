@@ -114,18 +114,17 @@
       const first = Math.floor((travel - 360) / spacing) - 1;
       const last = Math.ceil((travel + W + 360) / spacing) + 1;
 
-      // Final World 2 ground pass: cover the segmented legacy strip with a static ice lip.
-      // This deliberately has no scrolling micro-pattern, so the top edge cannot stutter independently.
+      // Final World 2 ground pass: overlap the blue ice upward so no dark seam can show between layers.
       ctx.save();
-      const lip = ctx.createLinearGradient(0, gy - 13, 0, gy + 8);
+      const lip = ctx.createLinearGradient(0, gy - 17, 0, gy + 8);
       lip.addColorStop(0, '#bfeef7');
       lip.addColorStop(.45, '#8fd8e8');
       lip.addColorStop(1, '#63b6cf');
       ctx.fillStyle = lip;
-      ctx.fillRect(0, gy - 13, W, 21);
+      ctx.fillRect(0, gy - 17, W, 25);
       ctx.globalAlpha = .16;
       ctx.fillStyle = '#e5f8fc';
-      ctx.fillRect(0, gy - 12, W, 2);
+      ctx.fillRect(0, gy - 16, W, 2);
       ctx.restore();
 
       ctx.save();
@@ -152,7 +151,7 @@
       game.__w2IceGroundSkeletonsV1Installed = true;
       game.__w2GroundStripFinalV2Installed = true;
       window.__FF_W2_ICE_GROUND_SKELETONS_V1__ = {
-        version: 'w2-ice-only-ground-sparse-skeletons-v1.1-strip-fix',
+        version: 'w2-ice-only-ground-sparse-skeletons-v1.2-blue-overlap-fix',
         whiteSnowCapRemoved: true,
         groundAssetReplacedBeforeGameplay: true,
         sparseSkeletons: true,
