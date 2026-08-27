@@ -1,27 +1,16 @@
 (() => {
   'use strict';
-  window.__FF_PATCH_BOOTING__ = true;
-  const bootGate = e => {
-    if (!window.__FF_PATCH_BOOTING__) return;
-    if (e && e.cancelable) e.preventDefault();
-    e?.stopImmediatePropagation?.();
-  };
-  document.addEventListener('pointerdown', bootGate, true);
-  document.addEventListener('click', bootGate, true);
-  document.addEventListener('keydown', bootGate, true);
-  document.addEventListener('touchstart', bootGate, { capture: true, passive: false });
-  const releaseBootGate = () => {
-    window.__FF_PATCH_BOOTING__ = false;
-    document.removeEventListener('pointerdown', bootGate, true);
-    document.removeEventListener('click', bootGate, true);
-    document.removeEventListener('keydown', bootGate, true);
-    document.removeEventListener('touchstart', bootGate, true);
-  };
-  const plan = {
-    appId: 'featherfury-lab',
-    entries: [
-      { id:'stable-runtime',kind:'core',critical:true,src:'https://cdn.jsdelivr.net/gh/aseel90/FeatherFury-LaB@5b83840d68ad65939b8efae336afd76c47b7bdc1/game.js',timeout:16000,readyTimeout:4000,ready:()=>!!window.game },
-      { id:'ruins-pillars-v3',src:'ruins-pillars-v3.js?v=1',dependsOn:['stable-runtime'] },
+  window.__FF_PATCH_MANIFEST__ = {
+    version: 'ff-patch-manifest-v1',
+    patches: [
+      {
+        id: 'stable-runtime',
+        src: 'stable-loader.js?v=6',
+        readyTimeout: 5000,
+        ready: () => !!window.game && typeof window.game.draw === 'function' && typeof window.game.update === 'function'
+      },
+      { id:'lab-ui',src:'lab-ui.js?v=1',dependsOn:['stable-runtime'] },
+      { id:'ruins-pillars-v3',src:'ruins-pillars-v3.js?v=1',dependsOn:['stable-runtime'],ready:()=>!!window.game?.__ruinsPillarsV3Installed },
       { id:'boss-crowking-v1',src:'boss-crowking-v1.js?v=1',dependsOn:['stable-runtime'],ready:()=>!!window.game?.__crowKingVisualV2Installed },
       { id:'boss-fight-core-v1',src:'boss-fight-core-v1.js?v=1',dependsOn:['stable-runtime'],readyTimeout:3500,ready:()=>!!window.game?.__bossFightCoreV1Installed },
       { id:'w1-fixes-batch-v1',src:'w1-fixes-batch-v1.js?v=1',dependsOn:['stable-runtime'],ready:()=>!!window.game?.__w1FixesBatchV1Installed },
@@ -38,10 +27,9 @@
       { id:'w2-ice-ground-skeletons-v1',src:'w2-ice-ground-skeletons-v1.js?v=1',dependsOn:['w2-visuals-v1'],readyTimeout:3500,ready:()=>!!window.game?.__w2IceGroundSkeletonsV1Installed },
       { id:'w2-gameplay-v1',src:'w2-gameplay-v1.js?v=1',dependsOn:['stable-runtime'],readyTimeout:3000,ready:()=>!!window.game?.__w2GameplayV1Installed },
       { id:'revive-core-fix-v1',src:'revive-core-fix-v1.js?v=2',dependsOn:['stable-runtime'],readyTimeout:2500,ready:()=>!!window.game?.__reviveCoreFixV1Installed },
-      { id:'w2-boss-polish-v2',src:'w2-boss-polish-v2.js?v=1',dependsOn:['w2-audio-v1','w2-visuals-v1','w2-gameplay-v1'],readyTimeout:3500,ready:()=>!!window.game?.__w2BossPolishV2Installed },
+      { id:'w2-boss-polish-v2',src:'w2-boss-polish-v2.js?v=2',dependsOn:['w2-audio-v1','w2-visuals-v1','w2-gameplay-v1'],readyTimeout:3500,ready:()=>!!window.game?.__w2BossPolishV2Installed },
       { id:'w2-boss-orb-v7',src:'w2-boss-orb-v7.js?v=1',dependsOn:['w2-boss-polish-v2'],readyTimeout:3500,ready:()=>!!window.game?.__w2BossOrbV7Installed },
-      { id:'w2-v7-compat-v1',src:'w2-v7-compat-v1.js?v=1',dependsOn:['w2-boss-orb-v7'],readyTimeout:2000,ready:()=>!!window.game?.__w2V7CompatV1Installed },
-      { id:'w2-boss-combat-v6',src:'w2-boss-combat-v6.js?v=1',dependsOn:['w2-v7-compat-v1'],readyTimeout:3500,ready:()=>!!window.game?.__w2BossCombatV6Installed },
+      { id:'w2-boss-combat-v6',src:'w2-boss-combat-v6.js?v=2',dependsOn:['w2-boss-orb-v7'],readyTimeout:3500,ready:()=>!!window.game?.__w2BossCombatV6Installed },
       { id:'w2-boss-tuning-v8',src:'w2-boss-tuning-v8.js?v=1',dependsOn:['w2-boss-combat-v6','revive-core-fix-v1'],readyTimeout:3000,ready:()=>!!window.game?.__w2BossTuningV8Installed },
       { id:'w2-boss-phase2-relief-v9',src:'w2-boss-phase2-relief-v9.js?v=1',dependsOn:['w2-boss-tuning-v8'],readyTimeout:2500,ready:()=>!!window.game?.__w2BossPhase2ReliefV9Installed },
       { id:'victory-screen-fix-v1',src:'victory-screen-fix-v1.js?v=1',dependsOn:['w2-boss-phase2-relief-v9'],readyTimeout:2500,ready:()=>!!window.game?.__victoryScreenFixV1Installed },
@@ -69,16 +57,13 @@
       { id:'world1-owl-dialogue-layer-fix-v3-final',src:'world1-owl-dialogue-layer-fix-v3.js?v=1',dependsOn:['world1-phase2-owl-dialogue-v3-final'] },
       { id:'crow-king-ingame-v4-final',src:'crow-king-ingame-v4.js?v=1',dependsOn:['world1-owl-dialogue-layer-fix-v3-final'],ready:()=>!!window.game?.__ffCrowKingIngameV4Installed },
       { id:'crow-minions-ingame-v3-final',src:'crow-minions-ingame-v3.js?v=1',dependsOn:['crow-king-ingame-v4-final'],ready:()=>!!window.game?.__ffCrowMinionsIngameV3Installed },
-      { id:'world1-crow-contrast-v1-final',src:'world1-crow-contrast-v1.js?v=1',dependsOn:['crow-minions-ingame-v3-final'],ready:()=>!!window.game?.__ffW1CrowContrastV1Installed },
-      { id:'world1-cursed-obstacle-top-final',src:'world1-cursed-obstacle-asset-top-a.js?v=1',dependsOn:['world1-crow-contrast-v1-final'] },
-      { id:'world1-cursed-obstacle-bottom-final',src:'world1-cursed-obstacle-asset-bottom-a.js?v=2',dependsOn:['world1-cursed-obstacle-top-final'] },
-      { id:'world1-cursed-obstacles-v5-final',src:'world1-cursed-obstacles-v5.js?v=1',dependsOn:['world1-cursed-obstacle-bottom-final'],readyTimeout:3500,ready:()=>!!window.game?.__ffW1CursedObstaclesV5Installed },
-      { id:'world1-classic-enhanced-background-v1-final',src:'world1-classic-enhanced-background-v1.js?v=1',dependsOn:['world1-cursed-obstacles-v5-final'],readyTimeout:3500,ready:()=>!!window.game?.__ffW1ClassicEnhancedBgV1Installed },
-      { id:'world1-ground-obstacle-polish-v2-final',src:'world1-ground-obstacle-polish-v2.js?v=3',dependsOn:['world1-classic-enhanced-background-v1-final'],readyTimeout:3500,ready:()=>!!window.game?.__ffW1GroundObstaclePolishV2Installed }
-    ],
-    onCriticalError: async () => { if (typeof window.__FF_START_LEGACY_PATCH_CHAIN__ === 'function') { console.warn('[FeatherFury] Patch Runner critical failure; starting legacy loader fallback.'); await window.__FF_START_LEGACY_PATCH_CHAIN__(); } }
+      { id:'world1-crow-contrast-v1-final',src:'world1-crow-contrast-v1.js?v=1',dependsOn:['crow-minions-ingame-v3-final'],ready:()=>!!window.game?.__ffWorld1CrowContrastV1Installed },
+      { id:'world1-cursed-obstacle-asset-top-a',src:'world1-cursed-obstacle-asset-top-a.js?v=1',dependsOn:['world1-crow-contrast-v1-final'],ready:()=>!!window.__FF_W1_CURSED_OBSTACLE_TOP_A_SVG__ },
+      { id:'world1-cursed-obstacle-asset-bottom-a',src:'world1-cursed-obstacle-asset-bottom-a.js?v=2',dependsOn:['world1-cursed-obstacle-asset-top-a'],ready:()=>!!window.__FF_W1_CURSED_OBSTACLE_BOTTOM_A_SVG__ },
+      { id:'world1-cursed-obstacles-v5',src:'world1-cursed-obstacles-v5.js?v=1',dependsOn:['world1-cursed-obstacle-asset-bottom-a'],readyTimeout:3000,ready:()=>!!window.game?.__ffWorld1CursedObstaclesV5Installed },
+      { id:'world1-classic-enhanced-background-v1',src:'world1-classic-enhanced-background-v1.js?v=1',dependsOn:['world1-cursed-obstacles-v5'],readyTimeout:3000,ready:()=>!!window.game?.__ffWorld1ClassicEnhancedBackgroundV1Installed },
+      { id:'world1-ground-obstacle-polish-v2',src:'world1-ground-obstacle-polish-v2.js?v=3',dependsOn:['world1-classic-enhanced-background-v1'],readyTimeout:3000,ready:()=>!!window.game?.__ffWorld1GroundObstaclePolishV2Installed },
+      { id:'patch-chain-done',src:'data:text/javascript,window.__FF_PATCH_CHAIN_DONE__=true',dependsOn:['world1-ground-obstacle-polish-v2'],ready:()=>!!window.__FF_PATCH_CHAIN_DONE__ }
+    ]
   };
-  window.FEATHERFURY_PATCH_PLAN = plan;
-  if (!window.PatchRunner) { console.error('[FeatherFury] PatchRunner is not available.'); window.__FF_START_LEGACY_PATCH_CHAIN__?.(); return; }
-  window.PatchRunner.run(plan).then(()=>{releaseBootGate();}).catch(error=>{releaseBootGate();console.error('[FeatherFury] Patch Runner boot failed.',error);});
 })();

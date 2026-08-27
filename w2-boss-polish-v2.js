@@ -191,7 +191,7 @@
     };
 
     // ---------------------------------------------------------------------
-    // Manual orb projectile system. It bypasses the old guaranteed homing.
+    // Manual orb transport bridge. V7 consumes these as charge; it must never damage the boss directly.
     // ---------------------------------------------------------------------
     function spawnManualShot(g, src) {
       const boss = g.boss;
@@ -242,23 +242,8 @@
           continue;
         }
 
-        const hittable = boss.state !== 'DODGING' && boss.state !== 'W2_ENRAGE' && boss.state !== 'EXPLODING';
-        if (hittable && Math.hypot(p.x - boss.x, p.y - (boss.y - 36)) < 38) {
-          p.active = false;
-          boss.hp--;
-          boss.__w2Recovery = Math.max(boss.__w2Recovery || 0, 18);
-          g.sound?.playEmperorHit?.();
-          g.sound?.playHit?.();
-          g.screenShake = 14;
-          for (let i=0;i<13;i++) g.particles.push({x:boss.x+(Math.random()-.5)*35,y:boss.y-35+(Math.random()-.5)*45,vx:(Math.random()-.5)*11,vy:(Math.random()-.5)*9,size:2+Math.random()*3,color:i%2?'#fef08a':'#7dd3fc',life:.72});
-          if (boss.hp <= 0) {
-            boss.hp = 0;
-            boss.state = 'EXPLODING';
-            boss.timer = 0;
-            g.sound?.playEmperorDefeat?.();
-            g.screenShake = 22;
-          }
-        }
+        // V7 owns boss damage: collected orbs are charge tokens only.
+        // Keep this projectile alive as a short transport/render bridge until V7 consumes it after the base update.
       }
       g.__w2ManualProjectiles = shots.filter(p => p.active);
     }
@@ -374,7 +359,6 @@
             const b=42+Math.random()*(W()-84);
             this.icicles.push({x:a,y:-30,state:'WARN',dropX:a,timer:0,__w2WarnTimer:28,__w2BossHazard:true,__w2HoldX:a});
             this.icicles.push({x:b,y:-30,state:'WARN',dropX:b,timer:0,__w2WarnTimer:28,__w2BossHazard:true,__w2HoldX:b});
-            this.sound?.playIceWarn?.();
           }
         }
       }
@@ -402,21 +386,22 @@
         if(boss.timer > 96) {
           boss.active=false;
           this.state='BOSS_OUTRO';
-          this.owl.x=W()+100; this.owl.y=H()/2;
-          const lines=[I18N[this.lang].w2_owlL1,I18N[this.lang].w2_owlL2];
+          this.owl.x=W()+100;
+          this.owl.y=H()/2;
+          const lines = this.lang==='ar'
+            ? ['الإمبراطور سقط...','الطريق إلى العاصفة مفتوح الآن!']
+            : ['The Emperor has fallen...','The path to the storm is open now!'];
           this.__w2VictoryCine={phase:'approach',frame:0,lines};
-          this.storyLines=lines; this.storyText1=''; this.storyText2=''; this.storyCompleted=true;
+          this.sound?.playWorldVictory?.();
           this.screenShake=0; this.snowballs=[]; this.icicles=[]; this.powerOrbs=[]; this.heroProjectiles=[]; this.__w2ManualProjectiles=[];
-          document.getElementById('gameHud')?.classList.add('hidden');
-          this.sound?.playEagleCall?.();
+          this.lightning=.8;
           for(let i=0;i<52;i++) this.particles.push({x:boss.x+(Math.random()-.5)*135,y:boss.y-35+(Math.random()-.5)*125,vx:(Math.random()-.5)*20,vy:(Math.random()-.5)*18,size:2+Math.random()*6,color:'#60a5fa',life:1.2});
         }
       }
 
-      // Snowballs keep the proven World 2 movement/collision behavior.
       this.snowballs.forEach(s=>{
-        if(s.vx>-3)s.vx=-7.5;
-        s.x+=s.vx; s.y+=s.vy; s.vy+=.045;
+        if(s.__w2Boss) s.vy += .045;
+        s.x += s.vx; s.y += s.vy;
         if(this.invincibleTimer<=0 && Math.hypot(this.bird.x-s.x,this.bird.y-s.y)<(C.BIRD_RADIUS||14)+9){
           if(this.feverActive||boss.state==='EXPLODING'||this.state==='BOSS_OUTRO'||this.state==='FLY_AWAY') s.x=-200;
           else this.gameOver(false);
