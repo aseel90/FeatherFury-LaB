@@ -45,9 +45,9 @@
     ctx.rotate(Math.sin(phase * .63) * .015);
     ctx.scale(scale, scale);
     ctx.globalAlpha = alpha;
-    ctx.strokeStyle = '#c1e1e8';
-    ctx.fillStyle = 'rgba(193,225,232,.22)';
-    ctx.lineWidth = 1.25;
+    ctx.strokeStyle = '#d9f4fb';
+    ctx.fillStyle = 'rgba(217,244,251,.32)';
+    ctx.lineWidth = 1.55;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
@@ -81,7 +81,7 @@
     const images = window.__FF_W2_ENV_IMAGES_V1__;
     const config = window.CONFIG || {};
     if (!game || !game.__w2VisualsV1Installed || !images?.ground) return false;
-    if (game.__w2IceGroundSkeletonsV1Installed) return true;
+    if (game.__w2GroundStripFinalV2Installed) return true;
 
     const groundImage = images.ground;
     let replacementReady = false;
@@ -114,21 +114,35 @@
       const first = Math.floor((travel - 360) / spacing) - 1;
       const last = Math.ceil((travel + W + 360) / spacing) + 1;
 
+      // Final World 2 ground pass: cover the segmented legacy strip with a static ice lip.
+      // This deliberately has no scrolling micro-pattern, so the top edge cannot stutter independently.
+      ctx.save();
+      const lip = ctx.createLinearGradient(0, gy - 13, 0, gy + 8);
+      lip.addColorStop(0, '#bfeef7');
+      lip.addColorStop(.45, '#8fd8e8');
+      lip.addColorStop(1, '#63b6cf');
+      ctx.fillStyle = lip;
+      ctx.fillRect(0, gy - 13, W, 21);
+      ctx.globalAlpha = .16;
+      ctx.fillStyle = '#e5f8fc';
+      ctx.fillRect(0, gy - 12, W, 2);
+      ctx.restore();
+
       ctx.save();
       ctx.beginPath();
-      ctx.rect(0, gy + 12, W, Math.max(1, gh - 16));
+      ctx.rect(0, gy + 8, W, Math.max(1, gh - 12));
       ctx.clip();
       for (let cell = first; cell <= last; cell++) {
         const a = seed(cell,1), b = seed(cell,2), c = seed(cell,3);
         const worldX = cell * spacing + 180 + a * 360;
         const x = worldX - travel;
-        if (x < -45 || x > W + 45) continue;
-        const y = gy + 31 + b * Math.max(10, gh - 52);
-        drawSkeleton(ctx, Math.abs(cell) % 3, x, y, .72 + c * .2, .095 + a * .04, (this.frame || 0) * .016 + cell * 1.7);
+        if (x < -52 || x > W + 52) continue;
+        const y = gy + 28 + b * Math.max(12, gh - 48);
+        drawSkeleton(ctx, Math.abs(cell) % 3, x, y, .84 + c * .18, .17 + a * .055, (this.frame || 0) * .016 + cell * 1.7);
       }
-      ctx.globalAlpha = .04;
+      ctx.globalAlpha = .018;
       ctx.fillStyle = '#64b8d0';
-      ctx.fillRect(0, gy + 12, W, Math.max(1, gh - 16));
+      ctx.fillRect(0, gy + 8, W, Math.max(1, gh - 12));
       ctx.restore();
       return result;
     };
@@ -136,12 +150,16 @@
     const markReady = () => {
       if (!replacementReady && !groundImage.complete) return false;
       game.__w2IceGroundSkeletonsV1Installed = true;
+      game.__w2GroundStripFinalV2Installed = true;
       window.__FF_W2_ICE_GROUND_SKELETONS_V1__ = {
-        version: 'w2-ice-only-ground-sparse-skeletons-v1',
+        version: 'w2-ice-only-ground-sparse-skeletons-v1.1-strip-fix',
         whiteSnowCapRemoved: true,
         groundAssetReplacedBeforeGameplay: true,
         sparseSkeletons: true,
         skeletonSpacing: 860,
+        legacySegmentedStripCovered: true,
+        skeletonVisibilityBoosted: true,
+        finalWorld2GroundPass: true,
         gameplayGeometryChanged: false,
         groundHeightChanged: false,
         hitboxesChanged: false
