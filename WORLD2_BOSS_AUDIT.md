@@ -9,9 +9,8 @@ Audit target: current Emperor Penguin runtime before visual redesign.
 - `w2-boss-polish-v2.js`: Emperor audio identity, visual lift/eagle polish, patched penguin state machine, and the legacy manual-orb bridge.
 - `w2-boss-orb-v7.js`: authoritative boss-damage mechanic. Orbs are charge tokens; three falling-ice strikes defeat the Emperor. It also owns the ice blocks, charge gauge, and burst conversion.
 - `w2-v7-compat-v1.js`: retired from active boot in Phase 2. It remains only as rollback history and is no longer required by Combat V6.
-- `w2-boss-combat-v6.js`: special-attack cadence and baseline boss-shot tuning.
-- `w2-boss-tuning-v8.js`: final landing settle, fire cooldown, projectile-speed override, and revive/resume preservation.
-- `w2-boss-phase2-relief-v9.js`: final phase-2 burst throttle and, after this audit, the final ice-only damage integrity guard.
+- `w2-boss-runtime-v10.js`: authoritative post-V7 Emperor runtime. It now owns the former Combat V6 special cadence, Tuning V8 landing/fire/resume behavior, Phase2 V9 burst relief, projectile tuning, and the final ice-only HP integrity guard in one installed layer.
+- `w2-boss-combat-v6.js`, `w2-boss-tuning-v8.js`, and `w2-boss-phase2-relief-v9.js`: retired from active boot in Phase 3; retained in repository history for rollback/reference only.
 
 ## Conflict found and fixed in Phase 1
 
@@ -37,6 +36,7 @@ This audit does not intentionally change:
 
 1. Verify the current fight still completes through exactly three ice drops and that direct orb projectiles no longer reduce HP.
 2. **DONE — Phase 2:** `w2-v7-compat-v1.js` is retired from normal and legacy boot; Combat V6 now depends directly on V7.
-3. Consolidate the stacked `updatePenguinBoss` wrappers into one authoritative Emperor runtime while preserving current approved mechanics.
-4. Consolidate the stacked `game.update` boss wrappers and make damage/projectile ownership explicit.
-5. Only after the runtime is clean, redesign the Emperor visually and use that approved design language to derive the smaller penguin enemies.
+3. **DONE — Phase 3:** Combat V6 + Tuning V8 + Phase2 V9 are consolidated into `w2-boss-runtime-v10.js`; their stacked `updatePenguinBoss` wrappers are retired from active boot.
+4. **DONE — Phase 3:** their stacked `game.update` wrappers are consolidated into Runtime V10. Explicit ownership is now: Polish V2 = base AI/manual transport, Orb V7 = charge/ice damage, Runtime V10 = cadence/tuning/relief/integrity.
+5. Runtime cleanup gate: verify the fight still completes through exactly three ice drops and revive/resume still preserves charge before locking the final Emperor art.
+6. After that verification, redesign the Emperor visually and derive the smaller penguin enemies from the approved boss design language.
