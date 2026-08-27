@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 190">
+<defs><linearGradient id="body" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#203b5f"/><stop offset="1" stop-color="#071426"/></linearGradient><linearGradient id="ice" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ecfeff"/><stop offset=".45" stop-color="#67e8f9"/><stop offset="1" stop-color="#2563eb"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<ellipse cx="90" cy="174" rx="48" ry="9" fill="#020617" opacity=".35"/>
+<path d="M57 76 Q25 105 34 166 L55 151 69 171 90 153 111 171 126 151 147 166 Q155 105 123 76Z" fill="#0b1f3b" stroke="#67e8f9" stroke-opacity=".25" stroke-width="2"/>
+<path d="M43 84 L25 70 37 57 29 43 52 50 58 65Z" fill="url(#ice)" stroke="#b6f5ff" stroke-width="2"/><path d="M137 84 L155 70 143 57 151 43 128 50 122 65Z" fill="url(#ice)" stroke="#b6f5ff" stroke-width="2"/>
+<ellipse cx="90" cy="112" rx="42" ry="50" fill="url(#body)" stroke="#07111f" stroke-width="4"/>
+<ellipse cx="90" cy="124" rx="25" ry="35" fill="#e8f3f6"/>
+<path d="M66 82 L78 91 90 84 102 91 114 82 107 99 90 106 73 99Z" fill="#23628b" stroke="#bae6fd"/>
+<path d="M90 96 102 110 98 129 90 139 82 129 78 110Z" fill="url(#ice)" stroke="#e0fbff" stroke-width="2" filter="url(#glow)"/>
+<ellipse cx="90" cy="66" rx="29" ry="24" fill="#071426"/>
+<ellipse cx="79" cy="65" rx="9" ry="7" fill="#f8fafc"/><ellipse cx="101" cy="65" rx="9" ry="7" fill="#f8fafc"/><circle cx="80" cy="65" r="3.5" fill="#0b1728"/><circle cx="100" cy="65" r="3.5" fill="#0b1728"/><circle cx="80" cy="65" r="1.6" fill="#38bdf8"/><circle cx="100" cy="65" r="1.6" fill="#38bdf8"/>
+<path d="M69 54 84 58M111 54 96 58" stroke="#bae6fd" stroke-width="4" stroke-linecap="round"/><path d="M81 73 90 83 101 73 90 77Z" fill="#f59e0b" stroke="#7c2d12"/>
+<path d="M69 43 73 21 82 36 88 9 95 35 105 18 109 41 119 27 118 49 62 49Z" fill="url(#ice)" stroke="#dffbff" stroke-width="2" filter="url(#glow)"/>
+<path d="M132 63 L140 36" stroke="#10243f" stroke-width="6" stroke-linecap="round"/><path d="M140 37 131 24 140 5 149 23 157 34 147 42Z" fill="url(#ice)" stroke="#e0fbff" stroke-width="2" filter="url(#glow)"/>
+<ellipse cx="69" cy="169" rx="14" ry="5" fill="#d97706"/><ellipse cx="111" cy="169" rx="14" ry="5" fill="#d97706"/>
+</svg>
