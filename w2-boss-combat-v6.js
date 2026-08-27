@@ -2,7 +2,7 @@
   'use strict';
   function install() {
     const game = window.game;
-    if (!game?.__w2BossOrbV6Installed) return false;
+    if (!game?.__w2BossOrbV7Installed) return false;
     if (game.__w2BossCombatV6Installed) return true;
     const C = window.CONFIG || {};
     const W = () => C.CANVAS_WIDTH || 360;

@@ -8,7 +8,7 @@ Audit target: current Emperor Penguin runtime before visual redesign.
 - `w2-gameplay-v1.js`: early World 2 gameplay/story boss override.
 - `w2-boss-polish-v2.js`: Emperor audio identity, visual lift/eagle polish, patched penguin state machine, and the legacy manual-orb bridge.
 - `w2-boss-orb-v7.js`: authoritative boss-damage mechanic. Orbs are charge tokens; three falling-ice strikes defeat the Emperor. It also owns the ice blocks, charge gauge, and burst conversion.
-- `w2-v7-compat-v1.js`: compatibility-only alias that exposes the old V6-installed flag for Combat V6. It has no gameplay behavior of its own.
+- `w2-v7-compat-v1.js`: retired from active boot in Phase 2. It remains only as rollback history and is no longer required by Combat V6.
 - `w2-boss-combat-v6.js`: special-attack cadence and baseline boss-shot tuning.
 - `w2-boss-tuning-v8.js`: final landing settle, fire cooldown, projectile-speed override, and revive/resume preservation.
 - `w2-boss-phase2-relief-v9.js`: final phase-2 burst throttle and, after this audit, the final ice-only damage integrity guard.
@@ -36,7 +36,7 @@ This audit does not intentionally change:
 ## Remaining cleanup before final Emperor design
 
 1. Verify the current fight still completes through exactly three ice drops and that direct orb projectiles no longer reduce HP.
-2. Retire `w2-v7-compat-v1.js` by making Combat V6 depend directly on V7.
+2. **DONE — Phase 2:** `w2-v7-compat-v1.js` is retired from normal and legacy boot; Combat V6 now depends directly on V7.
 3. Consolidate the stacked `updatePenguinBoss` wrappers into one authoritative Emperor runtime while preserving current approved mechanics.
 4. Consolidate the stacked `game.update` boss wrappers and make damage/projectile ownership explicit.
 5. Only after the runtime is clean, redesign the Emperor visually and use that approved design language to derive the smaller penguin enemies.
