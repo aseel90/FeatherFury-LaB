@@ -57,7 +57,8 @@
     window.__FF_LEGACY_BOOT_PROMISE__ = (async () => {
       await loadScript(stableRuntime);
       for (const src of legacyPatches) await loadScript(src);
-      await loadScript('w2-emperor-crow-style-v4.js?v=4');
+      await loadScript('w2-emperor-png-v5.js?v=5');
+      if (window.__FF_W2_EMPEROR_PNG_V5_READY__) await window.__FF_W2_EMPEROR_PNG_V5_READY__;
       window.__FF_PATCH_BOOTING__ = false;
       releaseBootstrapGate();
       return true;
@@ -88,7 +89,8 @@
     }
     await loadScript('w2-emperor-art-v1.js?v=3');
     await loadScript('w2-ice-ground-skeletons-v1.js?v=3');
-    await loadScript('w2-emperor-crow-style-v4.js?v=4');
+    await loadScript('w2-emperor-png-v5.js?v=5');
+    if (window.__FF_W2_EMPEROR_PNG_V5_READY__) await window.__FF_W2_EMPEROR_PNG_V5_READY__;
     releaseBootstrapGate();
   });
 })();
