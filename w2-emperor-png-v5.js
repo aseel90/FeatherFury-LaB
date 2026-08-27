@@ -31,11 +31,25 @@ function install(){
     if(!ready())return;
     const size=112,sx=INDEX[key]*FRAME;
     ctx.save();ctx.translate(x,y);ctx.scale(-1,1);
+    if(phase2){
+      const pulse=.88+Math.sin(f*.12)*.12;
+      ctx.save();
+      ctx.globalCompositeOperation='lighter';
+      const glow=ctx.createRadialGradient(0,-48,12,0,-48,86);
+      glow.addColorStop(0,`rgba(125,230,255,${.42*pulse})`);
+      glow.addColorStop(.42,`rgba(54,170,255,${.34*pulse})`);
+      glow.addColorStop(.72,`rgba(37,99,235,${.24*pulse})`);
+      glow.addColorStop(1,'rgba(15,40,120,0)');
+      ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,-48,86,0,Math.PI*2);ctx.fill();
+      ctx.restore();
+      ctx.shadowColor=`rgba(70,205,255,${.98*pulse})`;
+      ctx.shadowBlur=30+10*pulse;
+    }
     ctx.drawImage(sheet,sx,0,FRAME,FRAME,-size/2,-size+8,size,size);
     ctx.restore();
   };
   g.__w2EmperorPngV5Installed=true;
-  window.__FF_W2_EMPEROR_PNG_V5__={version:VERSION,assetType:'png-sprite-sheet',imageBased:true,canvasConstructed:false,sourceFrame:[80,80],fixedDrawSize:112,poses:['idle','attack','jump','dash','phase2'],bakedEffects:false,runtimeChanged:false,hitboxesChanged:false};
+  window.__FF_W2_EMPEROR_PNG_V5__={version:VERSION,assetType:'png-sprite-sheet',phase2RuntimeGlow:true,imageBased:true,canvasConstructed:false,sourceFrame:[80,80],fixedDrawSize:112,poses:['idle','attack','jump','dash','phase2'],bakedEffects:false,runtimeChanged:false,hitboxesChanged:false};
   installed=true;console.log('[FF] Ice Emperor PNG sprite set V5 installed');return true;
 }
 Promise.all(PARTS.map(url=>fetch(url,{cache:'force-cache'}).then(r=>{if(!r.ok)throw new Error(`${r.status} ${url}`);return r.text();})))
