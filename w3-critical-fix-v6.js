@@ -1,1 +1,1 @@
-PLACEHOLDER
+(()=>{'use strict';const U='https://cdn.jsdelivr.net/gh/aseel90/FeatherFury-LaB@c813ec285dc0a5712374cca92877ff1dd5776f8e/w3-critical-fix-v6.js?rescue=2';try{const x=new XMLHttpRequest();x.open('GET',U,false);x.send(null);if(x.status<200||x.status>=400)throw new Error('w3-critical-fix-v6.js '+x.status);(0,eval)(x.responseText+'\n//# sourceURL=ff-rescued-w3-critical-fix-v6.js');}catch(e){console.error('[FeatherFury] w3-critical-fix-v6.js rescue failed',e);}})();
