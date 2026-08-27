@@ -141,18 +141,29 @@
     function drawFrostBackground(ctx) {
       advanceEnvironment();
       drawAurora(ctx, 0.06 + bg.stageBlend * 0.08 + bg.bossBlend * 0.92);
-      drawTiledImage(ctx, assets.mountains, bg.travel, groundY() - 300, 300, .62 + bg.bossBlend*.08, .045);
-      drawTiledImage(ctx, assets.pines, bg.travel, groundY() - 246, 242, .54 * (1 - bg.stageBlend*.16), .105, 170);
-      drawTiledImage(ctx, assets.avalanche, bg.travel, groundY() - 178, 178, bg.stageBlend * (.48 + bg.bossBlend*.12), .16, 90);
+      drawTiledImage(ctx, assets.mountains, bg.travel, groundY() - 300, 300, .56 + bg.bossBlend*.06, .045);
+      drawTiledImage(ctx, assets.pines, bg.travel, groundY() - 242, 242, .50 * (1 - bg.stageBlend*.14) * (1 - bg.bossBlend*.18), .105, 170);
+      drawTiledImage(ctx, assets.avalanche, bg.travel, groundY() - 180, 180, bg.stageBlend * (.44 + bg.bossBlend*.10), .16, 90);
       drawNearIceCliffs(ctx, .12 + bg.stageBlend * .38);
 
-      const fogAlpha = 0.07 + bg.stageBlend * 0.14 + bg.bossBlend * .03;
+      const fogAlpha = 0.065 + bg.stageBlend * 0.12 + bg.bossBlend * .025;
       ctx.save();
-      const fog = ctx.createLinearGradient(0, groundY()-130, 0, groundY()+4);
+      const fog = ctx.createLinearGradient(0, groundY()-155, 0, groundY()+4);
       fog.addColorStop(0, 'rgba(226,242,248,0)');
+      fog.addColorStop(.58, `rgba(226,242,248,${fogAlpha * .38})`);
       fog.addColorStop(1, `rgba(226,242,248,${fogAlpha})`);
       ctx.fillStyle = fog;
-      ctx.fillRect(0, groundY()-135, W(), 140);
+      ctx.fillRect(0, groundY()-160, W(), 165);
+
+      // Thin horizon mist glues the pines and mountain bases into the snow without filling the gameplay corridor.
+      const mistShift = mod(bg.travel * .028, W() + 180);
+      ctx.fillStyle = `rgba(232,246,250,${0.025 + bg.stageBlend * .028})`;
+      for (let i = -1; i < 4; i++) {
+        const mx = i * 170 - mistShift + 40;
+        ctx.beginPath();
+        ctx.ellipse(mx, groundY() - 92 - (i % 2) * 18, 112, 16, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
       ctx.restore();
 
       const snowCount = Math.round(28 + bg.stageBlend * 30 - bg.bossBlend * 12);
@@ -207,6 +218,26 @@
       };
     }
 
+    const groundTileCache = { canvas: null, pattern: null, width: 0, height: 0 };
+
+    function ensureGroundTile(ctx, img, drawH) {
+      const scale = drawH / img.naturalHeight;
+      const tileW = Math.max(1, Math.round(img.naturalWidth * scale));
+      const tileH = Math.max(1, Math.round(drawH));
+      if (groundTileCache.canvas && groundTileCache.width === tileW && groundTileCache.height === tileH) return groundTileCache;
+      const canvas = document.createElement('canvas');
+      canvas.width = tileW;
+      canvas.height = tileH;
+      const tileCtx = canvas.getContext('2d');
+      tileCtx.imageSmoothingEnabled = true;
+      tileCtx.drawImage(img, 0, 0, tileW, tileH);
+      groundTileCache.canvas = canvas;
+      groundTileCache.pattern = ctx.createPattern(canvas, 'repeat');
+      groundTileCache.width = tileW;
+      groundTileCache.height = tileH;
+      return groundTileCache;
+    }
+
     function drawFrozenGround(g) {
       const img = assets.ground;
       if (!img || !img.complete || !img.naturalWidth) return;
@@ -217,14 +248,17 @@
       const overhang = 12;
       const drawH = gh + overhang;
       const drawY = gy - overhang;
-      const scale = drawH / img.naturalHeight;
-      const tileW = Math.max(1, Math.ceil(img.naturalWidth * scale));
-      const off = mod(bg.travel * .96, tileW);
+      const tile = ensureGroundTile(ctx, img, drawH);
+      if (!tile.pattern || !tile.width) return;
+      const phase = mod(bg.travel * .96, tile.width);
       ctx.save();
-      for (let x = Math.floor(-off - tileW); x < W() + tileW; x += tileW) {
-        ctx.drawImage(img, x, drawY, tileW + 1, drawH);
-      }
-      ctx.globalAlpha = .42;
+      ctx.translate(-phase, drawY);
+      ctx.fillStyle = tile.pattern;
+      ctx.fillRect(0, 0, W() + tile.width + phase, tile.height);
+      ctx.restore();
+
+      ctx.save();
+      ctx.globalAlpha = .32;
       ctx.strokeStyle = '#eefcff';
       ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(0,gy+.5); ctx.lineTo(W(),gy+.5); ctx.stroke();
@@ -336,7 +370,7 @@
 
     game.__w2VisualsV1Installed = true;
     window.__FF_W2_ENVIRONMENT_ART_V1__ = {
-      version: 'world2-environment-art-v1.1-ground-pine-polish',
+      version: 'world2-environment-art-v1.2-smooth-ground-background-polish',
       imageAssets: true,
       backgroundImageLayers: 3,
       groundImageTile: true,
@@ -348,6 +382,9 @@
       pineBasesGrounded: true,
       legacyGroundCapCovered: true,
       groundTileSeamOverlap: true,
+      groundPatternRepeat: true,
+      darkGroundBandRemoved: true,
+      horizonMistPolish: true,
       failedAssets: envAssetState.failed.slice()
     };
     console.log('[FF-LAB] w2-visuals-v1-environment-art-installed');
