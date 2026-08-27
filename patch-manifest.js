@@ -35,6 +35,7 @@
       { id:'w2-audio-v1',src:'w2-audio-v1.js?v=1',dependsOn:['stable-runtime'],readyTimeout:2500,ready:()=>!!window.game?.__w2AudioV1Installed },
       { id:'w2-environment-assets-v1',src:'w2-environment-assets-v1.js?v=3',dependsOn:['stable-runtime'],readyTimeout:2500,ready:()=>!!window.__FF_W2_ENV_ASSETS_V1_READY__ },
       { id:'w2-visuals-v1',src:'w2-visuals-v1.js?v=4',dependsOn:['w2-environment-assets-v1'],readyTimeout:3500,ready:()=>!!window.game?.__w2VisualsV1Installed },
+      { id:'w2-ice-ground-skeletons-v1',src:'w2-ice-ground-skeletons-v1.js?v=1',dependsOn:['w2-visuals-v1'],readyTimeout:3500,ready:()=>!!window.game?.__w2IceGroundSkeletonsV1Installed },
       { id:'w2-gameplay-v1',src:'w2-gameplay-v1.js?v=1',dependsOn:['stable-runtime'],readyTimeout:3000,ready:()=>!!window.game?.__w2GameplayV1Installed },
       { id:'revive-core-fix-v1',src:'revive-core-fix-v1.js?v=2',dependsOn:['stable-runtime'],readyTimeout:2500,ready:()=>!!window.game?.__reviveCoreFixV1Installed },
       { id:'w2-boss-polish-v2',src:'w2-boss-polish-v2.js?v=1',dependsOn:['w2-audio-v1','w2-visuals-v1','w2-gameplay-v1'],readyTimeout:3500,ready:()=>!!window.game?.__w2BossPolishV2Installed },
