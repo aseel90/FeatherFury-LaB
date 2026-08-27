@@ -57,6 +57,30 @@ function install(){
     return r;
   };
 
+  // Final integrity guard: V7 defines falling ice as the only Emperor damage source.
+  // Restore HP lost by older projectile wrappers unless V7's completed-drop count advanced.
+  const oldUpdate=g.update.bind(g);
+  g.update=function(){
+    const wasActive=active(this),boss=this.boss;
+    const dropsBefore=+this.__w2OrbBossV6?.completedDrops||0;
+    const stateBefore=boss?.state;
+    const r=oldUpdate();
+    if(!wasActive||!boss||this.boss!==boss)return r;
+    const s=this.__w2OrbBossV6;
+    if(!s)return r;
+    const drops=Math.max(0,+s.completedDrops||0);
+    const maxHp=Math.max(4,+C.W2_BOSS_HP||8);
+    const expectedHp=drops>=3?0:Math.max(1,Math.round(maxHp*((3-drops)/3)));
+    if(drops===dropsBefore&&boss.hp<expectedHp){
+      boss.hp=expectedHp;
+      if(boss.state==='EXPLODING'&&expectedHp>0){
+        boss.state=stateBefore&&stateBefore!=='EXPLODING'?stateBefore:'IDLE';
+        boss.timer=0;
+      }
+    }
+    return r;
+  };
+
   g.__w2BossPhase2ReliefV9Installed=true;
   console.log('[FF-LAB] w2-boss-phase2-relief-v9-installed');
   return true;
