@@ -7,6 +7,8 @@
   const originalDrawBirdSkin = window.drawBirdSkin;
   window.__FF_ORIGINAL_DRAW_BIRD_SKIN__ = window.__FF_ORIGINAL_DRAW_BIRD_SKIN__ || originalDrawBirdSkin;
 
+  // Keep the UI locked until the authoritative patch set is fully installed.
+  // This prevents the player from entering World 1 while legacy visuals are still loading.
   const bootstrapGate = e => {
     if (bootstrapReleased) return;
     if (e && e.cancelable) e.preventDefault();
@@ -85,6 +87,7 @@
       console.warn('[FeatherFury] Patch boot wait timed out; using cleaned legacy fallback.');
       return window.__FF_START_LEGACY_PATCH_CHAIN__();
     }
+    // Final World 2 visual pass. v3 raises the blue ground lip to overlap and hide the last dark seam.
     await loadScript('w2-ice-ground-skeletons-v1.js?v=3');
     releaseBootstrapGate();
   });
