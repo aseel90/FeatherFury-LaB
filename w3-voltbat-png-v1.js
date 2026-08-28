@@ -24,14 +24,30 @@ function install(){
     const state=String(b.state||'IDLE');
     const phase2=!!(enraged||b.__w3Phase2||state==='W3_RAGE');
     const dash=/DASHING|RETURNING/.test(state);
+    const explode=state==='EXPLODING';
     const attack=/W3_ARC_PREP|W3_ARC_RECOVER|W3_SWARM_PREP|W3_SWARM_RECOVER|DASH_PREP|SONIC|SHIELD_BREAK/.test(state);
     const key=phase2?'phase2':dash?'dash':attack?'attack':'idle';
     const size=132;
     const sx=INDEX[key]*FRAME;
     const f=Number(frame)||0;
+    const arrival=Math.max(0,Number(b.__w3ArrivalT||0));
+    const defeat=Math.max(0,Number(b.__w3DefeatT||0));
     ctx.save();
     ctx.translate(x,y);
-    if(Number(shield)>0){
+    if(arrival>0){
+      const q=Math.max(0,Math.min(1,1-arrival/54));
+      const sc=.72+.28*Math.min(1,q*1.5);
+      ctx.globalAlpha=Math.min(1,.34+q*1.1);
+      ctx.scale(sc,sc);
+    }
+    if(explode||defeat>0){
+      const t=Number(b.timer||0),q=Math.max(0,Math.min(1,t/82));
+      const sc=1-q*.30+Math.sin(f*.42)*.018*(1-q);
+      ctx.globalAlpha*=Math.max(.16,1-Math.max(0,q-.52)*1.55);
+      ctx.rotate(Math.sin(f*.17)*.035*(1-q));
+      ctx.scale(sc,sc);
+    }
+    if(Number(shield)>0&&!explode){
       const pulse=1+Math.sin(f*.18)*.05;
       ctx.save();
       ctx.globalCompositeOperation='lighter';
@@ -62,7 +78,7 @@ function install(){
   window.__FF_W3_VOLTBAT_PNG_V1__={
     version:VERSION,assetType:'png-sprite-sheet-v2',imageBased:true,canvasConstructed:false,
     sourceFrame:[FRAME,FRAME],fixedDrawSize:132,poses:['idle','attack','dash','phase2'],
-    shieldRuntimeFx:true,phase2RuntimeGlow:true,bakedEffects:false,runtimeChanged:false,hitboxesChanged:false
+    shieldRuntimeFx:true,phase2RuntimeGlow:true,arrivalRuntimeFx:true,defeatRuntimeFx:true,bakedEffects:false,runtimeChanged:false,hitboxesChanged:false
   };
   installed=true;
   console.log('[FF] Lord Voltbat PNG sprite set V1 installed');

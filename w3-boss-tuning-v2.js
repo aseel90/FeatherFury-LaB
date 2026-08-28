@@ -30,6 +30,8 @@ function install(){
     x.lightning=1;
     x.screenShake=Math.max(+x.screenShake||0,20);
     x.sound?.playVoltRage?.();
+    s.cinema={type:'phase2',timer:0,duration:58};
+    b.__w3PhaseBurstT=58;
   }
 
   const oa=g.activateBoss?.bind(g);

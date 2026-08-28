@@ -14,13 +14,40 @@
     const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
     function installPillarArt() {
-      g.__w3StormPillarSystem = {
-        version: '2.0.0',
-        variants: ['standard', 'charged', 'heavy'],
-        modular: true,
-        animatedEnergy: true,
-        lightningReactive: true,
-        preservesHitbox: true
+      g.drawStormPillarSprite = function(ctx, p, frame = this.frame) {
+        if (!p) return;
+        const gy = groundY();
+        const topH = Number(p.topHeight || 150);
+        const gap = Number(C.W3_GAP_SIZE || 142);
+        const lowerY = topH + gap;
+        const x = Number(p.x || 0), pw = Number(C.PIPE_WIDTH || 62);
+        const pulse = .5 + .5 * Math.sin(frame * .16 + x * .02);
+        const drawBody = (y, hh, topCap) => {
+          if (hh <= 0) return;
+          ctx.save(); ctx.translate(x, y);
+          const gr = ctx.createLinearGradient(0, 0, pw, 0);
+          gr.addColorStop(0, '#111827'); gr.addColorStop(.45, '#24304c'); gr.addColorStop(1, '#0b1225');
+          ctx.fillStyle = gr; ctx.fillRect(0, 0, pw, hh);
+          ctx.strokeStyle = '#475569'; ctx.lineWidth = 2; ctx.strokeRect(1, 0, pw - 2, hh);
+          ctx.fillStyle = 'rgba(139,92,246,.17)';
+          for (let yy = 15; yy < hh; yy += 34) ctx.fillRect(8, yy, pw - 16, 4);
+          if (topCap) {
+            ctx.fillStyle = '#252f4b'; ctx.fillRect(-7, 0, pw + 14, 14);
+            ctx.strokeStyle = '#64748b'; ctx.strokeRect(-7, 0, pw + 14, 14);
+          } else {
+            ctx.fillStyle = '#252f4b'; ctx.fillRect(-7, hh - 14, pw + 14, 14);
+            ctx.strokeStyle = '#64748b'; ctx.strokeRect(-7, hh - 14, pw + 14, 14);
+          }
+          ctx.restore();
+        };
+        drawBody(0, topH, false);
+        drawBody(lowerY, gy - lowerY, true);
+        ctx.save();
+        ctx.shadowColor = '#7dd3fc'; ctx.shadowBlur = 7 + pulse * 6;
+        ctx.strokeStyle = `rgba(125,211,252,${.35 + pulse * .25})`; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(x + 7, topH - 3); ctx.lineTo(x + pw - 7, topH - 3); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x + 7, lowerY + 3); ctx.lineTo(x + pw - 7, lowerY + 3); ctx.stroke();
+        ctx.restore();
       };
     }
 
@@ -37,47 +64,107 @@
       const oldGateSprite = typeof g.drawGravityGateSprite === 'function'
         ? g.drawGravityGateSprite.bind(g)
         : null;
-      if (oldGateSprite) {
-        g.drawGravityGateSprite = function(ctx, x, y, frame, radius) {
-          if (this.activeWorld !== W3) return oldGateSprite(ctx, x, y, frame, radius);
-          const gate = (this.gravityGates || []).find(q =>
-            Math.abs(Number(q?.x || 0) - x) < .75 &&
-            Math.abs(Number(q?.y || 0) - y) < .75
-          );
-          if (!gate?.__w3Current) return;
 
-          const dir = Number(gate.__w3Dir || -1);
-          const pulse = 1 + Math.sin(frame * .14) * .08;
+      g.drawGravityGateSprite = function(ctx, x, y, frame, radius) {
+        if (this.activeWorld !== W3) return oldGateSprite?.(ctx, x, y, frame, radius);
+        const gate = (this.gravityGates || []).find(q =>
+          Math.abs(Number(q?.x || 0) - x) < .75 &&
+          Math.abs(Number(q?.y || 0) - y) < .75
+        );
+        if (!gate?.__w3Current) return;
+
+        const dir = Number(gate.__w3Dir || -1);
+        const t = Number(frame || 0);
+        const phase = t * .09 + Number(gate.__w3Serial || 0) * 1.37;
+        const pulse = .5 + .5 * Math.sin(t * .16 + phase);
+        const travel = (t * (dir < 0 ? 2.8 : -2.8)) % 44;
+        const main = dir < 0 ? '#67e8f9' : '#c4b5fd';
+        const alt = dir < 0 ? '#38bdf8' : '#a855f7';
+
+        ctx.save();
+        ctx.translate(x, y);
+
+        const columnH = Math.max(92, radius * 4.1);
+        const grad = ctx.createLinearGradient(0, -columnH / 2, 0, columnH / 2);
+        grad.addColorStop(0, 'rgba(56,189,248,0)');
+        grad.addColorStop(.18, dir < 0 ? 'rgba(56,189,248,.08)' : 'rgba(168,85,247,.08)');
+        grad.addColorStop(.50, dir < 0 ? 'rgba(125,211,252,.16)' : 'rgba(196,181,253,.15)');
+        grad.addColorStop(.82, dir < 0 ? 'rgba(56,189,248,.08)' : 'rgba(168,85,247,.08)');
+        grad.addColorStop(1, 'rgba(56,189,248,0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, radius * 1.18, columnH / 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.lineCap = 'round';
+        for (let ring = 0; ring < 4; ring++) {
+          const yy = -columnH * .36 + ring * columnH * .24;
+          const wob = Math.sin(phase + ring * 1.9) * 5;
+          const rw = radius * (1.05 - ring * .07);
           ctx.save();
-          ctx.translate(x, y);
-          ctx.scale(pulse, pulse);
-          ctx.fillStyle = 'rgba(56,189,248,.14)';
-          ctx.strokeStyle = dir < 0 ? '#7dd3fc' : '#c4b5fd';
-          ctx.lineWidth = 3;
+          ctx.translate(0, yy + wob);
+          ctx.rotate(Math.sin(phase * .55 + ring) * .10);
+          ctx.strokeStyle = ring % 2
+            ? `rgba(196,181,253,${.34 + pulse * .18})`
+            : `rgba(103,232,249,${.36 + pulse * .20})`;
+          ctx.shadowColor = ring % 2 ? '#a855f7' : '#38bdf8';
+          ctx.shadowBlur = 6 + pulse * 5;
+          ctx.lineWidth = 2.1;
           ctx.beginPath();
-          ctx.arc(0, 0, radius, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.ellipse(0, 0, rw, 8 + ring * .8, 0, .18, Math.PI * 1.78);
           ctx.stroke();
-
-          ctx.lineCap = 'round';
-          ctx.lineWidth = 4;
-          ctx.beginPath();
-          ctx.moveTo(0, dir < 0 ? 12 : -12);
-          ctx.lineTo(0, dir < 0 ? -9 : 9);
-          ctx.stroke();
-
-          ctx.fillStyle = dir < 0 ? '#7dd3fc' : '#c4b5fd';
-          ctx.beginPath();
-          if (dir < 0) {
-            ctx.moveTo(0, -17); ctx.lineTo(-8, -7); ctx.lineTo(8, -7);
-          } else {
-            ctx.moveTo(0, 17); ctx.lineTo(-8, 7); ctx.lineTo(8, 7);
-          }
-          ctx.closePath();
-          ctx.fill();
           ctx.restore();
-        };
-      }
+        }
+
+        ctx.shadowColor = main;
+        ctx.shadowBlur = 7;
+        ctx.lineWidth = 1.5;
+        for (let i = 0; i < 7; i++) {
+          const seed = i * 17 + Number(gate.__w3Serial || 0) * 11;
+          const sx = Math.sin(seed * 1.71) * radius * .68;
+          let sy = -columnH / 2 + ((i * 23 + Math.abs(travel)) % columnH);
+          if (dir > 0) sy = columnH / 2 - ((i * 23 + Math.abs(travel)) % columnH);
+          const len = 9 + (i % 3) * 3;
+          ctx.strokeStyle = i % 2 ? 'rgba(196,181,253,.58)' : 'rgba(103,232,249,.62)';
+          ctx.beginPath();
+          ctx.moveTo(sx, sy);
+          ctx.lineTo(sx + Math.sin(phase + i) * 2, sy + (dir < 0 ? -len : len));
+          ctx.stroke();
+        }
+        ctx.shadowBlur = 0;
+
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.shadowColor = alt;
+        ctx.shadowBlur = 10 + pulse * 5;
+        ctx.fillStyle = dir < 0
+          ? `rgba(56,189,248,${.17 + pulse * .10})`
+          : `rgba(168,85,247,${.17 + pulse * .10})`;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, radius * .55, radius * .82, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = main;
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        const ay = dir < 0 ? -7 : 7;
+        ctx.moveTo(-5, ay + (dir < 0 ? 4 : -4));
+        ctx.lineTo(0, ay + (dir < 0 ? -3 : 3));
+        ctx.lineTo(5, ay + (dir < 0 ? 4 : -4));
+        ctx.stroke();
+        ctx.restore();
+
+        for (let i = 0; i < 5; i++) {
+          const a = phase * (i % 2 ? -.7 : .8) + i * Math.PI * .4;
+          const rr = radius * (.64 + (i % 3) * .13);
+          const px = Math.cos(a) * rr;
+          const py = Math.sin(a) * rr * 1.5;
+          ctx.fillStyle = i % 2 ? '#c4b5fd' : '#67e8f9';
+          ctx.globalAlpha = .45 + .35 * (.5 + .5 * Math.sin(t * .22 + i));
+          ctx.fillRect(px - 1.2, py - 1.2, 2.4, 2.4);
+        }
+        ctx.globalAlpha = 1;
+        ctx.restore();
+      };
     }
 
     function applyStormCurrent(x) {
@@ -87,12 +174,29 @@
         if (!gate?.__w3Current || gate.__w3Consumed) continue;
         if (Math.hypot(x.bird.x - gate.x, x.bird.y - gate.y) >= Number(gate.radius || 25) + birdR) continue;
         gate.__w3Consumed = true;
+        const gx = Number(gate.x || x.bird.x), gy = Number(gate.y || x.bird.y);
+        const dir = Number(gate.__w3Dir || -1);
         gate.x = -120;
         x.gravityFlipped = false;
-        if (Number(gate.__w3Dir || -1) < 0) x.bird.velocity = Math.min(Number(x.bird.velocity || 0), -4.8);
+        if (dir < 0) x.bird.velocity = Math.min(Number(x.bird.velocity || 0), -4.8);
         else x.bird.velocity = Math.max(Number(x.bird.velocity || 0), 3.9);
         x.screenShake = Math.max(Number(x.screenShake || 0), 5);
+        x.lightning = Math.max(Number(x.lightning || 0), .22);
         x.sound?.playLaser?.();
+
+        if (x.gfxEnabled !== false && Array.isArray(x.particles)) {
+          for (let i = 0; i < 14; i++) {
+            x.particles.push({
+              x: gx + (Math.random() - .5) * 24,
+              y: gy + (Math.random() - .5) * 40,
+              vx: (Math.random() - .5) * 2.4,
+              vy: (dir < 0 ? -1 : 1) * (2.2 + Math.random() * 4.8),
+              size: 1.3 + Math.random() * 2.1,
+              color: i % 3 === 0 ? '#c4b5fd' : '#67e8f9',
+              life: .34 + Math.random() * .28
+            });
+          }
+        }
       }
     }
 
@@ -167,19 +271,6 @@
       });
     }
 
-    function stylePillar(g, pillar, step, phase2) {
-      if (!pillar || pillar.__w3Variant) return;
-      let variant = 'standard';
-      if (phase2) {
-        const pick = step % 5;
-        variant = pick === 0 ? 'heavy' : (pick === 1 || pick === 4 ? 'standard' : 'charged');
-      } else if (step % 7 === 5) {
-        variant = 'heavy';
-      }
-      pillar.__w3Variant = variant;
-      pillar.__w3EnergySeed = (step * 29 + Math.round(Number(pillar.topHeight || 0))) % 101;
-    }
-
     function runDirector(g, newPillars) {
       if (!newPillars.length || g.boss?.active || g.state !== 'PLAYING') return;
       for (const pillar of newPillars) {
@@ -187,7 +278,6 @@
         const score = Number(g.score || 0);
         const stage2Start = Number(C.STAGE1_END || 15);
         const phase2 = score >= stage2Start;
-        stylePillar(g, pillar, step, phase2);
 
         if (!phase2) {
           if (step % 4 === 1) spawnTesla(g, pillar);
@@ -215,6 +305,8 @@
       const isW3 = this.activeWorld === W3;
       const before = isW3 ? new Set(this.pillars || []) : null;
       const gatesBefore = isW3 ? new Set(this.gravityGates || []) : null;
+      const teslasBefore = isW3 ? new Set(this.miniTeslas || []) : null;
+      const batsBefore = isW3 ? new Set(this.electricBats || []) : null;
       const gateRadii = new Map();
 
       if (isW3) {
@@ -237,6 +329,13 @@
         }
         this.gravityFlipped = false;
 
+        this.miniTeslas = (this.miniTeslas || []).filter(t =>
+          t?.__w3Director || teslasBefore?.has(t)
+        );
+        this.electricBats = (this.electricBats || []).filter(b =>
+          b?.__w3Director || b?.__w3BossSwarm || batsBefore?.has(b)
+        );
+
         const fresh = (this.pillars || []).filter(p => !before.has(p));
         runDirector(this, fresh);
         applyStormCurrent(this);
@@ -248,8 +347,9 @@
     // World 3 environment is provided only by w3-environment-png-v1.js.
     installPillarArt(); installCurrentArt(); installHazardArt();
     g.__w3LegacyEnvironmentIsolated = true;
+    g.__w3LegacyHazardBirthsIsolated = true;
     g.__w3WorldPolishV1Installed = true;
-    console.log('[FF-LAB] w3-world-polish-v1-installed (Storm Spire pillars v2)');
+    console.log('[FF-LAB] w3-world-polish-v1-installed (legacy environment isolated)');
     return true;
   }
 

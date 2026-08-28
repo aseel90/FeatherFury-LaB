@@ -60,7 +60,8 @@ orbSerial: 0,
 shieldBroken: false,
 phase2Started: false,
 defeatStarted: false,
-warning: null
+warning: null,
+cinema: null
 };
 g.boss.hp = MAX_HP;
 g.boss.shield = SHIELD_HP;
@@ -83,12 +84,132 @@ fill.classList.remove('max');
 }
 setFeverBarHidden(true);
 }
+
+function startCinema(g, type, duration) {
+const s = g.__w3BossFightV1;
+if (!s) return;
+s.cinema = { type, timer: 0, duration: Math.max(1, Number(duration || 1)) };
+if (g.boss) {
+if (type === 'arrival') g.boss.__w3ArrivalT = s.cinema.duration;
+if (type === 'phase2') g.boss.__w3PhaseBurstT = s.cinema.duration;
+if (type === 'defeat') g.boss.__w3DefeatT = s.cinema.duration;
+}
+}
+function updateCinema(g) {
+const s = g.__w3BossFightV1, c = s?.cinema;
+if (!c) return;
+if (c.type === 'arrival' && g.state !== 'PLAYING') return;
+c.timer++;
+const left = Math.max(0, c.duration - c.timer);
+if (g.boss) {
+if (c.type === 'arrival') g.boss.__w3ArrivalT = left;
+else if (c.type === 'phase2') g.boss.__w3PhaseBurstT = left;
+else if (c.type === 'defeat') g.boss.__w3DefeatT = left;
+}
+if (c.type === 'arrival') {
+if (c.timer === 1 || c.timer === 10 || c.timer === 22) g.lightning = Math.max(g.lightning || 0, c.timer === 1 ? 1 : .62);
+if (c.timer < 24 && c.timer % 6 === 0) g.screenShake = Math.max(g.screenShake || 0, 5);
+} else if (c.type === 'phase2') {
+if (c.timer < 28 && c.timer % 4 === 0) g.lightning = Math.max(g.lightning || 0, .74);
+if (c.timer === 1 || c.timer === 16) g.screenShake = Math.max(g.screenShake || 0, c.timer === 1 ? 20 : 9);
+} else if (c.type === 'defeat') {
+if (c.timer < 66 && c.timer % 9 === 0) g.lightning = Math.max(g.lightning || 0, .42);
+if (c.timer === 58) g.screenShake = Math.max(g.screenShake || 0, 13);
+}
+if (c.timer >= c.duration) {
+if (g.boss) {
+delete g.boss.__w3ArrivalT;
+delete g.boss.__w3PhaseBurstT;
+delete g.boss.__w3DefeatT;
+}
+s.cinema = null;
+}
+}
+function drawCinema(g, ctx) {
+const s = g.__w3BossFightV1, c = s?.cinema, b = g.boss;
+if (!c || !ctx || !b) return;
+if (c.type === 'arrival' && g.state !== 'PLAYING') return;
+const t = c.timer, d = c.duration, q = Math.max(0, Math.min(1, t / d));
+const gy = groundY();
+ctx.save();
+if (c.type === 'arrival') {
+const flash = Math.max(0, 1 - t / 16);
+if (flash > 0) {
+ctx.fillStyle = `rgba(224,231,255,${flash * .18})`;
+ctx.fillRect(0, 0, W(), gy);
+}
+const ring = 18 + q * 78;
+ctx.strokeStyle = `rgba(125,211,252,${(1-q)*.68})`;
+ctx.shadowColor = '#38bdf8'; ctx.shadowBlur = 14;
+ctx.lineWidth = 2.4;
+ctx.beginPath(); ctx.arc(b.x, b.y, ring, 0, Math.PI * 2); ctx.stroke();
+ctx.strokeStyle = `rgba(192,132,252,${(1-q)*.52})`;
+ctx.beginPath(); ctx.arc(b.x, b.y, ring * .72, 0, Math.PI * 2); ctx.stroke();
+ctx.shadowBlur = 0;
+if (t < 30) {
+ctx.strokeStyle = `rgba(216,180,254,${.9-t/42})`;
+ctx.lineWidth = 2.2;
+ctx.beginPath(); ctx.moveTo(b.x+10, 0);
+for (let i=1;i<=7;i++) ctx.lineTo(b.x+10+Math.sin(i*2.4+t*.15)*8, b.y*i/7);
+ctx.stroke();
+}
+} else if (c.type === 'phase2') {
+const burst = Math.max(0, 1 - t / 38);
+ctx.fillStyle = `rgba(59,7,100,${.13 + burst*.13})`;
+ctx.fillRect(0, 0, W(), gy);
+const ring = 24 + q * 118;
+ctx.strokeStyle = `rgba(232,121,249,${(1-q)*.82})`;
+ctx.shadowColor = '#d946ef'; ctx.shadowBlur = 18;
+ctx.lineWidth = 3;
+ctx.beginPath(); ctx.arc(b.x, b.y, ring, 0, Math.PI * 2); ctx.stroke();
+ctx.shadowBlur = 10;
+ctx.strokeStyle = `rgba(56,189,248,${(1-q)*.55})`;
+ctx.beginPath(); ctx.moveTo(0, gy-5); ctx.lineTo(W(), gy-5); ctx.stroke();
+ctx.shadowBlur = 0;
+if (t < 24) {
+ctx.strokeStyle = `rgba(240,171,252,${.92-t/34})`;
+ctx.lineWidth = 2.8;
+ctx.beginPath(); ctx.moveTo(b.x, 0);
+for (let i=1;i<=8;i++) ctx.lineTo(b.x+Math.sin(i*2.15+t*.22)*10, b.y*i/8);
+ctx.stroke();
+}
+} else if (c.type === 'defeat') {
+const inv = 1-q;
+const ring = 76 * inv + 12;
+ctx.strokeStyle = `rgba(103,232,249,${.34 + inv*.34})`;
+ctx.shadowColor = '#38bdf8'; ctx.shadowBlur = 14;
+ctx.lineWidth = 2.2;
+for (let i=0;i<3;i++) {
+ctx.beginPath(); ctx.arc(b.x, b.y, Math.max(7, ring-i*13), t*.05+i, t*.05+i+Math.PI*1.4); ctx.stroke();
+}
+ctx.strokeStyle = `rgba(232,121,249,${.26 + inv*.34})`;
+for (let i=0;i<5;i++) {
+const a=t*.08+i*Math.PI*2/5;
+ctx.beginPath();
+ctx.moveTo(b.x+Math.cos(a)*ring,b.y+Math.sin(a)*ring);
+ctx.lineTo(b.x+Math.cos(a+.7)*Math.max(5,ring*.24),b.y+Math.sin(a+.7)*Math.max(5,ring*.24));
+ctx.stroke();
+}
+ctx.shadowBlur = 0;
+if (q > .72) {
+const f=(q-.72)/.28;
+ctx.fillStyle=`rgba(240,171,252,${Math.sin(Math.PI*f)*.22})`;
+ctx.fillRect(0,0,W(),H());
+}
+}
+ctx.restore();
+}
+
 const previousActivateBoss = typeof game.activateBoss === 'function' ? game.activateBoss.bind(game) : null;
 if (previousActivateBoss) {
 game.activateBoss = function(...args) {
 const result = previousActivateBoss(...args);
 if (this.activeWorld === W3 && this.boss?.active && this.boss.type === 'thunderbird') {
 resetFight(this);
+startCinema(this, 'arrival', 54);
+this.lightning = Math.max(this.lightning || 0, 1);
+this.screenShake = Math.max(this.screenShake || 0, 8);
+this.sound?.playThunder?.();
 }
 return result;
 };
@@ -229,6 +350,7 @@ g.electricBats = (g.electricBats || []).filter(b => !b.__w3BossSwarm);
 g.lightning = 1;
 g.screenShake = Math.max(g.screenShake || 0, 20);
 g.sound?.playVoltRage?.();
+startCinema(g, 'phase2', 58);
 }
 function updateExplosion(g, s) {
 const boss = g.boss;
@@ -245,10 +367,11 @@ g.heroProjectiles = [];
 g.lightning = 1;
 g.screenShake = 28;
 g.sound?.playVoltDefeat?.();
+startCinema(g, 'defeat', 82);
 }
 boss.y += 1.25;
-if (g.gfxEnabled !== false && boss.timer % 3 === 0) {
-for (let i = 0; i < 3; i++) g.particles.push({
+if (g.gfxEnabled !== false && boss.timer % 4 === 0) {
+for (let i = 0; i < 2; i++) g.particles.push({
 x:boss.x+(Math.random()-.5)*95,
 y:boss.y+(Math.random()-.5)*95,
 vx:(Math.random()-.5)*11,
@@ -420,6 +543,7 @@ if (this.boss.x < this.bird.x + 55) p.x -= 19;
 }
 }
 const result = previousUpdate();
+if (this.activeWorld === W3 && this.boss?.type === 'thunderbird') updateCinema(this);
 const activeAfter = fightActive(this);
 if (activeAfter) setFeverBarHidden(true);
 else setFeverBarHidden(false);
@@ -434,6 +558,7 @@ if (!fightActive(this) || this.state !== 'PLAYING') return result;
 const boss = this.boss;
 const s = this.__w3BossFightV1;
 const ctx = this.ctx;
+if (ctx) drawCinema(this, ctx);
 if (!ctx || !s?.warning) return result;
 ctx.save();
 if (s.warning.type === 'arc' && boss.state === 'W3_ARC_PREP') {
