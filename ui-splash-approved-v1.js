@@ -1,0 +1,102 @@
+(()=>{'use strict';
+if(window.__FF_SPLASH_APPROVED_SCREEN_V1__)return;
+const A=window.__FF_SPLASH_APPROVED_V1__;
+if(!A||!A.background||!A.overlay){
+  console.warn('[FeatherFury] approved loading assets missing');
+  return;
+}
+
+const started=performance.now();
+const root=document.documentElement;
+root.classList.add('ff-approved-splash-active');
+
+const splash=document.createElement('div');
+splash.id='ffApprovedBootSplash';
+splash.className='ff-approved-splash';
+splash.setAttribute('role','status');
+splash.setAttribute('aria-live','polite');
+splash.innerHTML=`
+  <img class="ff-approved-bg" src="${A.background}" alt="" draggable="false" decoding="async">
+  <div class="ff-approved-vignette" aria-hidden="true"></div>
+  <img class="ff-approved-art" src="${A.overlay}" alt="Feather Fury" draggable="false" decoding="async">
+  <div class="ff-approved-loader">
+    <div class="ff-approved-status">Preparing the Skies...</div>
+    <div class="ff-approved-track" aria-hidden="true">
+      <div class="ff-approved-fill"></div>
+      <span class="ff-approved-marker"></span>
+    </div>
+    <div class="ff-approved-percent">6%</div>
+  </div>`;
+(document.body||document.documentElement).appendChild(splash);
+
+const status=splash.querySelector('.ff-approved-status');
+const percent=splash.querySelector('.ff-approved-percent');
+let progress=.06;
+let target=.08;
+let finished=false;
+const reached=new Set();
+
+function setTarget(value,label){
+  target=Math.max(target,Math.min(.985,value));
+  if(label)status.textContent=label;
+}
+function mark(key){
+  if(reached.has(key))return;
+  reached.add(key);
+  if(key==='assets') setTarget(.22,'Preparing the Skies...');
+  else if(key==='foundation') setTarget(.38,'Waking the Flock...');
+  else if(key==='game') setTarget(.57,'Building the Adventure...');
+  else if(key==='roster') setTarget(.75,'Calling the Heroes...');
+  else if(key==='worlds') setTarget(.89,'Opening the Worlds...');
+  else if(key==='ready') setTarget(.985,'Ready to Fly!');
+}
+function isReady(){
+  return !!(
+    document.getElementById('startScreen') &&
+    document.getElementById('previewBirdCanvas') &&
+    window.__FF_CHARACTER_ROSTER_V1__ &&
+    window.game
+  );
+}
+function paint(){
+  const value=Math.max(0,Math.min(100,Math.round(progress*100)));
+  splash.style.setProperty('--ff-load',value+'%');
+  percent.textContent=value+'%';
+}
+mark('assets');
+paint();
+
+const timer=setInterval(()=>{
+  if(finished)return;
+  if(window.__FF_UI_FOUNDATION_V1_READY__)mark('foundation');
+  if(window.game)mark('game');
+  if(window.__FF_CHARACTER_ROSTER_V1__)mark('roster');
+  if(window.__FF_W3_ENVIRONMENT_PNG_V1_READY__||window.__FF_W2_ENV_ASSETS_V1__||document.getElementById('worldCard'))mark('worlds');
+  const ready=isReady();
+  if(ready)mark('ready');
+
+  progress+=(target-progress)*.16;
+  if(Math.abs(target-progress)<.001)progress=target;
+  paint();
+
+  const elapsed=performance.now()-started;
+  if((ready&&elapsed>=1450)||elapsed>=8500)finish();
+},72);
+
+function finish(){
+  if(finished)return;
+  finished=true;
+  progress=1;
+  target=1;
+  status.textContent='Ready to Fly!';
+  paint();
+  clearInterval(timer);
+  setTimeout(()=>{
+    splash.classList.add('ff-approved-leaving');
+    root.classList.remove('ff-approved-splash-active');
+    setTimeout(()=>splash.remove(),380);
+  },220);
+}
+window.addEventListener('pagehide',()=>clearInterval(timer),{once:true});
+window.__FF_SPLASH_APPROVED_SCREEN_V1__={version:'1.0.0',finish,mark,get progress(){return progress;}};
+})();

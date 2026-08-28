@@ -1,0 +1,160 @@
+html.ff-approved-splash-active #startScreen,
+html.ff-approved-splash-active #worldScreen,
+html.ff-approved-splash-active #shopScreen,
+html.ff-approved-splash-active #gameOverScreen,
+html.ff-approved-splash-active #gameHud{
+  visibility:hidden!important;
+}
+
+#ffApprovedBootSplash.ff-approved-splash{
+  --ff-load:6%;
+  position:fixed;
+  inset:0;
+  z-index:2147483000;
+  overflow:hidden;
+  background:#030713;
+  color:#fff;
+  isolation:isolate;
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:none;
+  font-family:'Tajawal',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  opacity:1;
+  transition:opacity .32s ease,visibility .32s ease;
+}
+.ff-approved-leaving{
+  opacity:0!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+.ff-approved-bg{
+  position:absolute;
+  inset:-2px;
+  z-index:0;
+  width:calc(100% + 4px);
+  height:calc(100% + 4px);
+  object-fit:cover;
+  object-position:50% 50%;
+  pointer-events:none;
+}
+.ff-approved-vignette{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:
+    linear-gradient(180deg,rgba(1,4,15,.18) 0%,rgba(1,4,15,0) 33%,rgba(1,4,15,.04) 62%,rgba(1,4,15,.70) 100%),
+    radial-gradient(ellipse at 50% 48%,rgba(0,0,0,0) 0 45%,rgba(0,0,0,.22) 78%,rgba(0,0,0,.46) 100%);
+}
+.ff-approved-art{
+  position:absolute;
+  z-index:4;
+  top:calc(max(env(safe-area-inset-top),0px) + clamp(3px,1.1vh,10px));
+  left:50%;
+  width:min(100vw,500px);
+  max-height:calc(100dvh - 112px - max(env(safe-area-inset-bottom),0px));
+  height:auto;
+  object-fit:contain;
+  object-position:50% 0;
+  transform:translateX(-50%);
+  filter:drop-shadow(0 10px 14px rgba(0,0,0,.42));
+  pointer-events:none;
+}
+.ff-approved-loader{
+  position:absolute;
+  z-index:8;
+  left:50%;
+  bottom:calc(max(env(safe-area-inset-bottom),8px) + clamp(10px,2.1vh,22px));
+  width:min(87vw,470px);
+  transform:translateX(-50%);
+  text-align:center;
+}
+.ff-approved-status{
+  min-height:1.3em;
+  margin-bottom:8px;
+  color:#f5f8ff;
+  font-size:clamp(14px,4vw,19px);
+  line-height:1.2;
+  font-weight:900;
+  letter-spacing:.01em;
+  text-shadow:0 2px 7px rgba(0,0,0,.95),0 0 10px rgba(93,80,255,.18);
+}
+.ff-approved-track{
+  position:relative;
+  height:clamp(17px,2.4vh,21px);
+  padding:3px;
+  border:2px solid rgba(156,168,225,.82);
+  border-radius:999px;
+  background:rgba(2,6,18,.91);
+  box-shadow:inset 0 2px 7px rgba(0,0,0,.86),0 0 0 2px rgba(5,8,24,.44),0 0 18px rgba(62,169,255,.18);
+}
+.ff-approved-fill{
+  width:var(--ff-load);
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,#1ce3f4 0%,#36cfff 28%,#6f8cff 57%,#a24df3 79%,#e968ee 100%);
+  box-shadow:0 0 13px rgba(45,211,255,.52),inset 0 1px 2px rgba(255,255,255,.42);
+  transition:width .24s cubic-bezier(.2,.8,.2,1);
+}
+.ff-approved-marker{
+  position:absolute;
+  top:50%;
+  left:var(--ff-load);
+  width:11px;
+  height:11px;
+  border-radius:2px;
+  transform:translate(-50%,-50%) rotate(45deg);
+  background:#e6fbff;
+  box-shadow:0 0 7px #56dcff,0 0 12px #b55cff;
+  transition:left .24s cubic-bezier(.2,.8,.2,1);
+}
+.ff-approved-percent{
+  margin-top:6px;
+  color:rgba(226,236,255,.78);
+  font:800 clamp(10px,2.8vw,12px)/1 system-ui,-apple-system,sans-serif;
+  letter-spacing:.14em;
+  text-shadow:0 1px 4px rgba(0,0,0,.9);
+}
+
+@media(max-width:359px){
+  .ff-approved-art{width:101vw}
+  .ff-approved-loader{width:90vw}
+}
+@media(max-height:690px) and (orientation:portrait){
+  .ff-approved-art{
+    top:calc(max(env(safe-area-inset-top),0px) + 1px);
+    width:min(88vw,410px);
+    max-height:calc(100dvh - 92px - max(env(safe-area-inset-bottom),0px));
+  }
+  .ff-approved-loader{bottom:calc(max(env(safe-area-inset-bottom),4px) + 3px)}
+  .ff-approved-status{margin-bottom:5px}
+}
+@media(min-width:430px) and (orientation:portrait){
+  .ff-approved-art{width:min(94vw,530px)}
+}
+@media(orientation:landscape) and (max-height:560px){
+  .ff-approved-bg{object-position:50% 52%}
+  .ff-approved-art{
+    left:66%;
+    top:calc(max(env(safe-area-inset-top),3px) + 1vh);
+    width:auto;
+    height:82vh;
+    max-height:82vh;
+    transform:translateX(-50%);
+  }
+  .ff-approved-loader{
+    left:25%;
+    bottom:calc(max(env(safe-area-inset-bottom),4px) + 7vh);
+    width:40vw;
+  }
+}
+@media(min-width:700px) and (min-height:800px){
+  .ff-approved-art{width:min(72vw,620px)}
+  .ff-approved-loader{width:min(62vw,520px)}
+}
+@media(prefers-reduced-motion:reduce){
+  #ffApprovedBootSplash *,#ffApprovedBootSplash *::before,#ffApprovedBootSplash *::after{
+    transition-duration:.01ms!important;
+    animation:none!important;
+  }
+}
