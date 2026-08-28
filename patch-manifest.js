@@ -1,1 +1,1 @@
-__PLACEHOLDER__
+(()=>{'use strict';console.log('[FF-LAB] patch-manifest retired; using cleaned boot chain');window.__FF_START_LEGACY_PATCH_CHAIN__?.();})();
