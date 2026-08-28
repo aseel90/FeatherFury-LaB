@@ -1,0 +1,65 @@
+name: Optimize loading background
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/optimize-loading-background.yml'
+      - 'assets/ui/loading-hq/feather-fury-background.png'
+
+permissions:
+  contents: write
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install WebP tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y webp
+
+      - name: Convert loading background to WebP
+        run: |
+          cwebp -quiet -q 82 -m 6 -mt \
+            assets/ui/loading-hq/feather-fury-background.png \
+            -o assets/ui/loading-hq/feather-fury-background.webp
+
+      - name: Point splash screen to optimized background
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          js = Path('ui-splash-approved-v3.js')
+          s = js.read_text()
+          s = s.replace('assets/ui/loading-hq/feather-fury-background.png?v=20260828b',
+                        'assets/ui/loading-hq/feather-fury-background.webp?v=20260829a')
+          s = s.replace('class="ff-approved-bg" src="${BG}" alt="" draggable="false" decoding="async"',
+                        'class="ff-approved-bg" src="${BG}" alt="" draggable="false" decoding="async" fetchpriority="high"')
+          js.write_text(s)
+
+          index = Path('index.html')
+          s = index.read_text()
+          s = s.replace('assets/ui/loading-hq/feather-fury-background.png?v=20260828b',
+                        'assets/ui/loading-hq/feather-fury-background.webp?v=20260829a')
+          index.write_text(s)
+          PY
+
+      - name: Show size reduction
+        run: |
+          ls -lh assets/ui/loading-hq/feather-fury-background.png assets/ui/loading-hq/feather-fury-background.webp
+
+      - name: Commit optimized asset
+        run: |
+          if git diff --quiet -- ui-splash-approved-v3.js index.html && git diff --quiet -- assets/ui/loading-hq/feather-fury-background.webp; then
+            echo 'No optimization changes to commit.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/ui/loading-hq/feather-fury-background.webp ui-splash-approved-v3.js index.html
+          git commit -m 'Use optimized WebP loading background'
+          git push
