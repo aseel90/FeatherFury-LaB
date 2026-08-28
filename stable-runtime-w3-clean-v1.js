@@ -13,7 +13,39 @@ try{
 `    // Ground. World 3 owns its environment renderer completely; legacy cyber stripes are isolated.\n    if (this.activeWorld === 2) {\n      if (typeof this.drawWorld3Ground === 'function') this.drawWorld3Ground(this.ctx, this.frame);\n      else { this.ctx.fillStyle = '#090a12'; this.ctx.fillRect(0, gY, CONFIG.CANVAS_WIDTH, CONFIG.GROUND_HEIGHT); }\n    } else {\n      let gBase = '#3d2b1f', gTop = '#5c4033', gLines = '#8b5a2b';\n      if (this.activeWorld === 1) {\n        gBase = '#94a3b8'; gTop = '#e2e8f0'; gLines = '#cbd5e1';\n      } else if (this.boss.active || this.state === 'BOSS_OUTRO' || this.state === 'FLY_AWAY') {\n        gBase = '#1e293b'; gTop = '#334155'; gLines = '#475569';\n      }\n      this.ctx.fillStyle = gBase; this.ctx.fillRect(0, gY, CONFIG.CANVAS_WIDTH, CONFIG.GROUND_HEIGHT);\n      this.ctx.fillStyle = gTop; this.ctx.fillRect(0, gY, CONFIG.CANVAS_WIDTH, 10);\n      this.ctx.fillStyle = gLines;this.ctx.beginPath();\n      for (let x = -this.groundOffset; x < CONFIG.CANVAS_WIDTH + 40; x += 30) {this.ctx.moveTo(x,gY+10);this.ctx.lineTo(x+15,gY+10);this.ctx.lineTo(x-5,CONFIG.CANVAS_HEIGHT);this.ctx.lineTo(x-20,CONFIG.CANVAS_HEIGHT);}\n      this.ctx.fill();\n    }\n`,'ground');
   swap(`        if (this.state === 'STORY') {\n          if (this.activeWorld === 0) this.drawCage();\n          else this.drawBlizzardIntro();\n        }\n`,
 `        if (this.state === 'STORY') {\n          if (this.activeWorld === 0) this.drawCage();\n          else if (this.activeWorld === 1) this.drawBlizzardIntro();\n        }\n`,'story-weather');
-  window.__FF_W3_LEGACY_ENVIRONMENT_ISOLATED__={version:'1.0.0',changes};
+
+  swap(`    if (this.state === 'BOSS_OUTRO' || this.state === 'FLY_AWAY') {
+      if (this.activeWorld === 2) this.drawPhoenix(this.ctx, this.owl.x, this.owl.y, this.frame);
+      else if (this.activeWorld === 1) this.drawEagle(this.ctx, this.owl.x, this.owl.y, this.frame);
+      else this.drawOwl(this.ctx, this.owl.x, this.owl.y, this.frame);
+    }
+`,
+`    if (this.state === 'BOSS_OUTRO' || this.state === 'FLY_AWAY') {
+      if (this.activeWorld === 2) {
+        if (typeof window.drawBirdSkin === 'function') {
+          window.drawBirdSkin(this.ctx, 'phoenix', this.owl.x, this.owl.y, -0.04, Math.sin(this.frame * 0.42), 1.18, false);
+        } else {
+          this.drawPhoenix(this.ctx, this.owl.x, this.owl.y, this.frame);
+        }
+      } else if (this.activeWorld === 1) this.drawEagle(this.ctx, this.owl.x, this.owl.y, this.frame);
+      else this.drawOwl(this.ctx, this.owl.x, this.owl.y, this.frame);
+    }
+`,'w3-outro-phoenix-skin');
+
+  swap(`      if (this.activeWorld === 2) {
+        document.getElementById('endGameTitle').textContent = I18N[this.lang].w3_winText;
+        this.unlockedSkins.add('eagle');
+        safeSet('fh_unlocked_skins', JSON.stringify([...this.unlockedSkins]));
+      } else if (this.activeWorld === 1) {
+`,
+`      if (this.activeWorld === 2) {
+        document.getElementById('endGameTitle').textContent = I18N[this.lang].w3_winText;
+        this.unlockedSkins.add('phoenix');
+        safeSet('fh_unlocked_skins', JSON.stringify([...this.unlockedSkins]));
+      } else if (this.activeWorld === 1) {
+`,'w3-phoenix-reward');
+
+  window.__FF_W3_LEGACY_ENVIRONMENT_ISOLATED__={version:'1.1.0',changes,phoenixOutro:true,phoenixReward:true};
   (0,eval)(s+'\n//# sourceURL=ff-stable-runtime-w3-clean-v1.js');
 }catch(e){console.error('[FeatherFury] clean stable runtime failed',e);throw e;}
 })();
