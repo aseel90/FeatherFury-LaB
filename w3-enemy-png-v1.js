@@ -1,6 +1,6 @@
 (()=>{
 'use strict';
-const VERSION='w3-enemy-png-v2';
+const VERSION='w3-enemy-png-v3';
 const FRAME=112;
 const BASIC=[0,1,2];
 const CHARGED=[3,4,5];
@@ -52,7 +52,6 @@ function install(){
     const dw=charged?64:62,dh=charged?52:50;
     ctx.save();
     ctx.translate(x,y+bob);
-    // Tight alpha crop only. Charged identity comes from the crystal sprite itself, not a baked halo.
     ctx.drawImage(sheet,sx,0,FRAME,FRAME,-dw/2,-dh/2,dw,dh);
     ctx.restore();
   };
@@ -70,26 +69,24 @@ function install(){
     ctx.save();
     ctx.translate(x,y);
     ctx.drawImage(sheet,sx,0,FRAME,FRAME,-dw/2,-dh+9,dw,dh);
+    const hot=state==='fire',charging=state==='charge';
+    const sparkCount=hot?5:(charging?3:((f%36)<7?1:0));
+    for(let i=0;i<sparkCount;i++){
+      const ang=f*.19+i*2.11;
+      const rad=11+(i%3)*4+(hot?4:0);
+      const sx0=Math.cos(ang)*rad,sy0=-31+Math.sin(ang)*9;
+      ctx.save();
+      ctx.globalAlpha=hot?.9:(charging?.72:.40);
+      ctx.strokeStyle=i%2?'#67e8f9':'#d8b4fe';
+      ctx.shadowColor=ctx.strokeStyle;ctx.shadowBlur=hot?7:4;ctx.lineWidth=1.4;
+      ctx.beginPath();ctx.moveTo(sx0,sy0);ctx.lineTo(sx0+Math.cos(ang+1.1)*(hot?7:4),sy0+Math.sin(ang+1.1)*(hot?7:4));ctx.stroke();ctx.restore();
+    }
     ctx.restore();
   };
 
   g.__w3EnemyPngV1Installed=true;
-  window.__FF_W3_ENEMY_PNG_V1__={
-    version:VERSION,
-    assetType:'png-sprite-sheet-v1',
-    imageBased:true,
-    canvasConstructed:false,
-    sourceFrame:[FRAME,FRAME],
-    basicBatFrames:BASIC.length,
-    chargedBatFrames:CHARGED.length,
-    miniVoltTotem:true,
-    tightAlphaCrop:true,
-    bakedShadow:false,
-    bakedGlow:false,
-    runtimeChanged:true,
-    hitboxesChanged:false
-  };
-  console.log('[FF] World 3 enemy PNG sprites V2 installed');
+  window.__FF_W3_ENEMY_PNG_V1__={version:VERSION,assetType:'png-sprite-sheet-v1',imageBased:true,canvasConstructed:false,sourceFrame:[FRAME,FRAME],basicBatFrames:BASIC.length,chargedBatFrames:CHARGED.length,miniVoltTotem:true,tightAlphaCrop:true,bakedShadow:false,bakedGlow:false,runtimeChanged:true,runtimeTotemSparks:true,hitboxesChanged:false};
+  console.log('[FF] World 3 enemy PNG sprites V3 installed');
   return true;
 }
 Promise.all(PARTS.map(url=>fetch(url,{cache:'force-cache'}).then(r=>{if(!r.ok)throw new Error(`${r.status} ${url}`);return r.text();})))
