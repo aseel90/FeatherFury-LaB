@@ -1,6 +1,6 @@
 (()=>{'use strict';
 if(window.__FF_SPLASH_APPROVED_SCREEN_V3__)return;
-const BG='assets/ui/loading-hq/feather-fury-background.png?v=20260828b';
+const BG='assets/ui/loading-hq/feather-fury-background.webp?v=20260829a';
 const HEROES='assets/ui/loading-hq/feather-fury-heroes.png?v=20260828b';
 const LOGO='assets/ui/loading-hq/feather-fury-logo.png?v=20260828b';
 const started=performance.now();
@@ -14,7 +14,7 @@ splash.setAttribute('role','status');
 splash.setAttribute('aria-live','polite');
 splash.setAttribute('dir','ltr');
 splash.innerHTML=`
-  <img class="ff-approved-bg" src="${BG}" alt="" draggable="false" decoding="async">
+  <img class="ff-approved-bg" src="${BG}" alt="" draggable="false" decoding="async" fetchpriority="high">
   <div class="ff-approved-vignette" aria-hidden="true"></div>
   <div class="ff-approved-stage" aria-hidden="true">
     <img class="ff-approved-logo" src="${LOGO}" alt="" draggable="false" decoding="async" fetchpriority="high">
