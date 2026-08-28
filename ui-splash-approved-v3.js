@@ -1,14 +1,8 @@
 (()=>{'use strict';
 if(window.__FF_SPLASH_APPROVED_SCREEN_V3__)return;
-const B=window.__FF_SPLASHC_PARTS__;
-if(!B||!B.bg){
-  console.warn('[FeatherFury] approved loading background missing');
-  return;
-}
-
-const BG='data:image/jpeg;base64,'+B.bg;
-const HEROES='assets/ui/loading-hq/feather-fury-heroes.png?v=20260828';
-const LOGO='assets/ui/loading-hq/feather-fury-logo.png?v=20260828';
+const BG='assets/ui/loading-hq/feather-fury-background.png?v=20260828b';
+const HEROES='assets/ui/loading-hq/feather-fury-heroes.png?v=20260828b';
+const LOGO='assets/ui/loading-hq/feather-fury-logo.png?v=20260828b';
 const started=performance.now();
 const root=document.documentElement;
 root.classList.add('ff-approved-splash-active');
