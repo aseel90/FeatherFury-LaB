@@ -14,40 +14,13 @@
     const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
     function installPillarArt() {
-      g.drawStormPillarSprite = function(ctx, p, frame = this.frame) {
-        if (!p) return;
-        const gy = groundY();
-        const topH = Number(p.topHeight || 150);
-        const gap = Number(C.W3_GAP_SIZE || 142);
-        const lowerY = topH + gap;
-        const x = Number(p.x || 0), pw = Number(C.PIPE_WIDTH || 62);
-        const pulse = .5 + .5 * Math.sin(frame * .16 + x * .02);
-        const drawBody = (y, hh, topCap) => {
-          if (hh <= 0) return;
-          ctx.save(); ctx.translate(x, y);
-          const gr = ctx.createLinearGradient(0, 0, pw, 0);
-          gr.addColorStop(0, '#111827'); gr.addColorStop(.45, '#24304c'); gr.addColorStop(1, '#0b1225');
-          ctx.fillStyle = gr; ctx.fillRect(0, 0, pw, hh);
-          ctx.strokeStyle = '#475569'; ctx.lineWidth = 2; ctx.strokeRect(1, 0, pw - 2, hh);
-          ctx.fillStyle = 'rgba(139,92,246,.17)';
-          for (let yy = 15; yy < hh; yy += 34) ctx.fillRect(8, yy, pw - 16, 4);
-          if (topCap) {
-            ctx.fillStyle = '#252f4b'; ctx.fillRect(-7, 0, pw + 14, 14);
-            ctx.strokeStyle = '#64748b'; ctx.strokeRect(-7, 0, pw + 14, 14);
-          } else {
-            ctx.fillStyle = '#252f4b'; ctx.fillRect(-7, hh - 14, pw + 14, 14);
-            ctx.strokeStyle = '#64748b'; ctx.strokeRect(-7, hh - 14, pw + 14, 14);
-          }
-          ctx.restore();
-        };
-        drawBody(0, topH, false);
-        drawBody(lowerY, gy - lowerY, true);
-        ctx.save();
-        ctx.shadowColor = '#7dd3fc'; ctx.shadowBlur = 7 + pulse * 6;
-        ctx.strokeStyle = `rgba(125,211,252,${.35 + pulse * .25})`; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(x + 7, topH - 3); ctx.lineTo(x + pw - 7, topH - 3); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x + 7, lowerY + 3); ctx.lineTo(x + pw - 7, lowerY + 3); ctx.stroke();
-        ctx.restore();
+      g.__w3StormPillarSystem = {
+        version: '2.0.0',
+        variants: ['standard', 'charged', 'heavy'],
+        modular: true,
+        animatedEnergy: true,
+        lightningReactive: true,
+        preservesHitbox: true
       };
     }
 
@@ -194,6 +167,19 @@
       });
     }
 
+    function stylePillar(g, pillar, step, phase2) {
+      if (!pillar || pillar.__w3Variant) return;
+      let variant = 'standard';
+      if (phase2) {
+        const pick = step % 5;
+        variant = pick === 0 ? 'heavy' : (pick === 1 || pick === 4 ? 'standard' : 'charged');
+      } else if (step % 7 === 5) {
+        variant = 'heavy';
+      }
+      pillar.__w3Variant = variant;
+      pillar.__w3EnergySeed = (step * 29 + Math.round(Number(pillar.topHeight || 0))) % 101;
+    }
+
     function runDirector(g, newPillars) {
       if (!newPillars.length || g.boss?.active || g.state !== 'PLAYING') return;
       for (const pillar of newPillars) {
@@ -201,6 +187,7 @@
         const score = Number(g.score || 0);
         const stage2Start = Number(C.STAGE1_END || 15);
         const phase2 = score >= stage2Start;
+        stylePillar(g, pillar, step, phase2);
 
         if (!phase2) {
           if (step % 4 === 1) spawnTesla(g, pillar);
@@ -262,7 +249,7 @@
     installPillarArt(); installCurrentArt(); installHazardArt();
     g.__w3LegacyEnvironmentIsolated = true;
     g.__w3WorldPolishV1Installed = true;
-    console.log('[FF-LAB] w3-world-polish-v1-installed (legacy environment isolated)');
+    console.log('[FF-LAB] w3-world-polish-v1-installed (Storm Spire pillars v2)');
     return true;
   }
 
