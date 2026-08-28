@@ -138,6 +138,79 @@
       };
     }
 
+    function installCurrentArt() {
+      // World 3 no longer uses the legacy rotating Gravity Gate/crosshair.
+      const oldGlobalGate = window.drawGravityGate;
+      if (typeof oldGlobalGate === 'function' && !window.__ffW3LegacyGateHiddenV1) {
+        window.__ffW3LegacyGateHiddenV1 = true;
+        window.drawGravityGate = function(...args) {
+          if (window.game?.activeWorld === W3) return;
+          return oldGlobalGate(...args);
+        };
+      }
+
+      const oldGateSprite = typeof g.drawGravityGateSprite === 'function'
+        ? g.drawGravityGateSprite.bind(g)
+        : null;
+      if (oldGateSprite) {
+        g.drawGravityGateSprite = function(ctx, x, y, frame, radius) {
+          if (this.activeWorld !== W3) return oldGateSprite(ctx, x, y, frame, radius);
+          const gate = (this.gravityGates || []).find(q =>
+            Math.abs(Number(q?.x || 0) - x) < .75 &&
+            Math.abs(Number(q?.y || 0) - y) < .75
+          );
+          if (!gate?.__w3Current) return;
+
+          const dir = Number(gate.__w3Dir || -1);
+          const pulse = 1 + Math.sin(frame * .14) * .08;
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.scale(pulse, pulse);
+          ctx.fillStyle = 'rgba(56,189,248,.14)';
+          ctx.strokeStyle = dir < 0 ? '#7dd3fc' : '#c4b5fd';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(0, 0, radius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.lineCap = 'round';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.moveTo(0, dir < 0 ? 12 : -12);
+          ctx.lineTo(0, dir < 0 ? -9 : 9);
+          ctx.stroke();
+
+          ctx.fillStyle = dir < 0 ? '#7dd3fc' : '#c4b5fd';
+          ctx.beginPath();
+          if (dir < 0) {
+            ctx.moveTo(0, -17); ctx.lineTo(-8, -7); ctx.lineTo(8, -7);
+          } else {
+            ctx.moveTo(0, 17); ctx.lineTo(-8, 7); ctx.lineTo(8, 7);
+          }
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+        };
+      }
+    }
+
+    function applyStormCurrent(x) {
+      if (x.activeWorld !== W3 || x.state !== 'PLAYING') return;
+      const birdR = Number(C.BIRD_RADIUS || 14);
+      for (const gate of (x.gravityGates || [])) {
+        if (!gate?.__w3Current || gate.__w3Consumed) continue;
+        if (Math.hypot(x.bird.x - gate.x, x.bird.y - gate.y) >= Number(gate.radius || 25) + birdR) continue;
+        gate.__w3Consumed = true;
+        gate.x = -120;
+        x.gravityFlipped = false;
+        if (Number(gate.__w3Dir || -1) < 0) x.bird.velocity = Math.min(Number(x.bird.velocity || 0), -4.8);
+        else x.bird.velocity = Math.max(Number(x.bird.velocity || 0), 3.9);
+        x.screenShake = Math.max(Number(x.screenShake || 0), 5);
+        x.sound?.playLaser?.();
+      }
+    }
+
     function installHazardArt() {
       g.drawElectricBatSprite = function(ctx, x, y, frame) {
         ctx.save(); ctx.translate(x, y);
@@ -223,11 +296,10 @@
           else if (score >= 7 && step % 8 === 5) spawnBat(g, step, false);
         } else {
           // Stage 2 now shows Charged Voltbats clearly and a little more often before the boss.
-          // Two bat beats per ten beats is ~20% denser than the previous 1-in-6 cadence.
-          const pattern = step % 10;
+          const pattern = step % 9;
           if (pattern === 0) spawnTesla(g, pillar);
-          else if (pattern === 2 || pattern === 8) spawnBat(g, step, true);
-          else if (pattern === 5) spawnCurrent(g, pillar, step);
+          else if (pattern === 2 || pattern === 4 || pattern === 7) spawnBat(g, step, true);
+          else if (pattern === 6) spawnCurrent(g, pillar, step);
         }
         g.__w3DirectorStep = step + 1;
       }
@@ -243,11 +315,36 @@
 
     const oldUpdate = typeof g.update === 'function' ? g.update.bind(g) : null;
     if (oldUpdate) g.update = function() {
-      const before = this.activeWorld === W3 ? new Set(this.pillars || []) : null;
+      const isW3 = this.activeWorld === W3;
+      const before = isW3 ? new Set(this.pillars || []) : null;
+      const gatesBefore = isW3 ? new Set(this.gravityGates || []) : null;
+      const gateRadii = new Map();
+
+      if (isW3) {
+        // Prevent the old gravity-flip collision from firing on Storm Currents.
+        for (const gate of (this.gravityGates || [])) {
+          if (!gate?.__w3Current) continue;
+          gateRadii.set(gate, gate.radius);
+          gate.radius = -9999;
+        }
+        this.gravityFlipped = false;
+      }
+
       const r = oldUpdate();
-      if (this.activeWorld === W3 && before) {
+
+      if (isW3 && before) {
+        // Delete any legacy Gravity Gates born by the old World 3 loop.
+        this.gravityGates = (this.gravityGates || []).filter(gate =>
+          gate?.__w3Current || gatesBefore?.has(gate)
+        );
+        for (const gate of this.gravityGates) {
+          if (gateRadii.has(gate)) gate.radius = gateRadii.get(gate);
+        }
+        this.gravityFlipped = false;
+
         const fresh = (this.pillars || []).filter(p => !before.has(p));
         runDirector(this, fresh);
+        applyStormCurrent(this);
       }
       return r;
     };
@@ -269,7 +366,7 @@
       return r;
     };
 
-    installSky(); installPillarArt(); installGround(); installHazardArt();
+    installSky(); installPillarArt(); installGround(); installCurrentArt(); installHazardArt();
     g.__w3WorldPolishV1Installed = true;
     console.log('[FF-LAB] w3-world-polish-v1-installed');
     return true;
