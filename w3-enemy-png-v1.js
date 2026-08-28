@@ -1,6 +1,6 @@
 (()=>{
 'use strict';
-const VERSION='w3-enemy-png-v1';
+const VERSION='w3-enemy-png-v2';
 const FRAME=112;
 const BASIC=[0,1,2];
 const CHARGED=[3,4,5];
@@ -25,6 +25,15 @@ function nearestTesla(g,x,y){
   }
   return dist<14?best:null;
 }
+function nearestBat(g,x,y){
+  let best=null,dist=1e9;
+  for(const b of (g.electricBats||[])){
+    if(!b)continue;
+    const d=Math.abs((+b.x||0)-x)+Math.abs((+b.y||0)-y);
+    if(d<dist){dist=d;best=b;}
+  }
+  return dist<18?best:null;
+}
 function install(){
   const g=window.game;
   if(!g||typeof g.drawElectricBatSprite!=='function'||typeof g.drawMiniTeslaSprite!=='function')return false;
@@ -33,16 +42,17 @@ function install(){
   g.drawElectricBatSprite=function(ctx,x,y,frame){
     if(!ready())return;
     const f=Number(frame)||0;
+    const bat=nearestBat(this,x,y);
     const bossActive=!!this.boss?.active;
-    const charged=bossActive ? !!(this.boss.enraged||this.boss.__w3Phase2) : Number(this.score||0)>=Number((typeof CONFIG!=='undefined'&&CONFIG.STAGE1_END)||15);
+    const charged=!!bat?.__w3Charged || (bossActive && !!(this.boss.enraged||this.boss.__w3Phase2));
     const list=charged?CHARGED:BASIC;
     const anim=(Math.floor((f + Math.abs(Number(x)||0)*.17)/6)%list.length+list.length)%list.length;
     const sx=list[anim]*FRAME;
     const bob=Math.sin((f+(Number(x)||0)*.13)*.12)*1.1;
-    const dw=62,dh=50;
+    const dw=charged?64:62,dh=charged?52:50;
     ctx.save();
     ctx.translate(x,y+bob);
-    // Assets are tightly alpha-cropped: no baked shadow/halo is drawn here.
+    // Tight alpha crop only. Charged identity comes from the crystal sprite itself, not a baked halo.
     ctx.drawImage(sheet,sx,0,FRAME,FRAME,-dw/2,-dh/2,dw,dh);
     ctx.restore();
   };
@@ -76,10 +86,10 @@ function install(){
     tightAlphaCrop:true,
     bakedShadow:false,
     bakedGlow:false,
-    runtimeChanged:false,
+    runtimeChanged:true,
     hitboxesChanged:false
   };
-  console.log('[FF] World 3 enemy PNG sprites V1 installed');
+  console.log('[FF] World 3 enemy PNG sprites V2 installed');
   return true;
 }
 Promise.all(PARTS.map(url=>fetch(url,{cache:'force-cache'}).then(r=>{if(!r.ok)throw new Error(`${r.status} ${url}`);return r.text();})))
