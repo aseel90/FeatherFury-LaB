@@ -88,11 +88,11 @@ for (const token of ['__FF_RUNTIME_APPROVED_STACK__','__FF_MENU_UI_READY__','ui-
 
 const pauseCss = read('ui-end-screens-v1.css');
 if (/html body #ffPauseOverlay\.ff-pause-v1\s*\{[^}]*display\s*:\s*flex\s*!important/i.test(pauseCss)) fail('pause overlay must not be visible by default');
-if (!/#ffPauseOverlay\.ff-pause-v1\.show\s*\{[^}]*display\s*:\s*flex\s*!important/i.test(pauseCss)) fail('pause overlay must only display through .show');
+if (!/html body #ffPauseOverlay\.show\s*\{[^}]*display\s*:\s*flex\s*!important/i.test(pauseCss)) fail('pause overlay must only display through .show');
 
 const hud = read('ui-hud-v1.css');
 if (!/#ffPauseBtn\.ff-hud-pause-v1/.test(hud)) fail('current HUD must own pause button layout');
-if (!/\.hud-top\s*\{[^}]*grid-template-columns:auto minmax\(0,1fr\) auto/i.test(hud)) fail('HUD top row must be a stable three-column layout');
+if (!/\.hud-top\s*\{[^}]*grid-template-columns:76px minmax\(96px,118px\) 42px/i.test(hud)) fail('HUD top row must be the approved 76px / flexible score / 42px pause layout');
 if (!/fever-bar-container[^}]*display\s*:\s*none\s*!important/i.test(hud)) fail('retired fever bar must stay hidden');
 if (!/#ffBossHud[^}]*display\s*:\s*none\s*!important/i.test(hud)) fail('duplicate boss HUD must stay hidden');
 
@@ -104,7 +104,6 @@ if (!/window\.CONFIG\s*=\s*CONFIG/.test(runtimeBridge)) fail('runtime CONFIG bri
 
 if (!runtimeDoc.includes('runtime-config-bridge-v1.js')) fail('RUNTIME_ACTIVE.md must document runtime-config-bridge-v1.js');
 if (!runtimeDoc.includes('world1-ground-gap-polish-v1.js') || !/RETIRED/i.test(runtimeDoc)) fail('RUNTIME_ACTIVE.md must document retired ground-gap renderer');
-
 
 const liveVerify = read('.github/workflows/live-runtime-verify.yml');
 if (!/playwright install --with-deps chromium webkit/.test(liveVerify)) fail('live verify must install Chromium and WebKit');
