@@ -13,7 +13,7 @@
     'w1-final-gameplay-v1.js?v=2',
     'w1-final-story-v1.js?v=2',
     'core-gameplay-ux-v1.js?v=5',
-    'pause-hud-polish-v2.js?v=2',
+    'pause-hud-polish-v2.js?v=3',
     'world1-final-polish-v1.js?v=2',
 
     // World 2: consolidated runtime V10 owns boss behavior; PNG V5 owns final boss art.
@@ -82,7 +82,7 @@
   ];
 
   window.__FF_RUNTIME_MAP__ = Object.freeze({
-    version: 'approved-runtime-v1.1',
+    version: 'approved-runtime-v1.2',
     core: CORE_RUNTIME,
     active: ACTIVE_PATCHES.slice(),
     retired: RETIRED_PATCHES.slice()
@@ -105,16 +105,29 @@
     window.__FF_BOOTSTRAP_READY__ = true;
   }
 
-  function loadScript(src) {
-    return new Promise((resolve, reject) => {
+  function loadScript(src, maxAttempts = 3) {
+    const run = attempt => new Promise((resolve, reject) => {
       const el = document.createElement('script');
-      el.src = src;
+      const retryUrl = new URL(src, document.baseURI);
+      if (attempt > 1) retryUrl.searchParams.set('ffretry', `${attempt}-${Date.now()}`);
+      el.src = retryUrl.href;
       el.async = false;
       el.dataset.ffApprovedRuntime = '1';
+      el.dataset.ffAttempt = String(attempt);
       el.onload = () => resolve(true);
-      el.onerror = () => reject(new Error(`Failed to load ${src}`));
+      el.onerror = () => {
+        el.remove();
+        if (attempt >= maxAttempts) {
+          reject(new Error(`Failed to load ${src} after ${maxAttempts} attempts`));
+          return;
+        }
+        const delay = attempt === 1 ? 350 : 900;
+        console.warn(`[FeatherFury] retrying runtime asset ${src} (${attempt + 1}/${maxAttempts})`);
+        setTimeout(() => run(attempt + 1).then(resolve, reject), delay);
+      };
       document.head.appendChild(el);
     });
+    return run(1);
   }
 
   function waitFor(test, timeout = 6000, label = 'runtime condition') {
