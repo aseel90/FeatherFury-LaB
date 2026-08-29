@@ -16,8 +16,7 @@ const context = await browser.newContext({
   viewport: { width: 390, height: 844 },
   deviceScaleFactor: 2,
   isMobile: true,
-  hasTouch: true,
-  extraHTTPHeaders: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' }
+  hasTouch: true
 });
 const page = await context.newPage();
 const events = [];
