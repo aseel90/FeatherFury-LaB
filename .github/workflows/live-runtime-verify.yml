@@ -42,7 +42,7 @@ jobs:
       - name: Install Playwright
         run: |
           npm install --no-save playwright@1.55.0
-          npx playwright install --with-deps chromium
+          npx playwright install --with-deps chromium webkit
 
       - name: Verify LIVE GitHub Pages runtime
         id: smoke
@@ -51,7 +51,12 @@ jobs:
           FF_VERIFY_SHA: ${{ steps.meta.outputs.sha }}
         run: |
           set -o pipefail
-          node scripts/live-smoke.mjs 2>&1 | tee ff-live-smoke.log
+          status=0
+          echo "=== Chromium mobile ===" | tee ff-live-smoke.log
+          FF_BROWSER=chromium FF_SMOKE_OUT=artifacts/live-smoke/chromium node scripts/live-smoke.mjs 2>&1 | tee -a ff-live-smoke.log || status=1
+          echo "=== WebKit iPhone ===" | tee -a ff-live-smoke.log
+          FF_BROWSER=webkit FF_SMOKE_OUT=artifacts/live-smoke/webkit node scripts/live-smoke.mjs 2>&1 | tee -a ff-live-smoke.log || status=1
+          exit "$status"
 
       - name: Preserve live diagnostics
         if: always()
@@ -89,16 +94,15 @@ jobs:
             gh issue create --repo "$REPO" --title "$TITLE" --body-file /tmp/ff-live-failure.md
           fi
 
-      - name: Record successful live verification
+      - name: Close recovered live failure issue
         if: success()
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           SHA: ${{ steps.meta.outputs.sha }}
         run: |
-          MESSAGE="Live verify PASS on \`$SHA\`: Loading → visible World Select inside viewport → PLAY → gameplay/Pause checks passed with no critical browser/runtime errors."
-          gh issue comment 95 --repo "$REPO" --body "$MESSAGE"
-          OPEN_ISSUE="$(gh issue list --repo "$REPO" --state open --search '[LIVE] Feather Fury deployment broken in:title' --json number,title --jq '.[] | select(.title == "[LIVE] Feather Fury deployment broken") | .number' | head -n1)"
-          if [ -n "$OPEN_ISSUE" ]; then
-            gh issue close "$OPEN_ISSUE" --repo "$REPO" --comment "$MESSAGE"
+          TITLE='[LIVE] Feather Fury deployment broken'
+          ISSUE="$(gh issue list --repo "$REPO" --state open --search "$TITLE in:title" --json number,title --jq '.[] | select(.title == "[LIVE] Feather Fury deployment broken") | .number' | head -n1)"
+          if [ -n "$ISSUE" ]; then
+            gh issue close "$ISSUE" --repo "$REPO" --comment "Live runtime recovered on \`$SHA\`: Loading → complete World Select → PLAY passed with no critical browser/runtime errors."
           fi

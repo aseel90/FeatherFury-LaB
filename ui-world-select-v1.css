@@ -46,8 +46,14 @@
 #startScreen #settingsBtn{width:44px!important;height:44px!important;min-width:44px!important;border-radius:14px!important}
 
 #startScreen .start-main-content{
-  width:min(100%,430px)!important;max-width:430px!important;height:auto!important;min-height:0!important;max-height:100%!important;flex:1 1 auto!important;margin:0 auto!important;padding:clamp(54px,7.5vh,72px) 0 clamp(8px,1.2vh,14px)!important;
+  position:absolute!important;inset:0!important;
+  width:100%!important;max-width:none!important;height:100%!important;min-height:0!important;max-height:none!important;flex:none!important;margin:0!important;
+  padding:clamp(58px,7.5vh,72px) max(0px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(0px,env(safe-area-inset-left))!important;
   display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:clamp(8px,1.2vh,13px)!important;box-sizing:border-box!important;overflow:hidden!important;
+}
+#startScreen .world-select-shell{
+  width:100%!important;max-width:430px!important;min-height:0!important;flex:0 0 auto!important;margin:0!important;padding:0!important;
+  display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:0!important;
 }
 #startScreen .title-container{
   width:min(84vw,360px)!important;height:clamp(100px,17.5vh,158px)!important;min-height:82px!important;margin:0!important;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;
@@ -116,17 +122,18 @@
   #startScreen .title-container{width:min(76vw,274px)!important}
 }
 @media(min-width:600px){
-  #startScreen .start-main-content{width:min(72vw,480px)!important}
+  #startScreen .world-select-shell{width:min(72vw,480px)!important;max-width:480px!important}
   #startScreen .worlds-carousel{width:min(68vw,430px)!important}
   #startScreen .title-container{width:min(44vw,340px)!important}
   #startScreen .start-actions-group{width:min(42vw,320px)!important}
 }
 @media(orientation:landscape) and (max-height:560px){
-  #startScreen .start-main-content{max-width:760px!important;display:grid!important;grid-template-columns:minmax(180px,34%) minmax(300px,1fr);grid-template-rows:auto 1fr auto;column-gap:18px!important;padding:54px 18px 10px!important}
-  #startScreen .title-container{grid-column:1;grid-row:1/3;width:100%!important;height:auto!important;align-self:center!important}
-  #startScreen .worlds-carousel{grid-column:2;grid-row:1/3;width:100%!important;height:100%!important}
+  #startScreen .start-main-content{padding:54px 18px 10px!important}
+  #startScreen .world-select-shell{max-width:760px!important;display:grid!important;grid-template-columns:minmax(300px,1fr);grid-template-rows:1fr auto;column-gap:18px!important}
+  #startScreen .title-container{width:min(34vw,300px)!important;height:72px!important}
+  #startScreen .worlds-carousel{grid-column:1;grid-row:1;width:100%!important;height:100%!important}
   #startScreen .world-card{height:calc(100dvh - 120px)!important;min-height:230px!important}
-  #startScreen .start-actions-group{grid-column:2;grid-row:3;width:min(70%,310px)!important;justify-self:center!important}
+  #startScreen .start-actions-group{grid-column:1;grid-row:2;width:min(70%,310px)!important;justify-self:center!important}
 }
 
 /* Extra compact portrait guard: legacy/small Android and embedded webviews. */

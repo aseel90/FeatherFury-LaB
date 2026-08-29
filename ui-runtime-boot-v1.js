@@ -48,6 +48,19 @@
     return false;
   }
 
+  function fullyVisible(el) {
+    if (!el || el.classList.contains('hidden')) return false;
+    const style = getComputedStyle(el);
+    if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity || 1) <= 0.01) return false;
+    const r = el.getBoundingClientRect();
+    const vv = window.visualViewport;
+    const left = vv?.offsetLeft || 0;
+    const top = vv?.offsetTop || 0;
+    const right = left + (vv?.width || window.innerWidth);
+    const bottom = top + (vv?.height || window.innerHeight);
+    return r.width > 2 && r.height > 2 && r.left >= left - 2 && r.top >= top - 2 && r.right <= right + 2 && r.bottom <= bottom + 2;
+  }
+
   function menuContractReady() {
     const start = document.getElementById('startScreen');
     const thumb = document.querySelector('#worldCard .ff-world-thumb');
@@ -55,9 +68,12 @@
     const coinIcon = document.querySelector('#startScreen .ff-coin-icon');
     const birdButton = document.querySelector('#startScreen .ff-bird-avatar-btn');
     const preview = document.getElementById('previewBirdCanvas');
+    const logo = document.querySelector('#startScreen .ff-main-logo');
+    const card = document.getElementById('worldCard');
     const bg = thumb ? getComputedStyle(thumb).backgroundImage : 'none';
     return !!(
       start && start.classList.contains('active') && !start.classList.contains('hidden') &&
+      fullyVisible(logo) && fullyVisible(card) && fullyVisible(play) &&
       thumb && bg && bg !== 'none' && /world-1\.webp/.test(bg) &&
       play && !play.disabled &&
       coinIcon && birdButton && preview && canvasHasInk(preview) &&

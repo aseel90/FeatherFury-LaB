@@ -1,17 +1,19 @@
-import { chromium } from 'playwright';
+import { chromium, webkit } from 'playwright';
 import fs from 'node:fs';
 import path from 'node:path';
 
 const BASE = process.env.FF_LIVE_URL || 'https://aseel90.github.io/FeatherFury-LaB/';
 const SHA = process.env.FF_VERIFY_SHA || 'manual';
-const OUT = process.env.FF_SMOKE_OUT || 'artifacts/live-smoke';
+const ENGINE = (process.env.FF_BROWSER || 'chromium').toLowerCase();
+const OUT = process.env.FF_SMOKE_OUT || `artifacts/live-smoke/${ENGINE}`;
 fs.mkdirSync(OUT, { recursive: true });
 
 const url = new URL(BASE);
 url.searchParams.set('ui', 'world-v1');
 url.searchParams.set('ffverify', `${SHA}-${Date.now()}`);
 
-const browser = await chromium.launch({ headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage'] });
+const browserType = ENGINE === 'webkit' ? webkit : chromium;
+const browser = await browserType.launch(ENGINE === 'chromium' ? { headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage'] } : { headless: true });
 const context = await browser.newContext({
   viewport: { width: 390, height: 844 },
   deviceScaleFactor: 2,
@@ -36,7 +38,17 @@ const readState = () => page.evaluate(() => {
     const style = getComputedStyle(el);
     if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity || 1) <= 0.01) return false;
     const r = el.getBoundingClientRect();
-    return r.width > 1 && r.height > 1 && r.right > 0 && r.bottom > 0 && r.left < innerWidth && r.top < innerHeight;
+    const vv = window.visualViewport;
+    const left = vv?.offsetLeft || 0;
+    const top = vv?.offsetTop || 0;
+    const right = left + (vv?.width || innerWidth);
+    const bottom = top + (vv?.height || innerHeight);
+    return r.width > 1 && r.height > 1 && r.left >= left - 2 && r.top >= top - 2 && r.right <= right + 2 && r.bottom <= bottom + 2;
+  };
+  const rect = el => {
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height};
   };
   const preview = document.getElementById('previewBirdCanvas');
   let previewInk = false;
@@ -47,6 +59,8 @@ const readState = () => page.evaluate(() => {
   } catch (_) { previewInk = !!preview; }
   const thumb = document.querySelector('#worldCard .ff-world-thumb');
   return {
+    engine: navigator.userAgent,
+    viewport: {innerWidth, innerHeight, visualWidth: visualViewport?.width || null, visualHeight: visualViewport?.height || null},
     runtimeReady: window.__FF_RUNTIME_APPROVED_STACK__ === true,
     menuReady: window.__FF_MENU_UI_READY__ === true,
     runtimeBooting: window.__FF_PATCH_BOOTING__,
@@ -57,6 +71,7 @@ const readState = () => page.evaluate(() => {
     logoVisible: visible(document.querySelector('#startScreen .ff-main-logo')),
     worldCardVisible: visible(document.getElementById('worldCard')),
     playVisible: visible(document.getElementById('startStoryBtn')),
+    menuRects: {logo: rect(document.querySelector('#startScreen .ff-main-logo')), card: rect(document.getElementById('worldCard')), play: rect(document.getElementById('startStoryBtn'))},
     playDisabled: document.getElementById('startStoryBtn')?.disabled ?? null,
     worldThumb: thumb ? getComputedStyle(thumb).backgroundImage : null,
     worldKicker: document.querySelector('#worldCard .ff-world-kicker')?.textContent || null,
@@ -142,13 +157,13 @@ try {
   const criticalEvents = events.filter(e => e.type === 'pageerror' || e.type === 'requestfailed' || /approved runtime boot failed|clean stable runtime failed|post-runtime UI boot failed/i.test(e.text));
   if (criticalEvents.length) throw new Error(`Critical browser events: ${JSON.stringify(criticalEvents.slice(-20))}`);
 
-  const report = { ok: true, url: url.href, menu, afterPlay, events };
+  const report = { ok: true, browser: ENGINE, url: url.href, menu, afterPlay, events };
   fs.writeFileSync(path.join(OUT, 'state.json'), JSON.stringify(report, null, 2));
   console.log(JSON.stringify(report, null, 2));
 } catch (error) {
   const state = await readState().catch(() => null);
   await page.screenshot({ path: path.join(OUT, 'failure.png'), fullPage: true }).catch(() => {});
-  const report = { ok: false, url: url.href, error: error?.stack || String(error), state, events };
+  const report = { ok: false, browser: ENGINE, url: url.href, error: error?.stack || String(error), state, events };
   fs.writeFileSync(path.join(OUT, 'state.json'), JSON.stringify(report, null, 2));
   console.error(JSON.stringify(report, null, 2));
   process.exitCode = 1;
