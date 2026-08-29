@@ -76,6 +76,7 @@ function isReady(){
     document.getElementById('startScreen') &&
     document.getElementById('previewBirdCanvas') &&
     window.__FF_CHARACTER_ROSTER_V1__ &&
+    window.__FF_RUNTIME_APPROVED_STACK__ &&
     window.game
   );
 }
@@ -92,7 +93,7 @@ const timer=setInterval(()=>{
   if(window.__FF_UI_FOUNDATION_V1_READY__)mark('foundation');
   if(window.game)mark('game');
   if(window.__FF_CHARACTER_ROSTER_V1__)mark('roster');
-  if(window.__FF_W3_ENVIRONMENT_PNG_V1_READY__||window.__FF_W2_ENV_ASSETS_V1__||document.getElementById('worldCard'))mark('worlds');
+  if(window.__FF_RUNTIME_APPROVED_STACK__||window.__FF_W3_ENVIRONMENT_PNG_V1_READY__||window.__FF_W2_ENV_ASSETS_V1__)mark('worlds');
   const ready=isReady();
   if(ready)mark('ready');
 
@@ -101,7 +102,7 @@ const timer=setInterval(()=>{
   paint();
 
   const elapsed=performance.now()-started;
-  if((ready&&elapsed>=1450)||elapsed>=8500)finish();
+  if((ready&&elapsed>=1450)||elapsed>=15000)finish();
 },72);
 
 function finish(){
@@ -119,5 +120,5 @@ function finish(){
   },220);
 }
 window.addEventListener('pagehide',()=>clearInterval(timer),{once:true});
-window.__FF_SPLASH_APPROVED_SCREEN_V3__={version:'3.0.0',direction:'ltr',finish,mark,get progress(){return progress;}};
+window.__FF_SPLASH_APPROVED_SCREEN_V3__={version:'3.1.0',direction:'ltr',finish,mark,get progress(){return progress;}};
 })();
