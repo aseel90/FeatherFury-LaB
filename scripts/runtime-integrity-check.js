@@ -96,9 +96,16 @@ const requiredDom = [
   'id="highScore"',
   'id="earnedCoins"',
   'id="sfxToggleBtn"',
-  'id="resetDataBtn"'
+  'id="resetDataBtn"',
+  'id="htmlTag"',
+  'id="startTotalCoins"',
+  'id="leaderboardBtn"',
+  'id="shopBtnStart"'
 ];
 for (const token of requiredDom) if (!index.includes(token)) fail(`index.html is missing current UI DOM contract: ${token}`);
+for (const compatId of ['htmlTag','startTotalCoins','leaderboardBtn','shopBtnStart']) {
+  if (!new RegExp(`id=[\"']${compatId}[\"']`).test(index)) fail(`legacy core compatibility hook missing: ${compatId}`);
+}
 if (!/id=['"]startStoryBtn['"]/.test(index)) fail('index.html is missing startStoryBtn');
 if (/class=['"][^'"]*menu-card|id=['"]startBtn['"]/.test(index)) fail('legacy main-menu DOM leaked into index.html');
 const labUi = read('lab-ui.js');
