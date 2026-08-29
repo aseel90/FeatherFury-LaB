@@ -22,14 +22,17 @@
     return i === 1 ? !(g?.w1Completed || worldUnlocked) : !(g?.w2Completed || worldUnlocked);
   };
 
-  const openShop = () => {
+  const openShop = (tab = 'characters') => {
+    const target = tab === 'shop' ? 'shop' : 'characters';
+    window.__FF_STORE_OPEN_TAB__ = target;
     const btn = document.getElementById('shopBtnStart');
-    if (btn) return btn.click();
+    if (btn) { btn.click(); requestAnimationFrame(() => window.FFStoreUI?.switchTab?.(target)); return; }
     const start = document.getElementById('startScreen'), shop = document.getElementById('shopScreen');
     if (!start || !shop) return;
     start.classList.remove('active'); start.classList.add('hidden');
     shop.classList.remove('hidden'); shop.classList.add('active');
     window.game?.renderShop?.();
+    requestAnimationFrame(() => window.FFStoreUI?.switchTab?.(target));
   };
 
   const syncBirdButtonToSettings = (btn, settings) => {
@@ -76,11 +79,10 @@
       btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'ff-bird-avatar-btn';
-      btn.addEventListener('click', openShop);
+      btn.addEventListener('click', () => openShop('characters'));
       cluster.insertBefore(btn, settings);
     }
 
-    // Reuse the game's real selected-bird preview canvas, rather than a generic icon.
     const wrap = screen.querySelector('#worldCard .preview-canvas-wrap') || screen.querySelector('.bird-preview .preview-canvas-wrap');
     if (wrap && wrap.parentElement !== btn) {
       btn.replaceChildren(wrap);
@@ -106,7 +108,6 @@
     const topBar = screen?.querySelector('.top-bar');
     if (!screen || !main || !carousel) return null;
 
-    // Remove the old bottom bird button from v2 if it exists in a cached session.
     main.querySelector('.ff-secondary-menu-actions')?.remove();
 
     const coin = screen.querySelector('.top-bar .coin-pill');
@@ -115,8 +116,8 @@
       coin.setAttribute('role','button'); coin.tabIndex = 0; coin.querySelector('svg')?.remove();
       const count = document.getElementById('startTotalCoins');
       if (count) { count.before(icon('coin','ff-coin-icon')); count.after(icon('plus','ff-coin-plus')); }
-      coin.addEventListener('click', openShop);
-      coin.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openShop(); } });
+      coin.addEventListener('click', () => openShop('shop'));
+      coin.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openShop('shop'); } });
     }
 
     const settings = document.getElementById('settingsBtn');
@@ -163,7 +164,7 @@
     const play=document.getElementById('startStoryBtn');
     if(play){play.disabled=isLocked;play.classList.toggle('ff-disabled',isLocked);play.textContent=isLocked?(i===3?(lang==='ar'?'قريباً':'COMING SOON'):(lang==='ar'?'مغلق':'LOCKED')):(lang==='ar'?'ابدأ':'PLAY');}
 
-    const coin=ui.screen.querySelector('.ff-shop-coin'); if(coin){const t=lang==='ar'?'فتح متجر الأبطال':'Open heroes shop';coin.title=t;coin.setAttribute('aria-label',t);}
+    const coin=ui.screen.querySelector('.ff-shop-coin'); if(coin){const t=lang==='ar'?'فتح المتجر':'Open shop';coin.title=t;coin.setAttribute('aria-label',t);}
     if(ui.birdButton){const t=lang==='ar'?'اختيار الطائر':'Choose bird';ui.birdButton.title=t;ui.birdButton.setAttribute('aria-label',t);}
     document.getElementById('settingsBtn')?.setAttribute('aria-label',lang==='ar'?'الإعدادات':'Settings');
   }
