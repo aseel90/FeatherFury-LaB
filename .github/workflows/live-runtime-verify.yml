@@ -1,0 +1,103 @@
+name: Verify Live Feather Fury
+
+on:
+  workflow_run:
+    workflows: ["Deploy LAB Preview"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: feather-fury-live-verify
+  cancel-in-progress: true
+
+jobs:
+  live-smoke:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve deployed SHA
+        id: meta
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            echo "sha=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout deployed source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.meta.outputs.sha }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Verify LIVE GitHub Pages runtime
+        id: smoke
+        env:
+          FF_LIVE_URL: https://aseel90.github.io/FeatherFury-LaB/
+          FF_VERIFY_SHA: ${{ steps.meta.outputs.sha }}
+        run: |
+          set -o pipefail
+          node scripts/live-smoke.mjs 2>&1 | tee ff-live-smoke.log
+
+      - name: Preserve live diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: feather-fury-live-smoke-${{ steps.meta.outputs.sha }}
+          if-no-files-found: ignore
+          path: |
+            ff-live-smoke.log
+            artifacts/live-smoke/**
+
+      - name: Bridge live failure to issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ steps.meta.outputs.sha }}
+        run: |
+          set -euo pipefail
+          TITLE='[LIVE] Feather Fury deployment broken'
+          ISSUE="$(gh issue list --repo "$REPO" --state open --search "$TITLE in:title" --json number,title --jq '.[] | select(.title == "[LIVE] Feather Fury deployment broken") | .number' | head -n1)"
+          {
+            echo "Live browser verification failed for \`$SHA\`."
+            echo
+            echo "Run: https://github.com/$REPO/actions/runs/${{ github.run_id }}"
+            echo
+            echo '```text'
+            tail -c 14000 ff-live-smoke.log || true
+            echo
+            echo '```'
+          } > /tmp/ff-live-failure.md
+          if [ -n "$ISSUE" ]; then
+            gh issue comment "$ISSUE" --repo "$REPO" --body-file /tmp/ff-live-failure.md
+          else
+            gh issue create --repo "$REPO" --title "$TITLE" --body-file /tmp/ff-live-failure.md
+          fi
+
+      - name: Close recovered live failure issue
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ steps.meta.outputs.sha }}
+        run: |
+          TITLE='[LIVE] Feather Fury deployment broken'
+          ISSUE="$(gh issue list --repo "$REPO" --state open --search "$TITLE in:title" --json number,title --jq '.[] | select(.title == "[LIVE] Feather Fury deployment broken") | .number' | head -n1)"
+          if [ -n "$ISSUE" ]; then
+            gh issue close "$ISSUE" --repo "$REPO" --comment "Live runtime recovered on \`$SHA\`: Loading → complete World Select → PLAY passed with no critical browser/runtime errors."
+          fi
