@@ -36,7 +36,9 @@
     addImg(coin, 'ff-hud-coin-icon', ICONS.coin, true);
 
     const pause = document.getElementById('ffPauseBtn');
+    const top = hud.querySelector('.hud-top');
     if (pause) {
+      if (top && pause.parentElement !== top) top.appendChild(pause);
       pause.classList.add('ff-hud-pause-v1');
       if (!pause.querySelector('img')) pause.innerHTML = `<img src="${ICONS.pause}" alt="" aria-hidden="true">`;
       pause.setAttribute('aria-label', game?.lang === 'en' ? 'Pause' : 'إيقاف مؤقت');
@@ -69,11 +71,11 @@
     requestAnimationFrame(tick);
 
     window.__FF_UI_HUD_V1__ = {
-      version: 'ui-hud-v1.1',
+      version: 'ui-hud-v1.2',
       feverBar: false,
       duplicateBossBar: false
     };
-    console.log('[FF-LAB] ui-hud-v1.1-installed');
+    console.log('[FF-LAB] ui-hud-v1.2-installed');
     return true;
   }
 

@@ -9,7 +9,7 @@
     if (!game || !cfg || !canvas || !hud) return false;
     if (game.__coreGameplayUxV1Installed) return true;
 
-    const activePauseStates = new Set(['PLAYING', 'BOSS_WARNING', 'BOSS_INTRO']);
+    const activePauseStates = new Set(['STORY', 'PLAYING', 'BOSS_WARNING', 'BOSS_INTRO']);
     const style = document.createElement('style');
     style.id = 'ff-core-gameplay-ux-v1-style';
     style.textContent = `
@@ -153,133 +153,27 @@
       if (action === 'restart') {
         setPaused(false);
         pauseOverlay.classList.remove('show');
-        try { game.enterStoryState(); } catch (_) {}
+        if (game.gameMode === 'endless') { game.reset(); game.startGame?.('endless'); }
+        else { game.reset(); game.startStory?.(game.activeWorld || 0); }
       }
       if (action === 'settings') {
-        game.__ffSettingsFromPause = true;
         pauseOverlay.classList.remove('show');
+        game.__ffSettingsFromPause = true;
         const settings = document.getElementById('settingsScreen');
-        settings?.classList.remove('hidden'); settings?.classList.add('active');
+        if (settings) { settings.classList.remove('hidden'); settings.classList.add('active'); }
       }
       if (action === 'menu') {
         setPaused(false);
-        document.getElementById('mainMenuBtn')?.click();
+        pauseOverlay.classList.remove('show');
+        game.returnToMenu?.();
       }
     });
 
-    document.addEventListener('click', e => {
-      if (!game.__ffSettingsFromPause || !e.target.closest('#closeSettingsBtn')) return;
-      e.preventDefault(); e.stopImmediatePropagation();
-      game.__ffSettingsFromPause = false;
-      const settings = document.getElementById('settingsScreen');
-      settings?.classList.remove('active'); settings?.classList.add('hidden');
-      pauseOverlay.classList.add('show');
-      game.__ffPaused = true;
-      requestAnimationFrame(() => pauseOverlay.querySelector('[data-action="resume"]')?.focus());
-    }, true);
-
-    const blockWhilePaused = e => {
-      if (!game.__ffPaused) return;
-      if (e.target?.closest?.('#ffPauseOverlay,#settingsScreen')) return;
-      e.preventDefault(); e.stopImmediatePropagation();
-    };
-    document.addEventListener('pointerdown', blockWhilePaused, true);
-    document.addEventListener('touchstart', blockWhilePaused, { capture:true, passive:false });
-
-    const handleBack = e => {
-      if (game.__ffPaused) { e?.preventDefault?.(); setPaused(false); return; }
-      if (canPauseNow()) { e?.preventDefault?.(); setPaused(true); }
-    };
-    document.addEventListener('backbutton', handleBack, false);
-    window.addEventListener('popstate', handleBack, false);
-
-    const q = new URLSearchParams(location.search || '');
-    const perfEnabled = q.get('fps') === '1' || q.get('debug') === '1';
-    if (perfEnabled) perfHud.classList.add('show');
-    const perf = { fps:60, frameMs:16.7, minFps:60, drops:0, samples:[] };
-    window.FFPerformance = { getStats: () => ({ ...perf, samples: undefined }) };
-    let perfLast = performance.now(), bucketStart = perfLast, frames = 0, sumFrame = 0, dropSince = 0, lastDropLog = 0;
-    function perfLoop(ts) {
-      frames++;
-      const frame = ts - perfLast; perfLast = ts; sumFrame += frame;
-      if (frame > 32) { perf.drops++; dropSince++; }
-      if (ts - bucketStart >= 1000) {
-        perf.fps = frames * 1000 / (ts - bucketStart); perf.frameMs = sumFrame / Math.max(1, frames); perf.minFps = Math.min(perf.minFps, perf.fps);
-        perf.samples.push({ t:Math.round(ts), fps:+perf.fps.toFixed(1), ms:+perf.frameMs.toFixed(2), drops:dropSince }); if (perf.samples.length > 180) perf.samples.shift();
-        if (perfEnabled) perfHud.textContent = `FPS ${perf.fps.toFixed(1)}\nFrame ${perf.frameMs.toFixed(1)} ms\nDrops ${perf.drops}\nState ${game.state}`;
-        if (dropSince >= 5 && ts - lastDropLog > 5000) { console.warn('[FF-LAB] frame-drop burst', { fps:+perf.fps.toFixed(1), frameMs:+perf.frameMs.toFixed(1), state:game.state, boss:game.boss?.active ? game.boss.type : null }); lastDropLog = ts; }
-        frames = 0; sumFrame = 0; dropSince = 0; bucketStart = ts;
-      }
-      requestAnimationFrame(perfLoop);
-    }
-    requestAnimationFrame(perfLoop);
-
-    let countdownActive = false;
-    const originalEnterStory = typeof game.enterStoryState === 'function' ? game.enterStoryState.bind(game) : null;
-    if (originalEnterStory) {
-      game.enterStoryState = function() {
-        if (countdownActive) return;
-        countdownActive = true;
-        const start = document.getElementById('startScreen');
-        const end = document.getElementById('gameOverScreen');
-        const shop = document.getElementById('shopScreen');
-        start?.classList.remove('active'); start?.classList.add('hidden');
-        end?.classList.remove('active'); end?.classList.add('hidden');
-        shop?.classList.remove('active'); shop?.classList.add('hidden');
-        hud.classList.remove('hidden');
-        game.state = 'COUNTDOWN'; game.__ffPaused = false; pauseBtn.classList.remove('show'); stopGameAudio();
-        let value = 3; const valueEl = document.getElementById('ffCountdownValue');
-        const render = () => { valueEl.textContent = value > 0 ? value : (game.lang === 'ar' ? 'انطلق!' : 'GO!'); valueEl.style.animation = 'none'; void valueEl.offsetWidth; valueEl.style.animation = 'ffCountPop .78s ease both'; };
-        countdown.classList.add('show'); render();
-        const tick = setInterval(() => {
-          value--;
-          if (value >= 0) { render(); return; }
-          clearInterval(tick); countdown.classList.remove('show'); countdownActive = false;
-          originalEnterStory();
-        }, 720);
-      };
-    }
-
-    const originalDraw = typeof game.draw === 'function' ? game.draw.bind(game) : null;
-    if (originalDraw) {
-      game.draw = function() {
-        const r = originalDraw();
-        if (this.__ffPaused) return r;
-        return r;
-      };
-    }
-
-    const originalUpdate = typeof game.update === 'function' ? game.update.bind(game) : null;
-    if (originalUpdate) {
-      game.update = function() {
-        if (this.__ffPaused || countdownActive) return;
-        return originalUpdate();
-      };
-    }
-
-    const blockVictoryApproach = e => {
-      if (game.activeWorld === 0 && game.state === 'BOSS_OUTRO' && game.__ffVictoryCine?.phase === 'approach') {
-        e.preventDefault(); e.stopImmediatePropagation();
-      }
-    };
-    document.addEventListener('pointerdown', blockVictoryApproach, true);
-    document.addEventListener('touchstart', blockVictoryApproach, { capture:true, passive:false });
-    document.addEventListener('keydown', blockVictoryApproach, true);
-
-    const originalReset = typeof game.reset === 'function' ? game.reset.bind(game) : null;
-    if (originalReset) {
-      game.reset = function() {
-        this.__ffLaunchToken = (this.__ffLaunchToken || 0) + 1;
-        this.__ffLaunchAnimating = false;
-        this.__ffVictoryCine = null;
-        this.__ffVictoryAllowFinish = false;
-        this.__ffPaused = false;
-        pauseOverlay.classList.remove('show');
-        const r = originalReset();
-        try { if (window.CONFIG) window.CONFIG.REVIVE_COST = 1; } catch (_) {}
-        return r;
-      };
-    }
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return;
+      if (game.__ffPaused) { e.preventDefault(); setPaused(false); return; }
+      if (canPauseNow()) { e.preventDefault(); setPaused(true); }
+    });
 
     const uiWatch = () => {
       const show = !game.__ffPaused && canPauseNow() && !document.getElementById('settingsScreen')?.classList.contains('active');
@@ -294,10 +188,7 @@
     return true;
   }
 
-  let attempts = 0;
-  const timer = setInterval(() => {
-    attempts++;
-    if (install() || attempts > 100) clearInterval(timer);
-  }, 80);
+  let tries = 0;
+  const timer = setInterval(() => { tries++; if (install() || tries > 120) clearInterval(timer); }, 80);
   setTimeout(install, 900);
 })();

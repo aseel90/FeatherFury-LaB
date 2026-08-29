@@ -1,29 +1,5 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl" id="htmlTag">
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Feather Fury</title>
-  <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="apple-touch-icon" href="icon.png">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#06101f">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Changa:wght@600;800&family=Press+Start+2P&family=Tajawal:wght@700;900&family=Great+Vibes&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=2.3.4">
-  <link rel="stylesheet" href="lab-ui.css?v=2">
-  <link rel="stylesheet" href="ui-foundation-v1.css?v=1">
-  <link rel="stylesheet" href="ui-world-select-v1.css?v=5">
-  <link rel="stylesheet" href="ui-main-menu-v2.css?v=1">
-  <link rel="stylesheet" href="ui-main-menu-v3.css?v=6">
-  <link rel="stylesheet" href="ui-store-v1.css?v=2">
-  <link rel="stylesheet" href="ui-hud-v1.css?v=2">
-  <link rel="stylesheet" href="ui-end-screens-v1.css?v=2">
-  <link rel="stylesheet" href="ui-settings-leaderboard-v1.css?v=1">
-  <link rel="stylesheet" href="ui-splash-approved-v3.css?v=10">
-</head>
-<body>
-  <svg width="0" height="0" style="position:absolute"><defs>
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><title>Feather Fury: الانتقام</title><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="favicon.png"><meta name="theme-color" content="#0f172a"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Press+Start+2P&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css?v=2.3.6"><link rel="stylesheet" href="lab-ui.css?v=1"><link rel="stylesheet" href="ui-foundation-v1.css?v=1"><link rel="stylesheet" href="ui-world-select-v1.css?v=5"><link rel="stylesheet" href="ui-main-menu-v2.css?v=1"><link rel="stylesheet" href="ui-main-menu-v3.css?v=4"><link rel="stylesheet" href="ui-store-v1.css?v=2"><link rel="stylesheet" href="ui-hud-v1.css?v=3"><link rel="stylesheet" href="ui-end-screens-v1.css?v=2"><link rel="stylesheet" href="ui-settings-leaderboard-v1.css?v=1"><link rel="stylesheet" href="ui-splash-approved-v3.css?v=1"></head><body>
+  <svg style="display:none"><defs>
       <g id="coin-svg"><circle cx="12" cy="12" r="10" fill="#f1c40f" stroke="#d35400" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="#f39c12"/></g>
       <g id="star-svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor" stroke="#000" stroke-width="1" stroke-linejoin="round" /></g>
       <g id="trophy-svg"><path fill="#f1c40f" d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/></g>
@@ -32,9 +8,11 @@
       <g id="sound-off-svg"><path fill="#ffffff" d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></g>
       <g id="lang-svg"><path fill="#ffffff" d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56zm2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43-1.43-1.08-2.76-1.91-3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"/></g>
     </defs></svg>
-
-  <div class="game-wrapper"><div class="game-container" id="gameContainer"><canvas id="gameCanvas"></canvas><div id="gameToast" class="game-toast hidden"></div>
-      <div id="startScreen" class="overlay-screen active"><div class="top-bar"><div class="coin-pill"><svg width="22" height="22" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg><span id="startTotalCoins">0</span></div><div style="display: flex; gap: 8px;"><button id="leaderboardBtn" class="icon-btn" title="Top Players"><svg width="20" height="20" viewBox="0 0 24 24"><use href="#trophy-svg"></use></svg></button><button id="settingsBtn" class="icon-btn" title="Settings"><svg width="20" height="20" viewBox="0 0 24 24"><use href="#settings-svg"></use></svg></button><button id="shopBtnStart" class="shop-trigger-btn" data-i18n="shopBtn">المتجر</button></div></div>
+  <div class="game-container">
+    <canvas id="gameCanvas" width="480" height="640"></canvas>
+    <div id="uiLayer" class="ui-layer">
+      <div id="gameToast" class="game-toast hidden"></div>
+      <div id="startScreen" class="overlay-screen active"><div class="top-bar"><div class="coin-pill"><span id="totalCoins">0</span><svg width="24" height="24" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg></div><button id="settingsBtn" class="icon-btn"><svg width="26" height="26" viewBox="0 0 24 24"><use href="#settings-svg"></use></svg></button></div>
         <div class="start-main-content"><div class="title-container"><h1 class="game-title">FEATHER<br><span class="highlight">FURY</span></h1><div class="game-subtitle" data-i18n="subtitle">غضب الريش: الانتقام</div></div>
           <div class="worlds-carousel"><button id="prevWorldBtn" class="carousel-nav-btn" aria-label="Previous World"></button><div class="world-card" id="worldCard"><div class="world-title" id="worldTitle">الغابة الملعونة</div><div class="world-stars" id="worldStars"><span class="star empty star-small"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span><span class="star empty star-big"><svg width="1.7em" height="1.7em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span><span class="star empty star-small"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span></div><div class="bird-preview"><div class="preview-canvas-wrap"><canvas id="previewBirdCanvas" width="54" height="54"></canvas></div><span id="activeSkinName" class="skin-name-badge">العصفور الكلاسيكي</span></div><div class="world-status" id="worldStatus">جاهز للعب!</div></div><button id="nextWorldBtn" class="carousel-nav-btn" aria-label="Next World"></button></div>
           <div class="start-actions-group"><button id='startStoryBtn' class="arcade-btn" data-i18n="playBtn">بدء المهمة</button><button id='startEndlessBtn' class='arcade-btn secondary-action-btn' data-i18n="endlessBtn">الطور اللانهائي</button></div></div></div>
@@ -52,7 +30,7 @@
   <script src="js/world2.js?v=2.3.2"></script>
   <script src="js/world3.js?v=2.3.2"></script>
   <script src="ui-splash-approved-v3.js?v=11"></script>
-  <script src="game.js?v=2.4.4"></script>
+  <script src="game.js?v=2.4.5"></script>
   <script src="lab-ui.js?v=5"></script>
   <script src="ui-settings-leaderboard-v1.js?v=2"></script>
   <script src="ui-store-v1.js?v=1"></script>
@@ -60,6 +38,6 @@
   <script src="ui-main-menu-v2.js?v=1"></script>
   <script src="ui-world-select-v1.js?v=7"></script>
   <script src="ui-end-screens-v1.js?v=1"></script>
-  <script src="ui-hud-v1.js?v=2"></script>
+  <script src="ui-hud-v1.js?v=3"></script>
   <script src="ui-foundation-v1.js?v=1"></script>
 </body></html>

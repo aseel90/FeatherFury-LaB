@@ -12,7 +12,7 @@
     'w1-final-audio-v1.js?v=2',
     'w1-final-gameplay-v1.js?v=2',
     'w1-final-story-v1.js?v=2',
-    'core-gameplay-ux-v1.js?v=4',
+    'core-gameplay-ux-v1.js?v=5',
     'pause-hud-polish-v2.js?v=2',
     'world1-final-polish-v1.js?v=2',
 

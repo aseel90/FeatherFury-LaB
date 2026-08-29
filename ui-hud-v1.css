@@ -1,8 +1,179 @@
-html body #gameHud.ff-hud-v1{position:absolute !important;inset:0 !important;z-index:11 !important;pointer-events:none !important;background:transparent !important;padding:calc(max(env(safe-area-inset-top),0px) + 12px) max(calc(env(safe-area-inset-right) + 12px),12px) max(calc(env(safe-area-inset-bottom) + 10px),10px) max(calc(env(safe-area-inset-left) + 12px),12px) !important;box-sizing:border-box !important;overflow:visible !important}.ff-hud-v1 .hud-top{position:absolute !important;top:calc(max(env(safe-area-inset-top),0px) + 12px) !important;left:max(calc(env(safe-area-inset-left) + 12px),12px) !important;right:max(calc(env(safe-area-inset-right) + 12px),12px) !important;height:54px !important;display:grid !important;grid-template-columns:auto 1fr auto !important;align-items:start !important;gap:9px !important;pointer-events:none !important}.ff-hud-v1 .hud-coin-badge,.ff-hud-v1 .score-container,#ffPauseBtn.ff-hud-pause-v1,.ff-hud-v1 .fever-bar-container,.ff-hud-v1 #ffAbilityHud,#ffBossHud{background:linear-gradient(145deg,rgba(9,48,76,.80),rgba(7,29,57,.72)) !important;border:1.5px solid rgba(83,211,255,.48) !important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 7px 18px rgba(0,24,54,.22) !important;backdrop-filter:blur(9px) saturate(125%) !important;-webkit-backdrop-filter:blur(9px) saturate(125%) !important}.ff-hud-v1 .hud-coin-badge{position:static !important;height:48px !important;min-width:86px !important;padding:0 13px 0 10px !important;border-radius:18px !important;display:flex !important;align-items:center !important;justify-content:center !important;gap:8px !important;color:#ffe168 !important;font-family:'Press Start 2P',monospace !important;font-size:.78rem !important;pointer-events:auto !important;box-sizing:border-box !important}.ff-hud-v1 .hud-coin-badge>svg{display:none !important}.ff-hud-v1 .ff-hud-coin-icon{width:27px !important;height:27px !important;display:block !important;flex:0 0 27px !important;filter:drop-shadow(0 2px 2px rgba(0,0,0,.24))}.ff-hud-v1 .score-container{position:static !important;justify-self:center !important;min-width:108px !important;height:54px !important;border-radius:19px !important;padding:5px 12px 6px !important;display:flex !important;flex-direction:column !important;align-items:center !important;justify-content:center !important;gap:2px !important;box-sizing:border-box !important;transform:none !important}.ff-hud-v1 .score-badge{font-family:'Press Start 2P',monospace !important;font-size:clamp(1.05rem,5.5vw,1.4rem) !important;line-height:1 !important;color:#fff !important;text-shadow:0 2px 0 rgba(5,31,58,.72),0 0 10px rgba(85,220,255,.12) !important}.ff-hud-v1 .stage-badge{font-family:'Tajawal',sans-serif !important;font-size:clamp(.60rem,2.7vw,.72rem) !important;font-weight:900 !important;line-height:1.1 !important;color:#7ee7ff !important;white-space:nowrap !important}.ff-hud-v1 #soundToggleBtn{display:none !important}#ffPauseBtn.ff-hud-pause-v1{position:absolute !important;top:calc(max(env(safe-area-inset-top),0px) + 12px) !important;right:max(calc(env(safe-area-inset-right) + 12px),12px) !important;width:48px !important;height:48px !important;min-width:48px !important;max-width:48px !important;padding:0 !important;border-radius:17px !important;display:grid !important;place-items:center !important;pointer-events:auto !important;z-index:15 !important;box-sizing:border-box !important}#ffPauseBtn.ff-hud-pause-v1 img{width:22px !important;height:22px !important;display:block !important}.ff-hud-v1 .fever-bar-container{position:absolute !important;top:calc(max(env(safe-area-inset-top),0px) + 74px) !important;left:50% !important;transform:translateX(-50%) !important;width:min(78%,430px) !important;height:38px !important;padding:5px 9px !important;border-radius:18px !important;display:grid !important;grid-template-columns:auto 1fr !important;align-items:center !important;gap:7px !important;box-sizing:border-box !important}.ff-hud-v1 .fever-label{position:static !important;display:flex !important;align-items:center !important;gap:5px !important;font-family:'Tajawal',sans-serif !important;font-weight:900 !important;font-size:.76rem !important;color:#ffe168 !important;white-space:nowrap !important;order:2}.ff-hud-v1 .ff-hud-fever-icon{width:19px !important;height:19px !important;display:block !important}.ff-hud-v1 .fever-bar-bg{position:relative !important;order:1 !important;height:12px !important;border-radius:999px !important;background:rgba(1,16,35,.48) !important;border:1px solid rgba(103,232,249,.32) !important;overflow:hidden !important;box-shadow:inset 0 2px 4px rgba(0,0,0,.22) !important}.ff-hud-v1 .fever-bar-fill{height:100% !important;border-radius:inherit !important;background:linear-gradient(90deg,#22d3ee,#38bdf8 58%,#facc15) !important;box-shadow:0 0 10px rgba(34,211,238,.30) !important}.ff-hud-v1 #ffAbilityHud{position:absolute !important;top:calc(max(env(safe-area-inset-top),0px) + 118px) !important;left:50% !important;right:auto !important;bottom:auto !important;transform:translateX(-50%) !important;width:auto !important;max-width:min(76%,390px) !important;min-height:32px !important;padding:5px 13px !important;border-radius:16px !important;color:#cff6ff !important;font-family:'Tajawal',sans-serif !important;font-weight:900 !important;font-size:clamp(.68rem,2.9vw,.78rem) !important;text-align:center !important;pointer-events:none !important;box-sizing:border-box !important}#ffBossHud{position:absolute;top:calc(max(env(safe-area-inset-top),0px) + 158px);left:50%;transform:translateX(-50%);width:min(86%,470px);min-height:52px;padding:8px 12px 9px;border-radius:18px;box-sizing:border-box;pointer-events:none;transition:opacity .2s ease,transform .2s ease;opacity:1}#ffBossHud.ff-hidden{opacity:0;visibility:hidden;transform:translate(-50%,-5px)}#ffBossHud .ff-boss-head{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-bottom:6px;color:#f6eaff;font-family:'Tajawal',sans-serif;font-weight:900;font-size:clamp(.72rem,3vw,.84rem)}#ffBossHud .ff-boss-title{display:flex;align-items:center;gap:7px;min-width:0}#ffBossHud .ff-boss-title img{width:23px;height:23px;display:block}#ffBossHud .ff-boss-hp{font-family:'Press Start 2P',monospace;color:#d8b4fe;font-size:.60rem;direction:ltr}#ffBossHud .ff-boss-track{height:10px;border-radius:999px;background:rgba(4,12,30,.56);border:1px solid rgba(196,181,253,.24);overflow:hidden;box-shadow:inset 0 2px 4px rgba(0,0,0,.22)}#ffBossHud .ff-boss-fill{height:100%;width:100%;border-radius:inherit;background:linear-gradient(90deg,#8b5cf6,#38bdf8,#22d3ee);transition:width .15s linear;box-shadow:0 0 10px rgba(139,92,246,.28)}#bossWarning{top:calc(max(env(safe-area-inset-top),0px) + 218px) !important;left:50% !important;right:auto !important;transform:translateX(-50%) !important;width:min(88%,470px) !important;padding:8px 12px !important;border-radius:14px !important;background:rgba(86,31,52,.64) !important;border:1px solid rgba(251,113,133,.40) !important;box-shadow:0 7px 18px rgba(40,8,24,.18) !important;backdrop-filter:blur(8px) !important;-webkit-backdrop-filter:blur(8px) !important;color:#ffe4e6 !important;font-family:'Tajawal',sans-serif !important;font-weight:900 !important;font-size:clamp(.7rem,3vw,.82rem) !important;pointer-events:none !important}#gameHint{bottom:max(calc(env(safe-area-inset-bottom) + 16px),16px) !important;left:50% !important;transform:translateX(-50%) !important;width:auto !important;max-width:min(88%,430px) !important;padding:7px 12px !important;border-radius:14px !important;background:rgba(8,47,72,.64) !important;border:1px solid rgba(103,232,249,.32) !important;box-shadow:0 6px 16px rgba(1,22,45,.16) !important;backdrop-filter:blur(7px) !important;-webkit-backdrop-filter:blur(7px) !important;color:#e0f8ff !important;font-family:'Tajawal',sans-serif !important;font-weight:800 !important;font-size:clamp(.68rem,2.9vw,.78rem) !important;pointer-events:none !important}.ff-hud-v1 .hud-coin-badge,#ffPauseBtn.ff-hud-pause-v1{-webkit-tap-highlight-color:transparent}.ff-hud-v1 .hud-coin-badge:active,#ffPauseBtn.ff-hud-pause-v1:active{transform:translateY(2px) !important}@media (max-width:340px){.ff-hud-v1 .hud-top{left:max(calc(env(safe-area-inset-left) + 8px),8px) !important;right:max(calc(env(safe-area-inset-right) + 8px),8px) !important;gap:6px !important}.ff-hud-v1 .hud-coin-badge{min-width:76px !important;height:44px !important;padding-inline:8px !important;font-size:.67rem !important}.ff-hud-v1 .ff-hud-coin-icon{width:23px !important;height:23px !important;flex-basis:23px !important}.ff-hud-v1 .score-container{height:49px !important;min-width:94px !important;padding-inline:8px !important}#ffPauseBtn.ff-hud-pause-v1{width:44px !important;height:44px !important;min-width:44px !important;max-width:44px !important;right:max(calc(env(safe-area-inset-right) + 8px),8px) !important}.ff-hud-v1 .fever-bar-container{top:calc(max(env(safe-area-inset-top),0px) + 69px) !important;width:86% !important}.ff-hud-v1 #ffAbilityHud{top:calc(max(env(safe-area-inset-top),0px) + 111px) !important;max-width:84% !important}#ffBossHud{top:calc(max(env(safe-area-inset-top),0px) + 150px);width:91%}#bossWarning{top:calc(max(env(safe-area-inset-top),0px) + 207px) !important;width:91% !important}}@media (max-height:600px){.ff-hud-v1 .hud-top{top:calc(max(env(safe-area-inset-top),0px) + 7px) !important}.ff-hud-v1 .hud-coin-badge{height:42px !important}.ff-hud-v1 .score-container{height:46px !important}#ffPauseBtn.ff-hud-pause-v1{top:calc(max(env(safe-area-inset-top),0px) + 7px) !important;height:42px !important;width:42px !important;min-width:42px !important;max-width:42px !important}.ff-hud-v1 .fever-bar-container{top:calc(max(env(safe-area-inset-top),0px) + 58px) !important;height:34px !important}.ff-hud-v1 #ffAbilityHud{top:calc(max(env(safe-area-inset-top),0px) + 97px) !important;min-height:29px !important}#ffBossHud{top:calc(max(env(safe-area-inset-top),0px) + 132px);min-height:46px;padding-block:6px}#bossWarning{top:calc(max(env(safe-area-inset-top),0px) + 184px) !important}}@media (min-width:700px) and (min-height:650px){.ff-hud-v1 .hud-top{left:max(calc(env(safe-area-inset-left) + 22px),22px) !important;right:max(calc(env(safe-area-inset-right) + 22px),22px) !important}.ff-hud-v1 .hud-coin-badge{min-width:108px !important;height:54px !important}.ff-hud-v1 .score-container{min-width:136px !important;height:59px !important}#ffPauseBtn.ff-hud-pause-v1{right:max(calc(env(safe-area-inset-right) + 22px),22px) !important;width:54px !important;height:54px !important;min-width:54px !important;max-width:54px !important}.ff-hud-v1 .fever-bar-container{width:min(62%,520px) !important}.ff-hud-v1 #ffAbilityHud{max-width:min(60%,470px) !important}#ffBossHud{width:min(68%,560px)}}@media (orientation:landscape) and (max-height:540px) and (min-width:600px){.ff-hud-v1 .hud-top{top:calc(max(env(safe-area-inset-top),0px) + 6px) !important;left:max(calc(env(safe-area-inset-left) + 10px),10px) !important;right:max(calc(env(safe-area-inset-right) + 10px),10px) !important}.ff-hud-v1 .hud-coin-badge{height:40px !important;min-width:88px !important}.ff-hud-v1 .score-container{height:43px !important;min-width:112px !important}#ffPauseBtn.ff-hud-pause-v1{top:calc(max(env(safe-area-inset-top),0px) + 6px) !important;right:max(calc(env(safe-area-inset-right) + 10px),10px) !important;width:40px !important;height:40px !important;min-width:40px !important;max-width:40px !important}.ff-hud-v1 .fever-bar-container{top:calc(max(env(safe-area-inset-top),0px) + 53px) !important;left:14px !important;transform:none !important;width:min(44%,340px) !important;height:32px !important}.ff-hud-v1 #ffAbilityHud{top:calc(max(env(safe-area-inset-top),0px) + 91px) !important;left:14px !important;transform:none !important;max-width:min(44%,340px) !important}#ffBossHud{top:calc(max(env(safe-area-inset-top),0px) + 53px);left:auto;right:max(calc(env(safe-area-inset-right) + 14px),14px);transform:none;width:min(44%,350px)}#ffBossHud.ff-hidden{transform:translateY(-5px)}#bossWarning{top:calc(max(env(safe-area-inset-top),0px) + 111px) !important;left:auto !important;right:max(calc(env(safe-area-inset-right) + 14px),14px) !important;transform:none !important;width:min(44%,350px) !important}}@media (prefers-reduced-motion:reduce){#ffBossHud,.ff-hud-v1 .fever-bar-fill{transition:none !important}}
-/* 2026-08-29 HUD cleanup: fever stays a gameplay mechanic but has no dedicated bar. Boss HP is rendered only above the boss on canvas. */
+html body #gameHud.ff-hud-v1{
+  position:absolute!important;inset:0!important;z-index:11!important;pointer-events:none!important;
+  background:transparent!important;box-sizing:border-box!important;overflow:visible!important;
+}
+
+.ff-hud-v1 .hud-top{
+  position:absolute!important;
+  top:calc(max(env(safe-area-inset-top),0px) + 10px)!important;
+  left:max(calc(env(safe-area-inset-left) + 12px),12px)!important;
+  right:max(calc(env(safe-area-inset-right) + 12px),12px)!important;
+  height:50px!important;
+  display:grid!important;
+  grid-template-columns:auto minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:10px!important;
+  pointer-events:none!important;
+}
+
+.ff-hud-v1 .hud-coin-badge,
+.ff-hud-v1 .score-container,
+#ffPauseBtn.ff-hud-pause-v1,
+.ff-hud-v1 #ffAbilityHud{
+  background:linear-gradient(145deg,rgba(8,48,77,.78),rgba(6,27,54,.72))!important;
+  border:1.5px solid rgba(77,205,255,.46)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 5px 14px rgba(0,18,42,.18)!important;
+  backdrop-filter:blur(8px) saturate(120%)!important;
+  -webkit-backdrop-filter:blur(8px) saturate(120%)!important;
+  box-sizing:border-box!important;
+}
+
+.ff-hud-v1 .hud-coin-badge{
+  position:static!important;
+  justify-self:start!important;
+  height:44px!important;
+  min-width:78px!important;
+  padding:0 11px 0 9px!important;
+  border-radius:16px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+  color:#ffe16c!important;
+  font-family:'Press Start 2P',monospace!important;
+  font-size:.72rem!important;
+  pointer-events:auto!important;
+}
+.ff-hud-v1 .hud-coin-badge>svg{display:none!important}
+.ff-hud-v1 .ff-hud-coin-icon{width:24px!important;height:24px!important;display:block!important;flex:0 0 24px!important;filter:drop-shadow(0 2px 2px rgba(0,0,0,.22))}
+
+.ff-hud-v1 .score-container{
+  position:static!important;
+  justify-self:center!important;
+  align-self:center!important;
+  min-width:104px!important;
+  max-width:132px!important;
+  height:50px!important;
+  padding:5px 12px!important;
+  border-radius:17px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:3px!important;
+  transform:none!important;
+}
+.ff-hud-v1 .score-badge{
+  margin:0!important;padding:0!important;border:0!important;background:none!important;
+  font-family:'Press Start 2P',monospace!important;
+  font-size:clamp(.96rem,4.6vw,1.22rem)!important;
+  line-height:1!important;color:#fff!important;
+  text-shadow:0 2px 0 rgba(5,31,58,.68)!important;
+}
+.ff-hud-v1 .stage-badge{
+  margin:0!important;padding:0!important;border:0!important;outline:0!important;background:none!important;box-shadow:none!important;
+  font-family:'Tajawal',sans-serif!important;
+  font-size:clamp(.56rem,2.4vw,.66rem)!important;
+  font-weight:900!important;line-height:1!important;color:#79ddf7!important;white-space:nowrap!important;
+}
+.ff-hud-v1 #soundToggleBtn{display:none!important}
+
+#ffPauseBtn.ff-hud-pause-v1{
+  position:static!important;
+  grid-column:3!important;
+  justify-self:end!important;
+  align-self:center!important;
+  width:44px!important;height:44px!important;min-width:44px!important;max-width:44px!important;
+  padding:0!important;margin:0!important;border-radius:15px!important;
+  place-items:center!important;
+  pointer-events:auto!important;z-index:15!important;
+  color:#fff!important;
+  -webkit-tap-highlight-color:transparent!important;
+}
+#ffPauseBtn.ff-hud-pause-v1:not(.show){display:none!important}
+#ffPauseBtn.ff-hud-pause-v1.show{display:grid!important}
+#ffPauseBtn.ff-hud-pause-v1 img{width:20px!important;height:20px!important;display:block!important}
+#ffPauseBtn.ff-hud-pause-v1:active{transform:translateY(2px)!important}
+
+/* The gameplay ability remains visible, but no longer dominates the playfield. */
+.ff-hud-v1 #ffAbilityHud{
+  position:absolute!important;
+  top:calc(max(env(safe-area-inset-top),0px) + 67px)!important;
+  left:50%!important;right:auto!important;bottom:auto!important;
+  transform:translateX(-50%)!important;
+  width:auto!important;max-width:min(58%,270px)!important;
+  min-height:25px!important;
+  padding:3px 10px!important;
+  border-radius:999px!important;
+  color:#d9f8ff!important;
+  font-family:'Tajawal',sans-serif!important;
+  font-weight:900!important;
+  font-size:clamp(.58rem,2.45vw,.68rem)!important;
+  line-height:1.1!important;
+  letter-spacing:.01em!important;
+  text-align:center!important;
+  pointer-events:none!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;text-overflow:ellipsis!important;
+}
+
+/* Retired HUD pieces: Fever has no dedicated bar and boss HP stays above the boss on canvas. */
 html body #gameHud .fever-bar-container,
-html body #ffBossHud{
-  display:none !important;
-  visibility:hidden !important;
-  pointer-events:none !important;
+html body #ffBossHud{display:none!important;visibility:hidden!important;pointer-events:none!important}
+
+#bossWarning{
+  top:calc(max(env(safe-area-inset-top),0px) + 104px)!important;
+  left:50%!important;right:auto!important;transform:translateX(-50%)!important;
+  width:auto!important;max-width:min(82%,390px)!important;
+  padding:6px 10px!important;border-radius:12px!important;
+  background:rgba(82,27,48,.62)!important;border:1px solid rgba(251,113,133,.36)!important;
+  box-shadow:0 5px 14px rgba(40,8,24,.14)!important;
+  backdrop-filter:blur(7px)!important;-webkit-backdrop-filter:blur(7px)!important;
+  color:#ffe4e6!important;font-family:'Tajawal',sans-serif!important;font-weight:900!important;
+  font-size:clamp(.62rem,2.6vw,.74rem)!important;pointer-events:none!important;
+}
+#gameHint{
+  bottom:max(calc(env(safe-area-inset-bottom) + 14px),14px)!important;
+  left:50%!important;transform:translateX(-50%)!important;width:auto!important;
+  max-width:min(86%,420px)!important;padding:6px 11px!important;border-radius:13px!important;
+  background:rgba(8,47,72,.62)!important;border:1px solid rgba(103,232,249,.30)!important;
+  box-shadow:0 5px 14px rgba(1,22,45,.14)!important;
+  backdrop-filter:blur(7px)!important;-webkit-backdrop-filter:blur(7px)!important;
+  color:#e0f8ff!important;font-family:'Tajawal',sans-serif!important;font-weight:800!important;
+  font-size:clamp(.62rem,2.55vw,.74rem)!important;pointer-events:none!important;
+}
+
+@media (max-width:340px){
+  .ff-hud-v1 .hud-top{left:max(calc(env(safe-area-inset-left) + 8px),8px)!important;right:max(calc(env(safe-area-inset-right) + 8px),8px)!important;gap:6px!important}
+  .ff-hud-v1 .hud-coin-badge{height:40px!important;min-width:70px!important;padding-inline:7px!important;font-size:.62rem!important}
+  .ff-hud-v1 .ff-hud-coin-icon{width:21px!important;height:21px!important;flex-basis:21px!important}
+  .ff-hud-v1 .score-container{height:44px!important;min-width:88px!important;max-width:108px!important;padding-inline:7px!important}
+  #ffPauseBtn.ff-hud-pause-v1{width:40px!important;height:40px!important;min-width:40px!important;max-width:40px!important}
+  .ff-hud-v1 #ffAbilityHud{top:calc(max(env(safe-area-inset-top),0px) + 61px)!important;max-width:68%!important}
+}
+
+@media (max-height:600px){
+  .ff-hud-v1 .hud-top{top:calc(max(env(safe-area-inset-top),0px) + 6px)!important}
+  .ff-hud-v1 .hud-coin-badge{height:40px!important}
+  .ff-hud-v1 .score-container{height:44px!important}
+  #ffPauseBtn.ff-hud-pause-v1{width:40px!important;height:40px!important;min-width:40px!important;max-width:40px!important}
+  .ff-hud-v1 #ffAbilityHud{top:calc(max(env(safe-area-inset-top),0px) + 57px)!important;min-height:23px!important}
+  #bossWarning{top:calc(max(env(safe-area-inset-top),0px) + 88px)!important}
+}
+
+@media (min-width:700px) and (min-height:650px){
+  .ff-hud-v1 .hud-top{left:max(calc(env(safe-area-inset-left) + 20px),20px)!important;right:max(calc(env(safe-area-inset-right) + 20px),20px)!important}
+  .ff-hud-v1 .hud-coin-badge{min-width:92px!important;height:48px!important}
+  .ff-hud-v1 .score-container{min-width:118px!important;height:54px!important}
+  #ffPauseBtn.ff-hud-pause-v1{width:48px!important;height:48px!important;min-width:48px!important;max-width:48px!important}
+  .ff-hud-v1 #ffAbilityHud{top:calc(max(env(safe-area-inset-top),0px) + 73px)!important;max-width:320px!important}
+}
+
+@media (orientation:landscape) and (max-height:540px) and (min-width:600px){
+  .ff-hud-v1 .hud-top{top:calc(max(env(safe-area-inset-top),0px) + 5px)!important;left:max(calc(env(safe-area-inset-left) + 10px),10px)!important;right:max(calc(env(safe-area-inset-right) + 10px),10px)!important}
+  .ff-hud-v1 .hud-coin-badge{height:38px!important;min-width:76px!important}
+  .ff-hud-v1 .score-container{height:41px!important;min-width:96px!important}
+  #ffPauseBtn.ff-hud-pause-v1{width:38px!important;height:38px!important;min-width:38px!important;max-width:38px!important;border-radius:13px!important}
+  .ff-hud-v1 #ffAbilityHud{top:calc(max(env(safe-area-inset-top),0px) + 51px)!important;max-width:240px!important;min-height:22px!important}
+  #bossWarning{top:calc(max(env(safe-area-inset-top),0px) + 80px)!important}
 }
