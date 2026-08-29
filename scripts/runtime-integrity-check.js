@@ -54,6 +54,10 @@ for (const forbidden of [
 
 if (!/game\.js\?v=2\.4\.7/.test(index)) fail('index.html is not pinned to approved game.js v2.4.7');
 if (!/ui-runtime-boot-v1\.js\?v=4/.test(index)) fail('post-runtime UI boot loader is not active');
+
+if (!/<div class="game-wrapper"><div id="app" class="game-container"/.test(index)) fail('stable game wrapper/container contract is missing');
+if (!/id="startScreen" class="overlay-screen active"/.test(index)) fail('startScreen must remain an active overlay screen');
+if (!/ui-world-select-v1\.css\?v=6/.test(index)) fail('index.html is not pinned to Safari-safe world select CSS v6');
 if (!/ui-hud-v1\.css\?v=5/.test(index)) fail('index.html is not pinned to current HUD CSS release');
 if (!/ui-splash-approved-v3\.js\?v=12/.test(index)) fail('approved loading splash script is not active');
 if (!/js\/config\.js\?v=2\.3\.4/.test(index)) fail('core config dependency is missing or misordered');
@@ -71,13 +75,13 @@ for (const requiredId of [
   'sfxToggleBtn','gfxToggleBtn','langToggleBtn','shopTotalCoins','skinsGrid','endGameTitle','finalScore','highScore','earnedCoins','mainMenuBtn',
   'gameHud','settingsScreen','shopScreen','leaderboardScreen','resetDataBtn','startEndlessBtnGameOver','currentScoreDisplay','sessionCoinDisplay','stageDisplay','feverBarFill'
 ]) {
-  const dq = `id=\"${requiredId}\"`;
+  const dq = `id="${requiredId}"`;
   const sq = `id='${requiredId}'`;
   if (!index.includes(dq) && !index.includes(sq)) fail(`required core DOM hook missing from index: ${requiredId}`);
 }
 
 for (const legacyDirect of ['lab-ui.js','ui-settings-leaderboard-v1.js','ui-store-v1.js','ui-main-menu-v3.js','ui-world-select-v1.js','ui-end-screens-v1.js','ui-hud-v1.js','ui-foundation-v1.js']) {
-  if (new RegExp(`<script[^>]+src=[\"']${legacyDirect.replace('.', '\\\\.')}[^\"']*`, 'i').test(index)) fail(`UI patch must boot after runtime, not directly from index: ${legacyDirect}`);
+  if (new RegExp(`<script[^>]+src=["']${legacyDirect.replace('.', '\\\\.')}[^"']*`, 'i').test(index)) fail(`UI patch must boot after runtime, not directly from index: ${legacyDirect}`);
 }
 
 const uiBoot = read('ui-runtime-boot-v1.js');

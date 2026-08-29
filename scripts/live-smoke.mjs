@@ -31,7 +31,13 @@ page.on('requestfailed', req => {
 });
 
 const readState = () => page.evaluate(() => {
-  const visible = el => !!el && !el.classList.contains('hidden') && getComputedStyle(el).display !== 'none' && getComputedStyle(el).visibility !== 'hidden';
+  const visible = el => {
+    if (!el || el.classList.contains('hidden')) return false;
+    const style = getComputedStyle(el);
+    if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity || 1) <= 0.01) return false;
+    const r = el.getBoundingClientRect();
+    return r.width > 1 && r.height > 1 && r.right > 0 && r.bottom > 0 && r.left < innerWidth && r.top < innerHeight;
+  };
   const preview = document.getElementById('previewBirdCanvas');
   let previewInk = false;
   try {
@@ -48,6 +54,8 @@ const readState = () => page.evaluate(() => {
     menuError: window.__FF_MENU_UI_ERROR__ || null,
     startVisible: visible(document.getElementById('startScreen')),
     startActive: document.getElementById('startScreen')?.classList.contains('active') || false,
+    logoVisible: visible(document.querySelector('#startScreen .ff-main-logo')),
+    worldCardVisible: visible(document.getElementById('worldCard')),
     playVisible: visible(document.getElementById('startStoryBtn')),
     playDisabled: document.getElementById('startStoryBtn')?.disabled ?? null,
     worldThumb: thumb ? getComputedStyle(thumb).backgroundImage : null,
@@ -86,7 +94,7 @@ try {
   await page.waitForFunction(() => !document.getElementById('ffApprovedBootSplash'), null, { timeout: 10_000 });
 
   const menu = await readState();
-  const badMenu = !menu.startVisible || !menu.startActive || !menu.playVisible || menu.playDisabled ||
+  const badMenu = !menu.startVisible || !menu.startActive || !menu.logoVisible || !menu.worldCardVisible || !menu.playVisible || menu.playDisabled ||
     !menu.worldThumb?.includes('world-1.webp') || !menu.worldKicker || !menu.coinIcon || !menu.birdButton || !menu.previewInk || menu.pauseVisible;
   if (badMenu) throw new Error(`Main menu contract failed: ${JSON.stringify(menu)}`);
 

@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="style.css?v=2.3.6" />
   <link rel="stylesheet" href="lab-ui.css?v=1" />
   <link rel="stylesheet" href="ui-foundation-v1.css?v=1" />
-  <link rel="stylesheet" href="ui-world-select-v1.css?v=5" />
+  <link rel="stylesheet" href="ui-world-select-v1.css?v=6" />
   <link rel="stylesheet" href="ui-main-menu-v2.css?v=1" />
   <link rel="stylesheet" href="ui-main-menu-v3.css?v=4" />
   <link rel="stylesheet" href="ui-store-v1.css?v=2" />
@@ -30,10 +30,10 @@
     <symbol id="lang-svg" viewBox="0 0 24 24"><path d="M4 5h10M9 3v2m1.5 0c-.9 4-3 6.5-6 8m2.5-4c1.4 1.8 3 3.1 5 4m3-2h5m-2.5-2 3 8m-6 0 3-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   </svg>
 
-  <div id="app" class="app-shell">
+  <div class="game-wrapper"><div id="app" class="game-container" data-ff-app-shell="1">
     <canvas id="gameCanvas" width="450" height="800" aria-label="Feather Fury Game"></canvas>
 
-    <div id="startScreen" class="screen active">
+    <div id="startScreen" class="overlay-screen active">
       <div class="top-bar start-topbar">
         <div class="coin-pill start-balance"><svg width="22" height="22" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg><span id="startTotalCoins">0</span></div>
         <div class="start-header-actions">
@@ -60,7 +60,7 @@
     <div id="leaderboardScreen" class="overlay-screen hidden"><div class="leaderboard-dialog"><button id="closeLeaderboardBtn" class="close-btn">×</button><h2 class="dialog-title" data-i18n="leaderboardTitle">أفضل النتائج</h2><div id="leaderboardList" class="leaderboard-list"></div></div></div>
 
     <div id="ffCoreDomCompat" hidden aria-hidden="true"><button id="resetDataBtn" type="button" tabindex="-1"></button><button id="startEndlessBtnGameOver" type="button" tabindex="-1"></button><span id="currentScoreDisplay">0</span><span id="sessionCoinDisplay">0</span><span id="stageDisplay"></span><span id="feverBarFill"></span></div><div id="gameToast" class="game-toast hidden"></div>
-  </div>
+  </div></div>
 
   <script src="js/config.js?v=2.3.4"></script>
   <script src="js/audio.js?v=2.3.2"></script>

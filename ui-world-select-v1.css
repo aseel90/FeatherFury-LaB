@@ -1,6 +1,16 @@
 /* Feather Fury — World Select v1
    Portrait-first, simple identity-matched menu. Visual layer only. */
 #startScreen{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:100%!important;
+  max-height:100%!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
   --ff-menu-cyan:#27d8ff;
   --ff-menu-blue:#0f6fe8;
   --ff-menu-violet:#8b5cf6;
@@ -36,8 +46,8 @@
 #startScreen #settingsBtn{width:44px!important;height:44px!important;min-width:44px!important;border-radius:14px!important}
 
 #startScreen .start-main-content{
-  width:min(100%,430px)!important;max-width:430px!important;height:100%!important;min-height:0!important;margin:0 auto!important;padding:clamp(54px,7.5vh,72px) 0 clamp(8px,1.2vh,14px)!important;
-  display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:clamp(8px,1.2vh,13px)!important;box-sizing:border-box!important;
+  width:min(100%,430px)!important;max-width:430px!important;height:auto!important;min-height:0!important;max-height:100%!important;flex:1 1 auto!important;margin:0 auto!important;padding:clamp(54px,7.5vh,72px) 0 clamp(8px,1.2vh,14px)!important;
+  display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:clamp(8px,1.2vh,13px)!important;box-sizing:border-box!important;overflow:hidden!important;
 }
 #startScreen .title-container{
   width:min(84vw,360px)!important;height:clamp(100px,17.5vh,158px)!important;min-height:82px!important;margin:0!important;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;
