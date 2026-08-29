@@ -1,19 +1,75 @@
-<!DOCTYPE html><html id="htmlTag" lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><title>Feather Fury: الانتقام</title><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="favicon.png"><meta name="theme-color" content="#0f172a"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Press+Start+2P&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css?v=2.3.6"><link rel="stylesheet" href="lab-ui.css?v=1"><link rel="stylesheet" href="ui-foundation-v1.css?v=1"><link rel="stylesheet" href="ui-world-select-v1.css?v=5"><link rel="stylesheet" href="ui-main-menu-v2.css?v=1"><link rel="stylesheet" href="ui-main-menu-v3.css?v=4"><link rel="stylesheet" href="ui-store-v1.css?v=2"><link rel="stylesheet" href="ui-hud-v1.css?v=5"><link rel="stylesheet" href="ui-end-screens-v1.css?v=2"><link rel="stylesheet" href="ui-settings-leaderboard-v1.css?v=1"><link rel="stylesheet" href="ui-splash-approved-v3.css?v=1"></head><body>
+<!DOCTYPE html>
+<html id="htmlTag" lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>Feather Fury</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="favicon.png" />
+  <link rel="apple-touch-icon" href="icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=2.3.6" />
+  <link rel="stylesheet" href="lab-ui.css?v=1" />
+  <link rel="stylesheet" href="ui-foundation-v1.css?v=1" />
+  <link rel="stylesheet" href="ui-world-select-v1.css?v=5" />
+  <link rel="stylesheet" href="ui-main-menu-v2.css?v=1" />
+  <link rel="stylesheet" href="ui-main-menu-v3.css?v=4" />
+  <link rel="stylesheet" href="ui-store-v1.css?v=2" />
+  <link rel="stylesheet" href="ui-hud-v1.css?v=5" />
+  <link rel="stylesheet" href="ui-end-screens-v1.css?v=2" />
+  <link rel="stylesheet" href="ui-settings-leaderboard-v1.css?v=1" />
+  <link rel="stylesheet" href="ui-splash-approved-v3.css?v=1" />
+</head>
+<body>
+  <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+    <symbol id="coin-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#fbbf24" stroke="#f59e0b" stroke-width="2"/><path d="M13 5 9 12h4l-2 7 5-9h-4l1-5Z" fill="#fff3b0"/></symbol>
+    <symbol id="star-svg" viewBox="0 0 24 24"><path d="m12 2.5 2.85 5.78 6.38.93-4.62 4.5 1.09 6.35L12 17.06 6.3 20.06l1.09-6.35-4.62-4.5 6.38-.93L12 2.5Z" fill="currentColor"/></symbol>
+    <symbol id="lang-svg" viewBox="0 0 24 24"><path d="M4 5h10M9 3v2m1.5 0c-.9 4-3 6.5-6 8m2.5-4c1.4 1.8 3 3.1 5 4m3-2h5m-2.5-2 3 8m-6 0 3-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </svg>
+
   <div id="app" class="app-shell">
-    <main id="gameStage" class="game-stage">
-      <canvas id="gameCanvas" width="390" height="844" aria-label="Feather Fury game"></canvas>
-      <section id="startScreen" class="screen active">
-        <div class="top-bar"><div class="coin-pill"><span id="startTotalCoins">0</span></div><button id="settingsBtn" class="icon-btn" aria-label="الإعدادات"></button></div>
-        <div class="start-main-content"><div class="title-container"><img class="game-logo" src="assets/ui/loading-hq/feather-fury-logo.png" alt="Feather Fury"></div><div id="worldsCarousel" class="worlds-carousel"><button class="world-nav prev" aria-label="السابق">‹</button><article id="worldCard" class="world-card"><div class="world-card-header"><div class="world-label">WORLD 1</div><h2 id="worldTitle">Cursed Woods</h2></div><div class="bird-preview"><div class="preview-canvas-wrap"><canvas id="previewBirdCanvas" width="72" height="72"></canvas></div><div class="skin-name-badge" id="previewBirdName"></div></div><div id="starsDisplay" class="stars-display"></div><div id="worldStatus" class="world-status"></div></article><button class="world-nav next" aria-label="التالي">›</button></div><div id="worldDots" class="world-dots"></div><button id="startStoryBtn" class="primary-action">ابدأ المهمة</button></div>
-        <button id="leaderboardBtn" hidden aria-hidden="true"></button><button id="shopBtnStart" hidden aria-hidden="true"></button>
-      </section>
-      <section id="gameHud" class="hud hidden"><div class="hud-top"><div class="hud-coin-badge"><span id="runCoins">0</span></div><div class="score-container"><span id="scoreValue" class="score-badge">0</span><span id="stageName" class="stage-badge"></span></div><button id="soundToggleBtn" class="icon-btn"></button></div><div class="fever-bar-container"><div id="feverFill" class="fever-fill"></div></div><div id="bossWarning" class="boss-warning hidden"></div><div id="gameHint" class="game-hint hidden"></div></section>
-      <section id="gameOverScreen" class="screen hidden"><div class="gameover-panel"><p id="gameOverKicker"></p><h2 id="gameOverTitle"></h2><div id="resultStars"></div><div class="result-stats"><div><span id="resultScore">0</span><small>النقاط</small></div><div><span id="resultBest">0</span><small>أفضل نتيجة</small></div><div><span id="resultCoins">0</span><small>جمعت</small></div></div><button id="nextWorldBtn" class="hidden">العالم التالي</button><button id="reviveBtn" class="hidden">استمرار</button><div id="reviveAdSlot" class="hidden"></div><div class="gameover-actions"><button id="restartBtn">إعادة اللعب</button><button id="shopBtnGameOver">المتجر</button><button id="menuBtn">الرئيسية</button></div></div></section>
-      <section id="settingsScreen" class="screen hidden"><div class="settings-panel"><button id="closeSettingsBtn">×</button><h2 id="settingsTitle">الإعدادات</h2><button id="languageBtn"></button><button id="soundBtn"></button><button id="particlesBtn"></button><button id="resetBtn"></button></div></section>
-      <section id="shopScreen" class="screen hidden"><div id="shopContent"></div></section>
-      <section id="leaderboardScreen" class="screen hidden"><div id="leaderboardContent"></div></section>
-      <div id="gameToast" class="game-toast hidden"></div>
-    </main>
+    <canvas id="gameCanvas" width="450" height="800" aria-label="Feather Fury Game"></canvas>
+
+    <div id="startScreen" class="screen active">
+      <div class="start-topbar">
+        <div class="start-balance"><svg width="22" height="22" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg><span id="startTotalCoins">0</span></div>
+        <div class="start-header-actions">
+          <button id="leaderboardBtn" class="icon-btn" aria-label="Leaderboard">🏆</button>
+          <button id="shopBtnStart" class="icon-btn" aria-label="Shop">🛒</button>
+          <button id="settingsBtn" class="icon-btn" aria-label="Settings">⚙</button>
+        </div>
+      </div>
+      <div class="start-main-content">
+        <div class="title-container"><div class="game-title">FEATHER<br><span>FURY</span></div></div>
+        <div class="world-select-shell">
+          <div class="worlds-carousel"><button id="prevWorldBtn" class="carousel-nav-btn" aria-label="Previous World"></button><div class="world-card" id="worldCard"><div class="world-title" id="worldTitle">الغابة الملعونة</div><div class="world-stars" id="worldStars"><span class="star empty star-small"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span><span class="star empty star-big"><svg width="1.7em" height="1.7em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span><span class="star empty star-small"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span></div><div class="bird-preview"><div class="preview-canvas-wrap"><canvas id="previewBirdCanvas" width="54" height="54"></canvas></div><span id="activeSkinName" class="skin-name-badge">العصفور الكلاسيكي</span></div><div class="world-status" id="worldStatus">جاهز للعب!</div></div><button id="nextWorldBtn" class="carousel-nav-btn" aria-label="Next World"></button></div>
+          <div class="start-actions-group"><button id='startStoryBtn' class="arcade-btn" data-i18n="playBtn">بدء المهمة</button><button id='startEndlessBtn' class='arcade-btn secondary-action-btn' data-i18n="endlessBtn">الطور اللانهائي</button></div></div></div>
+    </div>
+
+    <div id="gameHud" class="hud hidden"><div class="hud-top"><div class="hud-coin-badge"><svg width="21" height="21" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg><span id="runCoins">0</span></div><div class="score-container"><div id="scoreValue" class="score-badge">0</div><div id="stageName" class="stage-badge"></div></div><button id="soundToggleBtn" class="icon-btn small-hud-btn" aria-label="Sound"></button></div><div class="fever-bar-container"><div class="fever-label"><span id="feverText"></span></div><div class="fever-track"><div id="feverFill" class="fever-fill"></div></div></div><div id="bossWarning" class="boss-warning hidden"></div><div id="gameHint" class="game-hint hidden"></div></div>
+
+    <div id="gameOverScreen" class="overlay-screen hidden"><div class="game-over-dialog"><h2 id="endGameTitle" class="game-over-title" data-i18n="gameOverTitle">انتهت اللعبة</h2><div class="run-stars-container" id="runStarsContainer"><span class="star empty star-side"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span><span class="star empty star-center"><svg width="1.9em" height="1.9em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span><span class="star empty star-side"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span></div><div class="score-card-modern"><div class="score-row-modern"><span class="label" data-i18n="scoreLabel">النقاط</span><span id="finalScore" class="value score-num">0</span></div><div class="score-row-modern best"><span class="label" data-i18n="bestScoreLabel">أعلى نتيجة</span><span id="highScore" class="value best-num">0</span></div><div class="score-row-modern coins"><span class="label" data-i18n="collectedLabel">جمعت</span><span class="value coins-num"><span id="earnedCoins">0</span> <svg width="18" height="18" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg></span></div></div><div class="game-over-buttons-group"><button id="nextWorldActionBtn" class="arcade-btn next-world-btn hidden" data-i18n="nextWorldBtn">العالم التالي</button><button id="reviveBtn" class="arcade-btn revive-btn" data-i18n="reviveBtn">استمرار (محاولة ثانية)</button><div class="secondary-btn-grid"><button id="restartBtn" class="arcade-btn action-sub-btn restart-btn" data-i18n="restartBtn">إعادة اللعب</button><button id="shopBtnGameOver" class="arcade-btn action-sub-btn shop-btn" data-i18n="shopBtn">المتجر</button><button id="mainMenuBtn" class="arcade-btn action-sub-btn menu-btn" data-i18n="mainMenuBtn">الرئيسية</button></div></div></div></div>
+
+    <div id="settingsScreen" class="overlay-screen hidden"><div class="settings-dialog"><button id="closeSettingsBtn" class="close-btn">×</button><h2 class="dialog-title" data-i18n="settingsTitle">الإعدادات</h2><div class="settings-options"><div class="setting-row"><span data-i18n="langLabel">اللغة</span><button id="langToggleBtn" class="setting-action"></button></div><div class="setting-row"><span data-i18n="sfxLabel">المؤثرات الصوتية</span><button id="sfxToggleBtn" class="setting-action"></button></div><div class="setting-row"><span data-i18n="gfxLabel">الجودة</span><button id="gfxToggleBtn" class="setting-action"></button></div><div class="setting-row danger-row"><span data-i18n="resetLabel">حذف التقدم</span><button id="resetProgressBtn" class="setting-action danger-btn" data-i18n="resetBtn">حذف</button></div></div></div></div>
+
+    <div id="shopScreen" class="overlay-screen hidden"><div class="shop-dialog"><div class="shop-header"><button id="closeShopBtn" class="close-btn">×</button><h2 class="dialog-title" data-i18n="shopTitle">الطيور والمتجر</h2><div class="shop-balance"><svg width="20" height="20" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg><span id="shopTotalCoins">0</span></div></div><div id="skinsGrid" class="skins-grid"></div></div></div>
+
+    <div id="leaderboardScreen" class="overlay-screen hidden"><div class="leaderboard-dialog"><button id="closeLeaderboardBtn" class="close-btn">×</button><h2 class="dialog-title" data-i18n="leaderboardTitle">أفضل النتائج</h2><div id="leaderboardList" class="leaderboard-list"></div></div></div>
+
+    <div id="gameToast" class="game-toast hidden"></div>
   </div>
-  <script src="js/config.js?v=2.3.4"></script><script src="js/audio.js?v=2.3.2"></script><script src="js/graphics.js?v=2.3.2"></script><script src="js/world1.js?v=2.3.2"></script><script src="js/world2.js?v=2.3.2"></script><script src="js/world3.js?v=2.3.2"></script><script src="ui-splash-approved-v3.js?v=11"></script><script src="game.js?v=2.4.7"></script><script src="ui-runtime-boot-v1.js?v=4"></script>
-</body></html>
+
+  <script src="js/config.js?v=2.3.4"></script>
+  <script src="js/audio.js?v=2.3.2"></script>
+  <script src="js/graphics.js?v=2.3.2"></script>
+  <script src="js/world1.js?v=2.3.2"></script>
+  <script src="js/world2.js?v=2.3.2"></script>
+  <script src="js/world3.js?v=2.3.2"></script>
+  <script src="ui-splash-approved-v3.js?v=12"></script>
+  <script src="game.js?v=2.4.7"></script>
+  <script src="ui-runtime-boot-v1.js?v=4"></script>
+</body>
+</html>

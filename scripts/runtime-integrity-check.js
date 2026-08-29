@@ -55,15 +55,25 @@ for (const forbidden of [
 if (!/game\.js\?v=2\.4\.7/.test(index)) fail('index.html is not pinned to approved game.js v2.4.7');
 if (!/ui-runtime-boot-v1\.js\?v=4/.test(index)) fail('post-runtime UI boot loader is not active');
 if (!/ui-hud-v1\.css\?v=5/.test(index)) fail('index.html is not pinned to current HUD CSS release');
-if (!/ui-splash-approved-v3\.js\?v=11/.test(index)) fail('approved loading splash script is not active');
+if (!/ui-splash-approved-v3\.js\?v=12/.test(index)) fail('approved loading splash script is not active');
 if (!/js\/config\.js\?v=2\.3\.4/.test(index)) fail('core config dependency is missing or misordered');
 if (!/js\/audio\.js\?v=2\.3\.2/.test(index)) fail('core audio dependency is missing or misordered');
 for (const dep of ['js/graphics.js?v=2.3.2','js/world1.js?v=2.3.2','js/world2.js?v=2.3.2','js/world3.js?v=2.3.2']) {
   if (!index.includes(dep)) fail(`core dependency missing from index: ${dep}`);
 }
-const depOrder = ['js/config.js?v=2.3.4','js/audio.js?v=2.3.2','js/graphics.js?v=2.3.2','js/world1.js?v=2.3.2','js/world2.js?v=2.3.2','js/world3.js?v=2.3.2','ui-splash-approved-v3.js?v=11','game.js?v=2.4.7','ui-runtime-boot-v1.js?v=4'];
+const depOrder = ['js/config.js?v=2.3.4','js/audio.js?v=2.3.2','js/graphics.js?v=2.3.2','js/world1.js?v=2.3.2','js/world2.js?v=2.3.2','js/world3.js?v=2.3.2','ui-splash-approved-v3.js?v=12','game.js?v=2.4.7','ui-runtime-boot-v1.js?v=4'];
 for (let i = 1; i < depOrder.length; i++) {
   if (index.indexOf(depOrder[i - 1]) < 0 || index.indexOf(depOrder[i]) < 0 || index.indexOf(depOrder[i - 1]) > index.indexOf(depOrder[i])) fail(`core dependency order invalid around ${depOrder[i - 1]} -> ${depOrder[i]}`);
+}
+
+for (const requiredId of [
+  'htmlTag','startScreen','startStoryBtn','startTotalCoins','leaderboardBtn','shopBtnStart','worldCard','previewBirdCanvas','activeSkinName',
+  'sfxToggleBtn','gfxToggleBtn','langToggleBtn','shopTotalCoins','skinsGrid','endGameTitle','finalScore','highScore','earnedCoins','mainMenuBtn',
+  'gameHud','settingsScreen','shopScreen','leaderboardScreen'
+]) {
+  const dq = `id=\"${requiredId}\"`;
+  const sq = `id='${requiredId}'`;
+  if (!index.includes(dq) && !index.includes(sq)) fail(`required core DOM hook missing from index: ${requiredId}`);
 }
 
 for (const legacyDirect of ['lab-ui.js','ui-settings-leaderboard-v1.js','ui-store-v1.js','ui-main-menu-v3.js','ui-world-select-v1.js','ui-end-screens-v1.js','ui-hud-v1.js','ui-foundation-v1.js']) {
