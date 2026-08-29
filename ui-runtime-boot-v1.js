@@ -48,10 +48,13 @@
     return false;
   }
 
-  function fullyVisible(el) {
+  // During boot the splash intentionally applies visibility:hidden to the menu.
+  // Readiness must validate geometry/layout, not painted visibility, otherwise the
+  // splash waits for menuReady while menuReady waits for the splash to disappear.
+  function laidOutInViewport(el) {
     if (!el || el.classList.contains('hidden')) return false;
     const style = getComputedStyle(el);
-    if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity || 1) <= 0.01) return false;
+    if (style.display === 'none') return false;
     const r = el.getBoundingClientRect();
     const vv = window.visualViewport;
     const left = vv?.offsetLeft || 0;
@@ -73,7 +76,7 @@
     const bg = thumb ? getComputedStyle(thumb).backgroundImage : 'none';
     return !!(
       start && start.classList.contains('active') && !start.classList.contains('hidden') &&
-      fullyVisible(logo) && fullyVisible(card) && fullyVisible(play) &&
+      laidOutInViewport(logo) && laidOutInViewport(card) && laidOutInViewport(play) &&
       thumb && bg && bg !== 'none' && /world-1\.webp/.test(bg) &&
       play && !play.disabled &&
       coinIcon && birdButton && preview && canvasHasInk(preview) &&
