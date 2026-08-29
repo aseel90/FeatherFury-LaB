@@ -3,7 +3,7 @@ name: Install World Thumbnails
 on:
   push:
     paths:
-      - 'assets/ui/world-thumbnails-staging/*.b64'
+      - 'assets/ui/world-thumbnails-staging/READY'
   workflow_dispatch:
 
 permissions:
@@ -17,29 +17,24 @@ jobs:
       - name: Decode staged WebP thumbnails
         shell: bash
         run: |
-          shopt -s nullglob
-          parts=(assets/ui/world-thumbnails-staging/*.b64)
-          if [ ${#parts[@]} -eq 0 ]; then
-            echo 'No staged thumbnails to install.'
+          if [ ! -f assets/ui/world-thumbnails-staging/READY ]; then
+            echo 'Upload is not marked ready.'
             exit 0
           fi
+          shopt -s nullglob
           mkdir -p assets/ui/world-thumbnails
           for n in 1 2 3 4; do
             chunks=(assets/ui/world-thumbnails-staging/world-${n}.webp.part*.b64)
-            if [ ${#chunks[@]} -gt 0 ]; then
-              cat "${chunks[@]}" | base64 -d > "assets/ui/world-thumbnails/world-${n}.webp"
-            elif [ -f "assets/ui/world-thumbnails-staging/world-${n}.webp.b64" ]; then
-              base64 -d "assets/ui/world-thumbnails-staging/world-${n}.webp.b64" > "assets/ui/world-thumbnails/world-${n}.webp"
+            if [ ${#chunks[@]} -eq 0 ]; then
+              echo "Missing chunks for world ${n}"
+              exit 1
             fi
+            cat "${chunks[@]}" | base64 -d > "assets/ui/world-thumbnails/world-${n}.webp"
           done
-          rm -f assets/ui/world-thumbnails-staging/*.b64
+          rm -rf assets/ui/world-thumbnails-staging
       - name: Commit installed thumbnails
         shell: bash
         run: |
-          if git diff --quiet && [ -z "$(git status --porcelain)" ]; then
-            echo 'Nothing to commit.'
-            exit 0
-          fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add assets/ui/world-thumbnails assets/ui/world-thumbnails-staging
