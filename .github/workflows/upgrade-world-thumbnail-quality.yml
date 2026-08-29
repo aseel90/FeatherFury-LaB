@@ -18,6 +18,7 @@ jobs:
         shell: bash
         run: |
           set -e
+          # One-time visual quality lift for the portrait world cards.
           for f in assets/ui/world-thumbnails/world-*.webp; do
             tmp="${f%.webp}.hq.webp"
             ffmpeg -y -loglevel error -i "$f" \
