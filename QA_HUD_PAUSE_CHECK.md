@@ -1,0 +1,1 @@
+QA trigger for the gameplay HUD refresh and pause-button placement. No production code changes.
