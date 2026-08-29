@@ -114,7 +114,7 @@
     if (coin && !coin.dataset.ffShopTrigger) {
       coin.dataset.ffShopTrigger = '1'; coin.classList.add('ff-shop-coin');
       coin.setAttribute('role','button'); coin.tabIndex = 0; coin.querySelector('svg')?.remove();
-      const count = document.getElementById('startTotalCoins');
+      const count = document.getElementById('startTotalCoins') || document.getElementById('totalCoins');
       if (count) { count.before(icon('coin','ff-coin-icon')); count.after(icon('plus','ff-coin-plus')); }
       coin.addEventListener('click', () => openShop('shop'));
       coin.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openShop('shop'); } });

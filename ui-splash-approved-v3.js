@@ -77,6 +77,7 @@ function isReady(){
     document.getElementById('previewBirdCanvas') &&
     window.__FF_CHARACTER_ROSTER_V1__ &&
     window.__FF_RUNTIME_APPROVED_STACK__ &&
+    window.__FF_MENU_UI_READY__ &&
     window.game
   );
 }
@@ -102,8 +103,21 @@ const timer=setInterval(()=>{
   paint();
 
   const elapsed=performance.now()-started;
-  if((ready&&elapsed>=1450)||elapsed>=15000)finish();
+  if(ready&&elapsed>=1450)finish();
+  else if(!ready&&elapsed>=15000) setTarget(.965,'Finalizing Feather Fury...');
+  if(!ready&&elapsed>=60000) fail('Feather Fury could not finish loading. Please refresh.');
 },72);
+
+function fail(message){
+  if(finished)return;
+  finished=true;
+  clearInterval(timer);
+  splash.classList.add('ff-approved-error');
+  status.textContent=message||'Feather Fury could not finish loading. Please refresh.';
+  status.style.color='#ffb4b4';
+  percent.textContent='!';
+  track.setAttribute('aria-valuenow','100');
+}
 
 function finish(){
   if(finished)return;
@@ -120,5 +134,5 @@ function finish(){
   },220);
 }
 window.addEventListener('pagehide',()=>clearInterval(timer),{once:true});
-window.__FF_SPLASH_APPROVED_SCREEN_V3__={version:'3.1.0',direction:'ltr',finish,mark,get progress(){return progress;}};
+window.__FF_SPLASH_APPROVED_SCREEN_V3__={version:'3.2.0',direction:'ltr',finish,fail,mark,get progress(){return progress;}};
 })();
