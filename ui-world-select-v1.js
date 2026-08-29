@@ -9,6 +9,10 @@
     'assets/ui/world-thumbnails/world-4.webp'
   ];
 
+  const WORLD_NAMES = ['Cursed Woods', null, null, null];
+  const STAR_FILLED = 'assets/ui/icons/star-filled.svg?v=1';
+  const STAR_EMPTY = 'assets/ui/icons/star-empty.svg?v=1';
+
   THUMBS.forEach(src => {
     const image = new Image();
     image.decoding = 'async';
@@ -48,7 +52,9 @@
       preview.appendChild(thumb);
     }
 
-    return { screen, card, kicker, thumb };
+    const title = card.querySelector('.world-title');
+    const stars = card.querySelector('.world-stars');
+    return { screen, card, kicker, thumb, title, stars };
   }
 
   function isWorldLocked(game, index, card) {
@@ -62,12 +68,42 @@
     return false;
   }
 
+  function syncStars(host) {
+    if (!host) return;
+    const text = (host.textContent || '').trim();
+    const filledFromText = (text.match(/[★⭐]/g) || []).length;
+    const emptyFromText = (text.match(/☆/g) || []).length;
+    let total = filledFromText + emptyFromText;
+    let filled = filledFromText;
+
+    if (!total) {
+      const oldImgs = [...host.querySelectorAll('img.ff-star-icon')];
+      if (oldImgs.length) return;
+      total = 3;
+      filled = 3;
+    }
+
+    total = Math.max(3, Math.min(5, total));
+    filled = Math.max(0, Math.min(total, filled || 0));
+    host.replaceChildren(...Array.from({length: total}, (_, i) => {
+      const img = document.createElement('img');
+      img.className = 'ff-star-icon';
+      img.src = i < filled ? STAR_FILLED : STAR_EMPTY;
+      img.alt = '';
+      img.setAttribute('aria-hidden','true');
+      img.decoding = 'async';
+      return img;
+    }));
+  }
+
   function apply(game) {
     const ui = ensureStructure();
     if (!ui) return;
     const raw = Number.isInteger(game?.currentWorldIndex) ? game.currentWorldIndex : 0;
     const index = Math.max(0, Math.min(THUMBS.length - 1, raw));
     ui.kicker.textContent = `WORLD ${index + 1}`;
+    if (ui.title && WORLD_NAMES[index]) ui.title.textContent = WORLD_NAMES[index];
+    syncStars(ui.stars);
     ui.thumb.style.backgroundImage = `url('${THUMBS[index]}')`;
     ui.card.classList.toggle('ff-locked', isWorldLocked(game, index, ui.card));
     ui.card.dataset.ffWorld = String(index + 1);

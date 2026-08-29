@@ -40,16 +40,16 @@
   display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:clamp(8px,1.2vh,13px)!important;box-sizing:border-box!important;
 }
 #startScreen .title-container{
-  width:min(78vw,330px)!important;height:clamp(92px,16vh,145px)!important;min-height:82px!important;margin:0!important;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;
+  width:min(84vw,360px)!important;height:clamp(100px,17.5vh,158px)!important;min-height:82px!important;margin:0!important;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;
 }
 #startScreen .game-title,#startScreen .game-subtitle{display:none!important}
 #startScreen .ff-main-logo{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 8px 15px rgba(0,0,0,.32));pointer-events:none;user-select:none}
 
 #startScreen .worlds-carousel{
-  width:min(94vw,392px)!important;flex:1 1 auto!important;min-height:0!important;margin:0!important;padding:0!important;display:grid!important;grid-template-columns:48px minmax(0,1fr) 48px!important;align-items:center!important;gap:6px!important;
+  position:relative!important;width:min(94vw,392px)!important;flex:0 0 auto!important;min-height:0!important;margin:0!important;padding:0!important;display:grid!important;grid-template-columns:40px minmax(0,1fr) 40px!important;align-items:center!important;gap:2px!important;
 }
 #startScreen .carousel-nav-btn{
-  width:46px!important;height:58px!important;min-width:46px!important;border:0!important;border-radius:16px!important;background-color:rgba(5,18,42,.42)!important;background-image:url('carousel-arrow.svg')!important;background-size:38px 38px!important;background-position:center!important;background-repeat:no-repeat!important;box-shadow:none!important;filter:drop-shadow(0 0 8px rgba(39,216,255,.45))!important;
+  width:40px!important;height:50px!important;min-width:40px!important;border:0!important;border-radius:16px!important;background-color:rgba(5,18,42,.42)!important;background-image:url('carousel-arrow.svg')!important;background-size:31px 31px!important;background-position:center!important;background-repeat:no-repeat!important;box-shadow:none!important;filter:drop-shadow(0 0 8px rgba(39,216,255,.45))!important;
 }
 #startScreen #prevWorldBtn{transform:scaleX(-1)!important}
 #startScreen #prevWorldBtn:hover,#startScreen #prevWorldBtn:focus-visible{transform:scaleX(-1) scale(1.04)!important}
@@ -57,22 +57,33 @@
 #startScreen .carousel-nav-btn:disabled{opacity:.18!important;filter:grayscale(1)!important}
 
 #startScreen .world-card{
-  position:relative!important;width:100%!important;max-width:none!important;height:min(52vh,430px)!important;min-height:292px!important;max-height:430px!important;padding:0!important;border:1.5px solid rgba(89,211,255,.62)!important;border-radius:24px!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;overflow:hidden!important;background:linear-gradient(180deg,rgba(7,20,42,.94),rgba(4,12,27,.97))!important;box-shadow:0 18px 34px rgba(0,0,0,.34),0 0 22px rgba(39,216,255,.10),inset 0 1px 0 rgba(255,255,255,.08)!important;filter:none!important;opacity:1!important;
+  position:relative!important;width:100%!important;max-width:none!important;height:auto!important;min-height:0!important;max-height:none!important;padding:0!important;border:1.5px solid rgba(89,211,255,.62)!important;border-radius:24px!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;overflow:hidden!important;background:linear-gradient(180deg,rgba(7,20,42,.94),rgba(4,12,27,.97))!important;box-shadow:0 18px 34px rgba(0,0,0,.34),0 0 22px rgba(39,216,255,.10),inset 0 1px 0 rgba(255,255,255,.08)!important;filter:none!important;opacity:1!important;
 }
 #startScreen .world-card::before{content:""!important;position:absolute!important;inset:0!important;border-radius:inherit!important;pointer-events:none!important;z-index:5!important;background:linear-gradient(180deg,rgba(255,255,255,.04),transparent 16%,transparent 80%,rgba(0,0,0,.18))!important}
 #startScreen .world-card::after{content:"";position:absolute;left:28%;right:28%;top:-1px;height:2px;background:linear-gradient(90deg,transparent,var(--ff-menu-cyan),transparent);box-shadow:0 0 12px rgba(39,216,255,.55);z-index:6}
 #startScreen .ff-world-kicker{order:1;flex:0 0 auto;padding:12px 12px 2px;color:var(--ff-menu-cyan);font:900 clamp(11px,3vw,13px)/1 'Changa','Tajawal',sans-serif;letter-spacing:.13em;text-align:center;direction:ltr}
 #startScreen .world-title{order:2;flex:0 0 auto;width:100%!important;min-height:0!important;margin:0!important;padding:4px 14px 10px!important;color:#f8fbff!important;font-size:clamp(20px,5.4vw,28px)!important;line-height:1.05!important;font-weight:900!important;text-align:center!important;text-shadow:0 3px 8px rgba(0,0,0,.72)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
-#startScreen .bird-preview{order:3;position:relative!important;flex:1 1 auto!important;width:100%!important;min-height:150px!important;margin:0!important;padding:0!important;display:block!important;overflow:hidden!important;background:#091627!important}
+#startScreen .bird-preview{order:3;position:relative!important;flex:0 0 clamp(176px,27vh,238px)!important;width:100%!important;min-height:176px!important;margin:0!important;padding:0!important;display:block!important;overflow:hidden!important;background:#091627!important}
 #startScreen .preview-canvas-wrap,#startScreen .skin-name-badge{position:absolute!important;opacity:0!important;pointer-events:none!important;width:1px!important;height:1px!important;min-width:0!important;min-height:0!important;overflow:hidden!important}
 #startScreen .ff-world-thumb{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;transition:opacity .18s ease,transform .28s ease;transform:scale(1.015)}
 #startScreen .ff-world-thumb::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,10,24,.02),rgba(2,9,23,.05) 58%,rgba(3,10,24,.52) 100%)}
 #startScreen .world-card.ff-locked .ff-world-thumb{filter:saturate(.55) brightness(.62)}
-#startScreen .world-card.ff-locked .ff-world-thumb::before{content:"🔒";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;font-size:clamp(42px,14vw,64px);filter:drop-shadow(0 7px 12px rgba(0,0,0,.7))}
-#startScreen .world-stars{order:4;flex:0 0 auto;width:100%!important;min-height:38px!important;margin:0!important;padding:8px 12px 3px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;background:rgba(3,11,25,.82)!important}
-#startScreen .world-status{order:5;flex:0 0 auto;width:100%!important;min-height:34px!important;max-height:42px!important;margin:0!important;padding:3px 12px 10px!important;color:#a9dff4!important;font-size:clamp(12px,3.2vw,14px)!important;font-weight:800!important;line-height:1.18!important;text-align:center!important;background:rgba(3,11,25,.82)!important}
 
-#startScreen .start-actions-group{width:min(78vw,300px)!important;flex:0 0 auto!important;margin:0!important;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important}
+#startScreen .worlds-carousel::before{
+  content:"";position:absolute;left:44px;right:44px;top:7%;bottom:5%;z-index:0;pointer-events:none;
+  border-radius:32px;background:rgba(3,11,27,.30);filter:blur(18px);box-shadow:0 0 34px rgba(32,164,255,.10);
+}
+#startScreen .worlds-carousel>*{position:relative;z-index:1}
+#startScreen .world-stars .ff-star-icon{width:clamp(25px,7vw,32px);height:clamp(25px,7vw,32px);display:block;filter:drop-shadow(0 3px 4px rgba(0,0,0,.45))}
+#startScreen .world-card.ff-locked .ff-world-thumb::before{
+  content:"";position:absolute;left:50%;top:50%;width:clamp(44px,13vw,60px);aspect-ratio:1;transform:translate(-50%,-50%);z-index:2;
+  background:url('assets/ui/icons/lock.svg?v=1') center/contain no-repeat;filter:drop-shadow(0 7px 12px rgba(0,0,0,.7));
+}
+
+#startScreen .world-stars{order:4;flex:0 0 auto;width:100%!important;min-height:38px!important;margin:0!important;padding:8px 12px 3px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:5px!important;background:rgba(3,11,25,.82)!important}
+#startScreen .world-status{order:5;flex:0 0 auto;width:100%!important;min-height:38px!important;max-height:44px!important;margin:0!important;padding:2px 12px 13px!important;color:#a9dff4!important;font-size:clamp(12px,3.2vw,14px)!important;font-weight:800!important;line-height:1.18!important;text-align:center!important;background:rgba(3,11,25,.82)!important}
+
+#startScreen .start-actions-group{width:min(78vw,300px)!important;flex:0 0 auto!important;margin:clamp(7px,1.1vh,12px) 0 0!important;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important}
 #startScreen #startEndlessBtn{display:none!important}
 #startScreen #startStoryBtn{
   width:100%!important;min-height:58px!important;margin:0!important;padding:10px 18px!important;border:1.5px solid rgba(150,237,255,.84)!important;border-radius:19px!important;background:linear-gradient(180deg,#32d8ff 0%,#138fe9 52%,#0c63c7 100%)!important;color:white!important;font:900 clamp(20px,5.4vw,26px)/1 'Changa','Tajawal',sans-serif!important;letter-spacing:.06em!important;text-shadow:0 2px 3px rgba(0,37,92,.52)!important;box-shadow:0 5px 0 #074a9a,0 12px 24px rgba(19,143,233,.24),0 0 18px rgba(39,216,255,.20),inset 0 1px 0 rgba(255,255,255,.34)!important;
@@ -81,18 +92,18 @@
 
 @media(max-height:680px){
   #startScreen .start-main-content{padding-top:52px!important;gap:7px!important}
-  #startScreen .title-container{height:78px!important;width:min(64vw,245px)!important}
-  #startScreen .world-card{height:min(50vh,330px)!important;min-height:260px!important}
+  #startScreen .title-container{height:86px!important;width:min(69vw,266px)!important}
+  #startScreen .world-card{height:auto!important;min-height:0!important}
   #startScreen .world-title{font-size:clamp(18px,5vw,23px)!important;padding-bottom:7px!important}
   #startScreen .ff-world-kicker{padding-top:9px!important}
-  #startScreen .bird-preview{min-height:126px!important}
+  #startScreen .bird-preview{flex-basis:clamp(148px,25vh,188px)!important;min-height:148px!important}
   #startScreen #startStoryBtn{min-height:52px!important;font-size:20px!important}
 }
 @media(max-width:350px){
-  #startScreen .worlds-carousel{width:96vw!important;grid-template-columns:40px minmax(0,1fr) 40px!important;gap:3px!important}
-  #startScreen .carousel-nav-btn{width:40px!important;height:52px!important;min-width:40px!important;background-size:32px 32px!important}
+  #startScreen .worlds-carousel{width:96vw!important;grid-template-columns:36px minmax(0,1fr) 36px!important;gap:1px!important}
+  #startScreen .carousel-nav-btn{width:36px!important;height:46px!important;min-width:36px!important;background-size:28px 28px!important}
   #startScreen .world-card{border-radius:21px!important}
-  #startScreen .title-container{width:min(70vw,250px)!important}
+  #startScreen .title-container{width:min(76vw,274px)!important}
 }
 @media(min-width:600px){
   #startScreen .start-main-content{width:min(72vw,480px)!important}
