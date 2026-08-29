@@ -89,10 +89,20 @@ try {
   if (badMenu) throw new Error(`Main menu contract failed: ${JSON.stringify(menu)}`);
 
   await page.locator('#startStoryBtn').click({ timeout: 5_000 });
-  await page.waitForFunction(() => ['STORY','PLAYING'].includes(window.game?.state), null, { timeout: 10_000 });
+  await page.waitForFunction(() => ['STORY','LAUNCH','PLAYING'].includes(window.game?.state), null, { timeout: 10_000 });
+
+  if (await page.evaluate(() => window.game?.state === 'STORY')) {
+    const canvas = page.locator('#gameCanvas');
+    await canvas.click({ position: { x: 220, y: 320 }, timeout: 5_000 });
+    await page.waitForTimeout(120);
+    await canvas.click({ position: { x: 220, y: 320 }, timeout: 5_000 });
+  }
+
+  await page.waitForFunction(() => window.game?.state === 'PLAYING', null, { timeout: 12_000 });
   await page.waitForFunction(() => {
     const btn = document.getElementById('ffPauseBtn');
-    return !!btn && btn.classList.contains('show') && getComputedStyle(btn).display !== 'none';
+    const hud = document.getElementById('gameHud');
+    return !!btn && !!hud && !hud.classList.contains('hidden') && btn.classList.contains('show') && getComputedStyle(btn).display !== 'none';
   }, null, { timeout: 8_000 });
 
   const afterPlay = await readState();
