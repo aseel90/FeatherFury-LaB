@@ -15,6 +15,10 @@ function fail(msg) {
 const game = read('game.js');
 const index = read('index.html');
 const runtimeDoc = read('RUNTIME_ACTIVE.md');
+const canonicalSpec = read('FEATHER_FURY_GAME_SPEC.md');
+const devRules = read('DEVELOPMENT_RULES.md');
+const gamePlan = read('GAME_PLAN.md');
+const readme = read('README.md');
 
 const activeMatch = game.match(/const ACTIVE_PATCHES = \[([\s\S]*?)\n\s*\];/);
 const retiredMatch = game.match(/const RETIRED_PATCHES = (?:new Set\()?\[([\s\S]*?)\n\s*\](?:\))?;/);
@@ -24,6 +28,21 @@ if (!retiredMatch) fail('RETIRED_PATCHES block not found');
 const extract = block => [...block.matchAll(/'([^']+\.js(?:\?[^']*)?)'/g)].map(m => m[1]);
 const active = activeMatch ? extract(activeMatch[1]).map(x => x.split('?')[0]) : [];
 const retired = retiredMatch ? extract(retiredMatch[1]).map(x => x.split('?')[0]) : [];
+const dynamicOwners = [...game.matchAll(/loadScriptWithRetry\('([^']+\.js(?:\?[^']*)?)'/g)].map(m => m[1].split('?')[0]);
+const coreMatch = game.match(/const\s+CORE_RUNTIME\s*=\s*['"]([^'"]+)['"]/);
+const coreRuntime = coreMatch ? coreMatch[1].split('?')[0] : null;
+
+if (!canonicalSpec.includes('CANONICAL TECHNICAL SOURCE OF TRUTH')) fail('FEATHER_FURY_GAME_SPEC.md is missing its canonical authority marker');
+if (!coreRuntime || !canonicalSpec.includes(coreRuntime)) fail(`canonical spec must document active core runtime: ${coreRuntime || 'missing CORE_RUNTIME'}`);
+for (const file of [...new Set([...active, ...dynamicOwners])]) {
+  if (!canonicalSpec.includes(file)) fail(`canonical spec missing active runtime owner: ${file}`);
+}
+for (const file of retired) {
+  if (!canonicalSpec.includes(file)) fail(`canonical spec missing retired runtime owner: ${file}`);
+}
+for (const [name, doc] of [['DEVELOPMENT_RULES.md', devRules], ['GAME_PLAN.md', gamePlan], ['README.md', readme], ['RUNTIME_ACTIVE.md', runtimeDoc]]) {
+  if (!doc.includes('FEATHER_FURY_GAME_SPEC.md')) fail(`${name} must point to FEATHER_FURY_GAME_SPEC.md`);
+}
 
 const dup = active.filter((x, i) => active.indexOf(x) !== i);
 if (dup.length) fail(`duplicate active patches: ${[...new Set(dup)].join(', ')}`);
