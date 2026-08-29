@@ -1,5 +1,7 @@
 # FeatherFury — Game Development Plan
 
+> **Scope:** design direction, approval locks, and historical planning. For the **current executable runtime**, active/retired files, boot order, ownership, and regression contracts, use `FEATHER_FURY_GAME_SPEC.md`. Some runtime filenames below are historical and may no longer be active; never reactivate a file from this plan without checking the canonical runtime spec and `game.js`.
+
 This file is the development source of truth for approved systems and the next allowed task. The goal is to keep successful implementation methods stable instead of repeatedly testing new techniques.
 
 ## Development principle
@@ -66,13 +68,13 @@ Approved implementation path:
 
 The modern World 1 stack must be installed **before gameplay is unlocked**. The player must never enter while an older visual patch is still active.
 
-- Authoritative background: `world1-classic-enhanced-background-v1.js`.
+- Authoritative background: `world1-cursed-woods-background-v3.js` + `world1-final-art-lock-v1.js`.
 - Authoritative ground + obstacle layout polish: `world1-ground-obstacle-polish-v2.js`.
 - Authoritative obstacle renderer/art: `world1-cursed-obstacles-v5.js` + the approved top/bottom assets.
 - Authoritative small-crow art: `crow-minions-ingame-v3.js` followed by `world1-crow-contrast-v1.js`.
-- `cursed-woods-v1.js`, `world1-background-scope-v1.js`, `cursed-crows-v1.js`, `world1-final-art-lock-v1.js`, and `world1-ground-gap-polish-v1.js` are **RETIRED from runtime loading**. They may remain in Git history/repository for rollback only.
-- Final World 1 visual patches belong in `patch-manifest.js`; do not load a second World 1 visual stack after the patch runner releases its boot gate.
-- Both normal boot and legacy fallback must keep input blocked until the authoritative stack is fully loaded. No visible old-background → new-background swap is acceptable.
+- Explicit runtime-retired W1 visual owners include `world1-classic-enhanced-background-v1.js`, `ruins-pillars-v3.js`, and `world1-ground-gap-polish-v1.js`. `cursed-woods-v1.js`, `world1-background-scope-v1.js`, and `cursed-crows-v1.js` are legacy/not loaded by the current boot chain.
+- Final World 1 runtime order belongs to the active map in `game.js`; `patch-runner.js` / `patch-manifest.js` are not part of current boot.
+- Boot input must remain blocked until the approved runtime and menu UI contracts are ready. No visible old-background → new-background swap is acceptable.
 
 ### World 1 completion gate
 
@@ -94,9 +96,9 @@ After this gate is passed, World 1 is frozen for feature work. Only reported bug
 - World 1 completion gate is considered PASSED.
 - Status: **COMPLETE / FROZEN**. Reopen only for a concrete regression or bug report.
 
-## World 2 — AUDIT / OPEN
+## World 2 — IMPLEMENTED / POLISH OPEN
 
-World 2 is now the active development target. No World 2 visual system is locked yet; first changes should follow an audit-and-approve cycle similar to World 1.
+World 2 is implemented in the current runtime. Remaining work should be treated as targeted bug/visual polish unless a new feature is explicitly requested. Current executable ownership is defined in `FEATHER_FURY_GAME_SPEC.md`.
 
 Current runtime stack observed during the initial audit:
 
@@ -104,8 +106,9 @@ Current runtime stack observed during the initial audit:
 - Environment visuals: `w2-visuals-v1.js`.
 - World 2 gameplay/story flow: `w2-gameplay-v1.js`.
 - Frost audio identity: `w2-audio-v1.js`.
-- Emperor Penguin boss is currently layered through `w2-boss-polish-v2.js`, `w2-boss-orb-v7.js`, `w2-v7-compat-v1.js`, `w2-boss-combat-v6.js`, `w2-boss-tuning-v8.js`, and `w2-boss-phase2-relief-v9.js`.
-- Until the World 2 direction is approved, prefer targeted refinement over introducing additional parallel boss/background systems.
+- Ice Emperor boss behavior authority is `w2-boss-runtime-v10.js`, with support from `w2-boss-polish-v2.js` and `w2-boss-orb-v7.js`; final boss art is `w2-emperor-png-v5.js`.
+- `w2-v7-compat-v1.js`, `w2-boss-combat-v5.js`, `w2-boss-combat-v6.js`, `w2-boss-tuning-v8.js`, and `w2-boss-phase2-relief-v9.js` are retired and must not be restored.
+- Prefer targeted refinement over introducing additional parallel boss/background systems.
 
 ### World 2 environment art v1 — IMPLEMENTED / AWAITING VISUAL APPROVAL
 
@@ -121,4 +124,4 @@ Current active scope is background + ground + obstacles only. Boss/gameplay tuni
 
 ## Next-work rule
 
-At the start of every future task, check this file first. If the target system is marked APPROVED / LOCKED, refine its current implementation instead of testing a new technique.
+At the start of every future task, check this file first for design locks and `FEATHER_FURY_GAME_SPEC.md` for executable ownership. If the target system is marked APPROVED / LOCKED, refine its current implementation instead of testing a new technique.
