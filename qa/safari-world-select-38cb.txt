@@ -1,0 +1,2 @@
+QA-only trigger for Safari/WebKit world-select validation. Do not merge.
+Base runtime commit: 38cb8d172260037258473c586a83dc8e387b0300
