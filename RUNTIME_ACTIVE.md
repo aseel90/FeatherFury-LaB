@@ -10,6 +10,7 @@ This file records the single active runtime chain used by `main` after the Augus
 
 ## Active owners
 - Core runtime: `stable-runtime-w3-clean-v1.js`
+- Runtime compatibility bridge: `runtime-config-bridge-v1.js` exposes the legacy lexical `CONFIG` object as `window.CONFIG` for runtime patches that require it. It owns no renderer or visual UI.
 - Playable characters: `character-roster-v1.js` after `hero-blue-ninja-v1.js`, `hero-static-smooth-v2.js`, `hero-blue-effects-v1.js`, `fierce-falcon-v1.js`, and `skin-routing-hardfix-v2.js`
 - World 1 background: `world1-cursed-woods-background-v3.js` + `world1-final-art-lock-v1.js`
 - World 1 boss art: `crow-king-ingame-v4.js`
@@ -18,7 +19,7 @@ This file records the single active runtime chain used by `main` after the Augus
 - World 2 boss behavior: `w2-boss-runtime-v10.js`
 - World 2 boss final art: `w2-emperor-png-v5.js`
 - World 3 runtime cleanup: `w3-runtime-cleanup-v1.js`
-- World 3 final enemies/environment: `w3-enemy-png-v1.js`, `w3-voltbat-png-v1.js`, `w3-environment-png-v1.js`
+- World 3 final enemies/environment: `w3-enemy-png-v1.js`, `w3-voltbat-png-v1.js`, `w3-enemy-png-v1.js`, `w3-environment-png-v1.js`
 
 ## Retired / not loaded
 - `boss-crowking-v1.js` — superseded by Crow King V4
