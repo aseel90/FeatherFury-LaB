@@ -63,8 +63,8 @@ jobs:
           check_min_size "lab-ui.js" 700
           check_min_size "lab-ui.css" 5000
 
-          if ! grep -q "GOOD_UI" lab-ui.js; then
-            echo "::error::lab-ui.js is missing the pinned full-UI loader marker"
+          if ! grep -q "FF_LAB_RUNTIME_SAFE" lab-ui.js; then
+            echo "::error::lab-ui.js is missing the local safe helper marker"
             exit 1
           fi
 

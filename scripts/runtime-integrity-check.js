@@ -57,8 +57,12 @@ if (!(order['crow-king-ingame-v4.js'] < order['world1-final-art-lock-v1.js'])) f
 
 if (/startup-menu-guard-v1\.js/.test(index)) fail('obsolete startup-menu-guard-v1.js is still loaded by index.html');
 if (/patch-manifest\.js|patch-runner\.js/.test(index)) fail('legacy patch runner/manifest boot path is still loaded by index.html');
-if (!/game\.js\?v=2\.4\.0/.test(index)) fail('index.html is not pinned to approved game.js v2.4.0');
-if (!/ui-splash-approved-v3\.css\?v=8/.test(index)) fail('approved splash CSS is not loaded');
+if (!/game\.js\?v=2\.4\.1/.test(index)) fail('index.html is not pinned to approved game.js v2.4.1');
+if (!/ui-splash-approved-v3\.css\?v=9/.test(index)) fail('approved splash CSS is not loaded');
+if (/cdn\.jsdelivr\.net\/gh\/aseel90\/FeatherFury-LaB@|fetch\(BASE/.test(index)) fail('index.html still bootstraps from a historical remote commit');
+const labUi = read('lab-ui.js');
+if (!labUi.includes('FF_LAB_RUNTIME_SAFE')) fail('lab-ui.js is not the local safe helper');
+if (/cdn\.jsdelivr\.net|createElement\(['"]script['"]\)/.test(labUi)) fail('lab-ui.js still contains a remote/nested script loader');
 
 const hidden = endCss.lastIndexOf('html body #ffPauseOverlay{display:none !important;}');
 const shown = endCss.lastIndexOf('html body #ffPauseOverlay.show{display:flex !important;}');
