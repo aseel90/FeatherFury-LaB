@@ -5,6 +5,9 @@
 
   const CORE_RUNTIME = 'stable-runtime-w3-clean-v1.js?v=4';
   const ACTIVE_PATCHES = [
+    // Bootstrap compatibility: exposes the legacy lexical CONFIG as window.CONFIG.
+    'runtime-config-bridge-v1.js?v=1',
+
     // Core gameplay and World 1 systems. Retired visual owners are intentionally omitted.
     'boss-fight-core-v1.js?v=2',
     'w1-fixes-batch-v1.js?v=2',
@@ -82,7 +85,7 @@
   ];
 
   window.__FF_RUNTIME_MAP__ = Object.freeze({
-    version: 'approved-runtime-v1.2',
+    version: 'approved-runtime-v1.3',
     core: CORE_RUNTIME,
     active: ACTIVE_PATCHES.slice(),
     retired: RETIRED_PATCHES.slice()
@@ -153,6 +156,12 @@
 
     for (const src of ACTIVE_PATCHES) {
       await loadScript(src);
+      if (src.startsWith('runtime-config-bridge-v1')) {
+        await waitFor(() => window.__FF_RUNTIME_CONFIG_BRIDGE_V1__ && window.CONFIG, 2500, 'runtime CONFIG bridge');
+      }
+      if (src.startsWith('core-gameplay-ux-v1')) {
+        await waitFor(() => window.game?.__coreGameplayUxV1Installed && document.getElementById('ffPauseBtn') && document.getElementById('ffPauseOverlay'), 4500, 'gameplay UX and pause controls');
+      }
       if (src.startsWith('character-roster-v1')) {
         await waitFor(() => window.__FF_CHARACTER_ROSTER_V1__, 4500, 'approved character roster');
       }
@@ -180,7 +189,6 @@
     await loadScript('w3-environment-png-v1.js?v=5');
     if (window.__FF_W3_ENVIRONMENT_PNG_V1_READY__) await window.__FF_W3_ENVIRONMENT_PNG_V1_READY__;
 
-    // Boot must always land on the world-select menu. No pause state may survive startup.
     const game = window.game;
     if (game) {
       game.__ffPaused = false;
@@ -221,6 +229,5 @@
       toast.textContent = 'Feather Fury failed to initialize. Please refresh.';
       toast.classList.remove('hidden');
     }
-    // Fail closed: do not silently load retired patches.
   });
 })();
