@@ -46,6 +46,8 @@ const requiredActive = [
   'world1-cursed-woods-background-v3.js',
   'world1-cursed-obstacles-v5.js',
   'world1-final-art-lock-v1.js',
+  'world1-ground-obstacle-polish-v2.js',
+  'world1-owl-dialogue-layer-fix-v3.js',
   'w2-boss-runtime-v10.js',
   'w3-runtime-cleanup-v1.js'
 ];
@@ -57,10 +59,13 @@ for (const file of requiredRetired) if (!retired.includes(file)) fail(`supersede
 const order = requiredActive.reduce((o, f) => (o[f] = active.findIndex(x => x.startsWith(f)), o), {});
 if (!(order['character-roster-v1.js'] < order['crow-king-ingame-v4.js'])) fail('character roster must load before final World 1 visual owners');
 if (!(order['crow-king-ingame-v4.js'] < order['world1-final-art-lock-v1.js'])) fail('Crow King V4 must load before the final World 1 art lock');
+if (!(order['world1-ground-obstacle-polish-v2.js'] < order['world1-owl-dialogue-layer-fix-v3.js'])) fail('World 1 dialogue layer must load after the final ground owner');
+const outroLayer = read('world1-owl-dialogue-layer-fix-v3.js');
+if (!/phase:\s*['"]approach['"]/.test(outroLayer) || !/phase:\s*['"]depart['"]/.test(outroLayer) || !/__ffVictoryAllowFinish\s*=\s*true/.test(outroLayer)) fail('World 1 outro cinematic ownership is incomplete');
 
 if (/startup-menu-guard-v1\.js/.test(index)) fail('obsolete startup-menu-guard-v1.js is still loaded by index.html');
 if (/patch-manifest\.js|patch-runner\.js/.test(index)) fail('legacy patch runner/manifest boot path is still loaded by index.html');
-if (!/game\.js\?v=2\.4\.2/.test(index)) fail('index.html is not pinned to approved game.js v2.4.2');
+if (!/game\.js\?v=2\.4\.3/.test(index)) fail('index.html is not pinned to approved game.js v2.4.3');
 if (!/ui-splash-approved-v3\.css\?v=9/.test(index)) fail('approved splash CSS is not loaded');
 if (/cdn\.jsdelivr\.net\/gh\/aseel90\/FeatherFury-LaB@|fetch\(BASE/.test(index)) fail('index.html still bootstraps from a historical remote commit');
 const labUi = read('lab-ui.js');

@@ -14,7 +14,7 @@ This file records the single active runtime chain used by `main` after the Augus
 - World 1 background: `world1-cursed-woods-background-v3.js` + `world1-final-art-lock-v1.js`
 - World 1 boss art: `crow-king-ingame-v4.js`
 - World 1 obstacle art: `world1-cursed-obstacles-v5.js`
-- World 1 final ground/dialogue ownership: `world1-ground-obstacle-polish-v2.js` + `world1-owl-dialogue-layer-fix-v3.js`; the dialogue layer also owns the `BOSS_OUTRO → FLY_AWAY` transition
+- World 1 final ground/dialogue ownership: `world1-ground-obstacle-polish-v2.js` + `world1-owl-dialogue-layer-fix-v3.js`; the dialogue layer owns the final `approach → dialogue → paired FLY_AWAY → victory` cinematic
 - World 2 boss behavior: `w2-boss-runtime-v10.js`
 - World 2 boss final art: `w2-emperor-png-v5.js`
 - World 3 runtime cleanup: `w3-runtime-cleanup-v1.js`

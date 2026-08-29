@@ -65,7 +65,7 @@
     'world1-cursed-obstacles-v5.js?v=2',
     'world1-final-art-lock-v1.js?v=4',
     'world1-ground-obstacle-polish-v2.js?v=4',
-    'world1-owl-dialogue-layer-fix-v3.js?v=3'
+    'world1-owl-dialogue-layer-fix-v3.js?v=4'
   ];
 
   const RETIRED_PATCHES = [

@@ -94,13 +94,24 @@
   function beginWorld1FlyAway(game) {
     if (!game || game.activeWorld !== 0 || game.state !== 'BOSS_OUTRO' || !game.storyCompleted) return false;
 
+    const cfg = window.CONFIG || {};
+    const w = Number(cfg.CANVAS_WIDTH) || 360;
+    game.__ffVictoryCine = {
+      phase: 'depart',
+      frame: 0,
+      birdX: game.bird?.x || 0,
+      birdY: game.bird?.y || 0,
+      owlX: game.owl?.x || 0,
+      owlY: game.owl?.y || 0,
+      endX: w + 120
+    };
+    game.__ffVictoryAllowFinish = false;
     game.state = 'FLY_AWAY';
     game.storyCompleted = true;
     game.__ffW1FlyAwayStarted = true;
-    if (game.__ffVictoryCine && typeof game.__ffVictoryCine === 'object') game.__ffVictoryCine.phase = 'fly-away';
-
-    // Leave the dialogue cleanly, then let the core FLY_AWAY motion finish the scene.
     game.__ffW1OwlDialogueSceneV3 = null;
+    if (Array.isArray(game.bossFeathers)) game.bossFeathers.length = 0;
+    if (Array.isArray(game.powerOrbs)) game.powerOrbs.length = 0;
     hideCinematicHud();
     try { game.sound?.playWhoosh?.(); } catch (_) {}
     return true;
@@ -111,12 +122,85 @@
     if (!game || typeof game.update !== 'function' || typeof game.draw !== 'function' || typeof game.drawOwl !== 'function') return false;
     if (game.__ffW1OwlDialogueLayerFixV3Installed) return true;
 
+    const priorGameOver = typeof game.gameOver === 'function' ? game.gameOver.bind(game) : null;
+    if (priorGameOver) {
+      game.gameOver = function(isVictory = false, ...args) {
+        const departing = isVictory && this.activeWorld === 0 && this.state === 'FLY_AWAY' && this.__ffVictoryCine?.phase === 'depart';
+        if (departing && !this.__ffVictoryAllowFinish) return;
+        return priorGameOver(isVictory, ...args);
+      };
+    }
+
     const priorUpdate = game.update.bind(game);
     game.update = function(...args) {
-      const result = priorUpdate(...args);
       const cfg = window.CONFIG || {};
       const w = Number(cfg.CANVAS_WIDTH) || 360;
       const h = Number(cfg.CANVAS_HEIGHT) || 640;
+
+      const enteringOutro = this.activeWorld === 0 && this.state === 'BOSS_OUTRO' &&
+        (!this.__ffVictoryCine || !['approach', 'dialogue'].includes(this.__ffVictoryCine.phase));
+      if (enteringOutro) {
+        this.__ffVictoryCine = { phase: 'approach', frame: 0 };
+        this.__ffVictoryAllowFinish = false;
+        if (Array.isArray(this.bossFeathers)) this.bossFeathers.length = 0;
+        if (Array.isArray(this.powerOrbs)) this.powerOrbs.length = 0;
+        try { this.sound?.stopBossAmbiance?.(); } catch (_) {}
+      }
+
+      const cine = this.__ffVictoryCine;
+      if (this.activeWorld === 0 && this.state === 'BOSS_OUTRO' && cine?.phase === 'approach') {
+        // Let both characters meet first; dialogue starts only after they are staged face-to-face.
+        const completed = this.storyCompleted;
+        this.storyCompleted = true;
+        const result = priorUpdate(...args);
+        this.storyCompleted = completed;
+
+        cine.frame += 1;
+        const targetBirdX = w / 2 - 52;
+        const targetOwlX = w / 2 + 52;
+        const targetY = h / 2 - 32;
+        this.bird.x += (targetBirdX - this.bird.x) * 0.075;
+        this.bird.y += (targetY - this.bird.y) * 0.065;
+        this.owl.x += (targetOwlX - this.owl.x) * 0.07;
+        this.owl.y += (targetY - this.owl.y) * 0.06;
+        this.bird.rotation += (0 - this.bird.rotation) * 0.15;
+        this.bird.wingCycle = Math.sin((this.frame || 0) * 0.45);
+
+        if ((Math.abs(this.bird.x - targetBirdX) < 2.5 && Math.abs(this.owl.x - targetOwlX) < 3) || cine.frame > 105) {
+          this.bird.x = targetBirdX;
+          this.owl.x = targetOwlX;
+          this.bird.y = targetY;
+          this.owl.y = targetY;
+          cine.phase = 'dialogue';
+        }
+        hideCinematicHud();
+        return result;
+      }
+
+      if (this.activeWorld === 0 && this.state === 'FLY_AWAY' && cine?.phase === 'depart') {
+        // Core keeps particles/background alive; this owner controls the paired exit trajectory.
+        const result = priorUpdate(...args);
+        cine.frame += 1;
+        const t = clamp(cine.frame / 90, 0, 1);
+        const easeOut = t * t;
+        const lift = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+        this.bird.x = cine.birdX + (cine.endX - cine.birdX) * easeOut;
+        this.owl.x = cine.owlX + (cine.endX + 42 - cine.owlX) * easeOut;
+        this.bird.y = cine.birdY - 58 * lift;
+        this.owl.y = cine.owlY - 62 * lift;
+        this.bird.rotation = -0.08 - 0.20 * easeOut;
+        this.bird.wingCycle = Math.sin((this.frame || 0) * 0.72);
+        hideCinematicHud();
+
+        if (t >= 1 && !this.__ffVictoryAllowFinish) {
+          this.__ffVictoryAllowFinish = true;
+          priorGameOver?.(true);
+        }
+        return result;
+      }
+
+      const result = priorUpdate(...args);
       const w1Outro = this.activeWorld === 0 && (this.state === 'BOSS_OUTRO' || this.state === 'FLY_AWAY');
       const dialogue = this.activeWorld === 0 && this.state === 'BOSS_OUTRO' && this.__ffVictoryCine?.phase === 'dialogue';
 
@@ -125,23 +209,10 @@
       if (dialogue && this.owl) {
         const layout = getLayout(w, h);
         this.__ffW1OwlDialogueSceneV3 = { layout };
-
-        // Keep the real/background owl in the same secondary position used by the approved scene.
-        // Its rendered size is handled separately and never changes when dialogue ends.
         this.owl.x += (layout.background.x - this.owl.x) * 0.16;
         this.owl.y += (layout.background.y - this.owl.y) * 0.16;
       } else if (this.__ffW1OwlDialogueSceneV3) {
-        // Only the speaking portrait disappears. The real owl remains for FLY_AWAY.
         this.__ffW1OwlDialogueSceneV3 = null;
-      }
-
-      if (this.activeWorld === 0 && this.state === 'FLY_AWAY' && this.owl && this.bird) {
-        // Fly out as one pair. The core moves both characters; this gentle join keeps
-        // the owl beside the selected bird instead of leaving a large gap between them.
-        const pairX = this.bird.x + 70;
-        const pairY = this.bird.y - 6;
-        this.owl.x += (pairX - this.owl.x) * 0.18;
-        this.owl.y += (pairY - this.owl.y) * 0.18;
       }
 
       return result;
@@ -230,18 +301,19 @@
       game.reset = function(...args) {
         this.__ffW1OwlDialogueSceneV3 = null;
         this.__ffW1FlyAwayStarted = false;
+        this.__ffVictoryAllowFinish = false;
         return priorReset(...args);
       };
     }
 
     game.__ffW1OwlDialogueLayerFixV3Installed = true;
     window.__FF_W1_OWL_DIALOGUE_LAYER_FIX_V3__ = {
-      version: 'world1-owl-dialogue-layer-fix-v3.2',
+      version: 'world1-owl-dialogue-layer-fix-v3.3',
       fullSizeIntroRemoved: true,
       speakerScaleMode: 'fixed',
       backgroundScaleMode: 'fixed-through-fly-away',
       talkingAnimation: 'effects-only',
-      outroTransition: 'dialogue-to-fly-away-pair',
+      outroTransition: 'approach-dialogue-paired-fly-away',
       layoutFor: getLayout
     };
     console.log('[FF-LAB] world1-owl-dialogue-layer-fix-v3-installed');
