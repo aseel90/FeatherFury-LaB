@@ -1,190 +1,213 @@
 (() => {
   'use strict';
+  if (window.__FF_APPROVED_RUNTIME_BOOT_V1__) return;
+  window.__FF_APPROVED_RUNTIME_BOOT_V1__ = true;
 
-  let bootStarted = false;
-  let bootstrapReleased = false;
-  const originalDrawBirdSkin = window.drawBirdSkin;
-  window.__FF_ORIGINAL_DRAW_BIRD_SKIN__ = window.__FF_ORIGINAL_DRAW_BIRD_SKIN__ || originalDrawBirdSkin;
+  const CORE_RUNTIME = 'stable-runtime-w3-clean-v1.js?v=4';
+  const ACTIVE_PATCHES = [
+    // Core gameplay and World 1 systems. Retired visual owners are intentionally omitted.
+    'boss-fight-core-v1.js?v=2',
+    'w1-fixes-batch-v1.js?v=2',
+    'boss-audio-fix-v2.js?v=3',
+    'w1-final-audio-v1.js?v=2',
+    'w1-final-gameplay-v1.js?v=2',
+    'w1-final-story-v1.js?v=2',
+    'core-gameplay-ux-v1.js?v=4',
+    'pause-hud-polish-v2.js?v=2',
+    'world1-final-polish-v1.js?v=2',
 
-  const bootstrapGate = e => {
-    if (bootstrapReleased) return;
-    if (e && e.cancelable) e.preventDefault();
+    // World 2: consolidated runtime V10 owns boss behavior; PNG V5 owns final boss art.
+    'w2-audio-v1.js?v=2',
+    'w2-environment-assets-v1.js?v=4',
+    'w2-visuals-v1.js?v=6',
+    'w2-ice-ground-skeletons-v1.js?v=4',
+    'w2-gameplay-v1.js?v=2',
+    'revive-core-fix-v1.js?v=3',
+    'w2-emperor-art-v1.js?v=4',
+    'w2-boss-polish-v2.js?v=2',
+    'w2-boss-orb-v7.js?v=2',
+    'w2-boss-runtime-v10.js?v=2',
+    'victory-screen-fix-v1.js?v=2',
+
+    // World 3: cleaned runtime + latest storm/boss passes.
+    'w3-foundation-v1.js?v=2',
+    'w3-world-polish-v1.js?v=7',
+    'w3-boss-v1.js?v=3',
+    'w3-final-polish-v1.js?v=2',
+    'w3-balance-visual-v2.js?v=2',
+    'w3-challenge-audio-v3.js?v=3',
+    'w3-final-balance-v4.js?v=3',
+    'w3-critical-fix-v6.js?v=3',
+    'w3-runtime-cleanup-v1.js?v=5',
+
+    // Approved playable character stack. This is the only active bird renderer chain.
+    'hero-blue-ninja-v1.js?v=3',
+    'hero-static-smooth-v2.js?v=2',
+    'hero-blue-effects-v1.js?v=4',
+    'fierce-falcon-v1.js?v=4',
+    'skin-routing-hardfix-v2.js?v=3',
+    'character-roster-v1.js?v=3',
+    'character-abilities-v2.js?v=3',
+    'mountain-eagle-stability-v3.js?v=2',
+    'character-ability-ui-v1.js?v=2',
+    'character-ability-fx-v1.js?v=2',
+
+    // World 1 final approved visual/story ownership. These intentionally load after characters.
+    'world1-qa-fix-v2.js?v=2',
+    'owl-guardian-v2.js?v=3',
+    'world1-phase2-owl-dialogue-v3.js?v=3',
+    'crow-king-ingame-v4.js?v=2',
+    'crow-minions-ingame-v3.js?v=2',
+    'world1-crow-contrast-v1.js?v=2',
+    'world1-cursed-woods-background-v3.js?v=4',
+    'world1-cursed-obstacle-asset-top-a.js?v=2',
+    'world1-cursed-obstacle-asset-bottom-a.js?v=3',
+    'world1-cursed-obstacles-v5.js?v=2',
+    'world1-final-art-lock-v1.js?v=4',
+    'world1-ground-obstacle-polish-v2.js?v=4',
+    'world1-ground-gap-polish-v1.js?v=2',
+    'world1-owl-dialogue-layer-fix-v3.js?v=2'
+  ];
+
+  const RETIRED_PATCHES = [
+    'boss-crowking-v1.js',
+    'world1-classic-enhanced-background-v1.js',
+    'ruins-pillars-v3.js',
+    'w2-v7-compat-v1.js',
+    'w2-boss-combat-v5.js',
+    'w2-boss-combat-v6.js',
+    'w2-boss-tuning-v8.js',
+    'w2-boss-phase2-relief-v9.js',
+    'w3-critical-fix-v5.js'
+  ];
+
+  window.__FF_RUNTIME_MAP__ = Object.freeze({
+    version: 'approved-runtime-v1',
+    core: CORE_RUNTIME,
+    active: ACTIVE_PATCHES.slice(),
+    retired: RETIRED_PATCHES.slice()
+  });
+
+  let bootReleased = false;
+  const blockBootInput = e => {
+    if (bootReleased) return;
+    if (e?.cancelable) e.preventDefault();
     e?.stopImmediatePropagation?.();
   };
-  for (const type of ['pointerdown', 'click', 'keydown']) document.addEventListener(type, bootstrapGate, true);
-  document.addEventListener('touchstart', bootstrapGate, { capture: true, passive: false });
+  for (const type of ['pointerdown', 'click', 'keydown']) document.addEventListener(type, blockBootInput, true);
+  document.addEventListener('touchstart', blockBootInput, { capture:true, passive:false });
 
-  function releaseBootstrapGate() {
-    if (bootstrapReleased) return;
-    bootstrapReleased = true;
-    for (const type of ['pointerdown', 'click', 'keydown']) document.removeEventListener(type, bootstrapGate, true);
-    document.removeEventListener('touchstart', bootstrapGate, true);
+  function releaseBootInput() {
+    if (bootReleased) return;
+    bootReleased = true;
+    for (const type of ['pointerdown', 'click', 'keydown']) document.removeEventListener(type, blockBootInput, true);
+    document.removeEventListener('touchstart', blockBootInput, true);
     window.__FF_BOOTSTRAP_READY__ = true;
   }
 
   function loadScript(src) {
-    return new Promise(resolve => {
-      const script = document.createElement('script');
-      script.src = src;
-      script.async = false;
-      script.onload = () => resolve(true);
-      script.onerror = () => {
-        console.error(`[FeatherFury] Failed to load ${src}`);
-        resolve(false);
-      };
-      document.head.appendChild(script);
+    return new Promise((resolve, reject) => {
+      const el = document.createElement('script');
+      el.src = src;
+      el.async = false;
+      el.dataset.ffApprovedRuntime = '1';
+      el.onload = () => resolve(true);
+      el.onerror = () => reject(new Error(`Failed to load ${src}`));
+      document.head.appendChild(el);
     });
   }
 
-  async function awaitReady(key, timeout = 8000) {
-    const value = window[key];
-    if (!value || typeof value.then !== 'function') return;
-    await Promise.race([
-      value.catch?.(() => {}) || value,
-      new Promise(resolve => setTimeout(resolve, timeout))
-    ]);
+  function waitFor(test, timeout = 6000, label = 'runtime condition') {
+    const start = performance.now();
+    return new Promise((resolve, reject) => {
+      const tick = () => {
+        let ok = false;
+        try { ok = !!test(); } catch (_) {}
+        if (ok) return resolve(true);
+        if (performance.now() - start >= timeout) return reject(new Error(`Timed out waiting for ${label}`));
+        setTimeout(tick, 40);
+      };
+      tick();
+    });
   }
 
-  const corePatches = [
-    // World 1 gameplay/core. The obsolete boss-crowking-v1 visual renderer is intentionally retired.
-    'ruins-pillars-v3.js?v=1',
-    'cursed-woods-v1.js?v=2',
-    'cursed-crows-v1.js?v=1',
-    'boss-fight-core-v1.js?v=1',
-    'w1-fixes-batch-v1.js?v=1',
-    'boss-audio-fix-v2.js?v=2',
-    'w1-final-audio-v1.js?v=1',
-    'w1-final-gameplay-v1.js?v=1',
-    'w1-final-story-v1.js?v=1',
-    'core-gameplay-ux-v1.js?v=3',
-    'pause-hud-polish-v2.js?v=1',
-    'world1-final-polish-v1.js?v=1',
-
-    // World 2 approved runtime/art stack.
-    'w2-audio-v1.js?v=1',
-    'w2-environment-assets-v1.js?v=3',
-    'w2-visuals-v1.js?v=5',
-    'w2-ice-ground-skeletons-v1.js?v=3',
-    'w2-gameplay-v1.js?v=1',
-    'revive-core-fix-v1.js?v=2',
-    'w2-emperor-art-v1.js?v=3',
-    'w2-boss-polish-v2.js?v=1',
-    'w2-boss-orb-v7.js?v=1',
-    'w2-boss-runtime-v10.js?v=1',
-    'victory-screen-fix-v1.js?v=1',
-
-    // World 3 approved gameplay stack. Environment image owners are loaded after this list.
-    'w3-foundation-v1.js?v=1',
-    'w3-world-polish-v1.js?v=6',
-    'w3-boss-v1.js?v=2',
-    'w3-final-polish-v1.js?v=1',
-    'w3-balance-visual-v2.js?v=1',
-    'w3-challenge-audio-v3.js?v=2',
-    'w3-final-balance-v4.js?v=2',
-    'w3-critical-fix-v6.js?v=2',
-    'w3-runtime-cleanup-v1.js?v=4',
-
-    // Character gameplay/skins.
-    'hero-blue-ninja-v1.js?v=2',
-    'hero-static-smooth-v2.js?v=1',
-    'hero-blue-effects-v1.js?v=3',
-    'fierce-falcon-v1.js?v=3',
-    'skin-routing-hardfix-v2.js?v=2',
-    'character-roster-v1.js?v=2',
-    'character-abilities-v2.js?v=2',
-    'mountain-eagle-stability-v3.js?v=1',
-    'character-ability-ui-v1.js?v=1',
-    'character-ability-fx-v1.js?v=1',
-
-    'world1-qa-fix-v2.js?v=1',
-    'owl-guardian-v2.js?v=2',
-    'world1-phase2-owl-dialogue-v3.js?v=2',
-    'world1-owl-dialogue-layer-fix-v3.js?v=1'
-  ];
-
-  const finalWorld1Visuals = [
-    'crow-king-ingame-v4.js?v=2',
-    'crow-minions-ingame-v3.js?v=1',
-    'world1-cursed-woods-background-v3.js?v=2',
-    'world1-cursed-obstacle-asset-top-a.js?v=1',
-    'world1-cursed-obstacle-asset-bottom-a.js?v=2',
-    'world1-cursed-obstacles-v5.js?v=2',
-    'world1-final-art-lock-v1.js?v=2'
-  ];
-
-  async function boot() {
-    if (bootStarted) return window.__FF_RUNTIME_BOOT_PROMISE__;
-    bootStarted = true;
+  async function loadApprovedStack() {
     window.__FF_PATCH_BOOTING__ = true;
+    window.__FF_RUNTIME_APPROVED_STACK__ = false;
 
-    window.__FF_RUNTIME_BOOT_PROMISE__ = (async () => {
-      // Use the cleaned stable runtime so legacy World 3 painting cannot leak back in.
-      const runtimeOk = await loadScript('stable-runtime-w3-clean-v1.js?v=3');
-      if (!runtimeOk || !window.game) throw new Error('clean runtime did not initialize');
+    await loadScript(CORE_RUNTIME);
+    await waitFor(() => window.game, 8000, 'core game');
 
-      for (const src of corePatches) await loadScript(src);
-
-      // Lock the approved playable-character renderer before any final world renderer can
-      // capture or restore an older drawBirdSkin implementation.
-      if (!window.__FF_CHARACTER_ROSTER_V1__ || typeof window.drawBirdSkin !== 'function') {
-        throw new Error('approved character roster renderer did not initialize');
+    for (const src of ACTIVE_PATCHES) {
+      await loadScript(src);
+      if (src.startsWith('character-roster-v1')) {
+        await waitFor(() => window.__FF_CHARACTER_ROSTER_V1__, 4500, 'approved character roster');
       }
-      const approvedCharacterRenderer = window.drawBirdSkin;
+      if (src.startsWith('w2-boss-runtime-v10')) {
+        await waitFor(() => window.game?.__w2BossRuntimeV10Installed, 4500, 'World 2 boss runtime V10');
+      }
+      if (src.startsWith('crow-king-ingame-v4')) {
+        await waitFor(() => window.game?.__ffCrowKingIngameV4Installed, 4500, 'Crow King V4');
+      }
+      if (src.startsWith('world1-final-art-lock-v1')) {
+        await waitFor(() => window.game?.__world1FinalArtLockV1Installed, 4500, 'World 1 final art lock');
+      }
+    }
 
-      // Final World 2 image owner and outro/dialogue fixes.
-      await loadScript('w2-emperor-png-v5.js?v=6');
-      await awaitReady('__FF_W2_EMPEROR_PNG_V5_READY__');
-      await loadScript('w2-outro-eagle-skin-v3.js?v=3');
-      await loadScript('w2-dialogue-ground-fix-v1.js?v=1');
+    await loadScript('w2-emperor-png-v5.js?v=7');
+    if (window.__FF_W2_EMPEROR_PNG_V5_READY__) await window.__FF_W2_EMPEROR_PNG_V5_READY__;
+    await loadScript('w2-outro-eagle-skin-v3.js?v=4');
+    await loadScript('w2-dialogue-ground-fix-v1.js?v=2');
 
-      // Final World 3 PNG owners and tuning. These are the last World 3 renderers by design.
-      await loadScript('w3-voltbat-png-v1.js?v=2');
-      await awaitReady('__FF_W3_VOLTBAT_PNG_V1_READY__');
-      await loadScript('w3-boss-tuning-v2.js?v=2');
-      await loadScript('w3-enemy-png-v1.js?v=3');
-      await awaitReady('__FF_W3_ENEMY_PNG_V1_READY__');
-      await loadScript('w3-environment-png-v1.js?v=4');
-      await awaitReady('__FF_W3_ENVIRONMENT_PNG_V1_READY__');
+    await loadScript('w3-voltbat-png-v1.js?v=3');
+    if (window.__FF_W3_VOLTBAT_PNG_V1_READY__) await window.__FF_W3_VOLTBAT_PNG_V1_READY__;
+    await loadScript('w3-boss-tuning-v2.js?v=3');
+    await loadScript('w3-enemy-png-v1.js?v=4');
+    if (window.__FF_W3_ENEMY_PNG_V1_READY__) await window.__FF_W3_ENEMY_PNG_V1_READY__;
+    await loadScript('w3-environment-png-v1.js?v=5');
+    if (window.__FF_W3_ENVIRONMENT_PNG_V1_READY__) await window.__FF_W3_ENVIRONMENT_PNG_V1_READY__;
 
-      // Re-assert World 1's approved final renderers after every other world's owner has loaded.
-      for (const src of finalWorld1Visuals) await loadScript(src);
+    // Boot must always land on the world-select menu. No pause state may survive startup.
+    const game = window.game;
+    if (game) {
+      game.__ffPaused = false;
+      game.__ffSettingsFromPause = false;
+      game.state = 'MENU';
+    }
+    document.getElementById('ffPauseOverlay')?.classList.remove('show');
+    document.getElementById('ffPauseBtn')?.classList.remove('show');
+    document.getElementById('gameHud')?.classList.add('hidden');
+    const start = document.getElementById('startScreen');
+    if (start) {
+      start.classList.remove('hidden');
+      start.classList.add('active');
+    }
+    for (const id of ['gameOverScreen','settingsScreen','shopScreen','leaderboardScreen']) {
+      const el = document.getElementById(id);
+      if (!el) continue;
+      el.classList.remove('active');
+      el.classList.add('hidden');
+    }
+    try { game?.updateCarousel?.(); } catch (_) {}
+    try { game?.updatePreview?.(); } catch (_) {}
+    try { game?.renderShop?.(); } catch (_) {}
 
-      // Character visuals must be the final owner of drawBirdSkin. World patches are allowed
-      // to wrap game.draw, but they must never put the legacy bird renderer back on screen.
-      window.drawBirdSkin = approvedCharacterRenderer;
-      window.__FF_CHARACTER_RENDER_LOCK__ = 'approved-roster-v1';
-      try { window.game?.updatePreview?.(); } catch (_) {}
-      try { window.game?.renderShop?.(); } catch (_) {}
-      try { window.FFStoreUI?.render?.(); } catch (_) {}
-
-      window.__FF_PATCH_BOOTING__ = false;
-      releaseBootstrapGate();
-      window.__FF_RUNTIME_APPROVED_STACK__ = {
-        version: '2026-08-29-runtime-lock-2',
-        world1: 'final-art-lock + crow-king-ingame-v4',
-        world2: 'emperor-runtime-v10 + png-v5',
-        world3: 'clean-runtime + png-environment'
-      };
-      console.log('[FF-LAB] approved runtime stack ready');
-      return true;
-    })().catch(err => {
-      window.__FF_PATCH_BOOTING__ = false;
-      releaseBootstrapGate();
-      console.error('[FeatherFury] approved runtime boot failed', err);
-      return false;
-    });
-
-    return window.__FF_RUNTIME_BOOT_PROMISE__;
+    window.__FF_RUNTIME_APPROVED_STACK__ = true;
+    window.__FF_PATCH_BOOTING__ = false;
+    releaseBootInput();
+    console.log('[FeatherFury] approved runtime ready', window.__FF_RUNTIME_MAP__);
   }
 
-  // Keep the old public entry point for any code that calls it, but route it to the single approved boot.
-  window.__FF_START_LEGACY_PATCH_CHAIN__ = boot;
-
-  const langIconPath = document.querySelector('#lang-svg path');
-  if (langIconPath) {
-    const d = langIconPath.getAttribute('d') || '';
-    langIconPath.setAttribute('d', d.replace('c-.43-1.43-1.08-2.76-1.91-3.96z', 'c-.43 1.43-1.08 2.76-1.91 3.96z'));
-  }
-
-  boot();
+  loadApprovedStack().catch(err => {
+    window.__FF_PATCH_BOOTING__ = false;
+    console.error('[FeatherFury] approved runtime boot failed', err);
+    const splash = window.__FF_SPLASH_APPROVED_SCREEN_V3__;
+    try { splash?.mark?.('game'); } catch (_) {}
+    const toast = document.getElementById('gameToast');
+    if (toast) {
+      toast.textContent = 'Feather Fury failed to initialize. Please refresh.';
+      toast.classList.remove('hidden');
+    }
+    // Fail closed: do not silently load retired patches.
+  });
 })();

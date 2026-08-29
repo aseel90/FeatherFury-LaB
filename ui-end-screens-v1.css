@@ -32,3 +32,7 @@ html body #ffPauseOverlay{position:fixed !important;inset:0 !important;z-index:2
     min-height:44px !important;
   }
 }
+
+/* Runtime visibility lock: the pause overlay is hidden unless gameplay explicitly pauses. */
+html body #ffPauseOverlay{display:none !important;}
+html body #ffPauseOverlay.show{display:flex !important;}

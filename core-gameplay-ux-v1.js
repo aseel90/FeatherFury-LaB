@@ -3,49 +3,42 @@
 
   function install() {
     const game = window.game;
-    if (!game || game.__coreGameplayUxV1Installed) return !!game;
+    const cfg = window.CONFIG;
+    const canvas = document.getElementById('gameCanvas');
+    const hud = document.getElementById('gameHud');
+    if (!game || !cfg || !canvas || !hud) return false;
+    if (game.__coreGameplayUxV1Installed) return true;
 
-    const cfg = window.CONFIG || {};
-    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-    const easeOutCubic = t => 1 - Math.pow(1 - clamp(t, 0, 1), 3);
-    const easeInOutCubic = t => {
-      t = clamp(t, 0, 1);
-      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-    };
-    const easeInQuad = t => { t = clamp(t, 0, 1); return t * t; };
-
+    const activePauseStates = new Set(['PLAYING', 'BOSS_WARNING', 'BOSS_INTRO']);
     const style = document.createElement('style');
-    style.id = 'ff-core-gameplay-ux-style';
+    style.id = 'ff-core-gameplay-ux-v1-style';
     style.textContent = `
-      /* HUD: keep score truly centered after moving sound control into Pause. */
-      #gameHud .hud-top{display:grid!important;grid-template-columns:1fr auto 1fr!important;align-items:start!important;width:100%!important;position:relative!important}
-      #gameHud .hud-coin-badge{grid-column:1!important;justify-self:start!important;align-self:start!important}
-      #gameHud .score-container{grid-column:2!important;justify-self:center!important;align-self:start!important;min-width:0!important}
-      #gameHud .score-badge,#gameHud .stage-badge{text-align:center!important}
       #ffPauseBtn{position:fixed;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));z-index:12000;width:48px;height:48px;border:2px solid #4b5a70;border-radius:15px;background:linear-gradient(180deg,#3e4b62 0%,#2b3548 100%);display:none;align-items:center;justify-content:center;color:#fff;box-shadow:0 5px 0 #182231,0 10px 20px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.16);touch-action:manipulation}
       #ffPauseBtn.show{display:flex} #ffPauseBtn:active{transform:translateY(3px);box-shadow:0 2px 0 #182231,0 6px 12px rgba(0,0,0,.24)} #ffPauseBtn:focus-visible{outline:3px solid #facc15;outline-offset:3px}
       #ffPauseOverlay{position:fixed;inset:0;z-index:13000;background:#09131f;display:none;align-items:center;justify-content:center;padding:max(22px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(22px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));overflow:auto}
       #ffPauseOverlay::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 0%,rgba(251,191,36,.08),transparent 31%),linear-gradient(180deg,#0c1825 0%,#09131f 48%,#07101a 100%)}
       #ffPauseOverlay.show{display:flex}
-      #ffPausePanel{position:relative;z-index:1;width:min(92vw,430px);display:flex;flex-direction:column;align-items:stretch;gap:16px;text-align:center}
-      #ffPauseTitle{margin:0;color:#f1c40f;font-family:'Tajawal',sans-serif;font-size:clamp(1.6rem,6vw,2rem);font-weight:900;letter-spacing:.2px;text-shadow:0 2px 0 #5d4a00,0 5px 14px rgba(241,196,15,.18)}
-      #ffPauseCard{position:relative;display:flex;flex-direction:column;gap:14px;padding:20px 18px 18px;border:3px solid #334155;border-radius:22px;background:rgba(3,8,14,.84);box-shadow:0 7px 0 #02060a,0 18px 34px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.04)}
-      #ffPauseCard::before{content:"";position:absolute;left:16px;right:16px;top:-3px;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,rgba(241,196,15,.85),transparent)}
-      #ffPausePanel .setting-row{display:flex!important;justify-content:space-between!important;align-items:center!important;gap:16px!important;min-height:52px!important;padding:2px 0!important;color:#e2e8f0!important;font-family:'Tajawal',sans-serif!important;font-size:1rem!important;font-weight:800!important;text-align:start!important}
-      #ffPauseSoundSlot{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:132px;padding:4px 10px;border:2px solid #1f618d;border-radius:25px;background:linear-gradient(135deg,#3498db,#2980b9);box-shadow:0 4px 0 #1a5276,0 6px 14px rgba(0,0,0,.28);color:#fff;cursor:pointer;user-select:none}
-      #ffPauseSoundSlot:active{transform:translateY(3px);box-shadow:0 1px 0 #1a5276}
-      #ffPauseSoundSlot #soundToggleBtn{position:static!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;width:34px!important;height:34px!important;min-width:34px!important;margin:0!important;padding:0!important;border:0!important;border-radius:50%!important;background:transparent!important;box-shadow:none!important;color:#fff!important;pointer-events:auto}
-      #ffPauseSoundState{min-width:68px;text-align:center;color:#fff;font-family:'Tajawal',sans-serif;font-size:.92rem;font-weight:900;line-height:1}
-      #ffPauseDivider{height:1px;background:#334155;margin:2px 0 0}
-      #ffPauseActions{display:grid;grid-template-columns:1fr 1fr;gap:11px}
-      #ffPauseActions button{width:100%;min-height:50px;margin:0;padding:10px 12px;border-radius:18px;font-family:'Tajawal',sans-serif;font-size:.98rem;font-weight:900;color:#fff;cursor:pointer;transition:transform .08s,filter .08s}
-      #ffPauseActions [data-action="resume"]{grid-column:1/-1;min-height:56px;background:linear-gradient(135deg,#3498db,#2980b9);border:2px solid #1f618d;box-shadow:0 5px 0 #1a5276,0 8px 16px rgba(0,0,0,.28)}
-      #ffPauseActions [data-action="restart"],#ffPauseActions [data-action="settings"]{background:linear-gradient(180deg,#475569,#334155);border:2px solid #253449;box-shadow:0 4px 0 #172231,0 7px 14px rgba(0,0,0,.25)}
-      #ffPauseActions [data-action="menu"]{grid-column:1/-1;background:linear-gradient(180deg,#263548,#1c2938);border:2px solid #111c29;box-shadow:0 4px 0 #0b121c,0 7px 14px rgba(0,0,0,.24);color:#e2e8f0}
-      #ffPauseActions button:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.55)!important} #ffPauseActions button:focus-visible{outline:3px solid #facc15;outline-offset:3px}
-      @media(max-width:380px){#ffPausePanel{width:min(94vw,360px)}#ffPauseCard{padding:17px 14px 15px}#ffPauseActions{grid-template-columns:1fr}#ffPauseActions [data-action]{grid-column:1!important}}
-      #ffPerfHud{position:fixed;left:max(8px,env(safe-area-inset-left));top:max(8px,env(safe-area-inset-top));z-index:14000;display:none;pointer-events:none;background:rgba(2,6,23,.78);border:1px solid rgba(255,255,255,.13);border-radius:9px;padding:6px 8px;color:#e2e8f0;font:600 10px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre;text-shadow:0 1px 2px #000}
-      #ffPerfHud.show{display:block}
+      #ffPausePanel{position:relative;z-index:1;width:min(94vw,760px);display:flex;flex-direction:column;gap:18px}
+      #ffPauseTitle{margin:0;text-align:center;color:#f1c40f;font-family:'Tajawal',sans-serif;font-size:clamp(1.7rem,6vw,2.4rem);font-weight:900;text-shadow:0 2px 0 #5d4a00,0 5px 14px rgba(241,196,15,.16)}
+      #ffPauseCard{width:100%;display:flex;flex-direction:column;background:rgba(0,0,0,.5);padding:20px 24px;border-radius:27px;border:3px solid #334155;box-shadow:0 16px 36px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.035);box-sizing:border-box}
+      #ffPauseCard .setting-row{display:flex;justify-content:space-between;align-items:center;gap:18px;min-height:68px;padding:7px 8px;color:#e2e8f0;font-family:'Tajawal',sans-serif;font-size:clamp(1rem,3vw,1.18rem);font-weight:800}
+      #ffPauseCard .setting-row+.setting-row{border-top:1px solid rgba(71,85,105,.38)}
+      #ffPauseCard .ffPauseDangerRow{margin-top:8px;padding-top:16px;border-top:2px solid #334155} #ffPauseCard .ffPauseDangerRow>span{color:#ff6b72}
+      .ffPausePill{flex:0 0 auto;min-width:128px;min-height:50px;padding:9px 22px;border:2px solid #1f618d;border-radius:28px;background:linear-gradient(180deg,#3ca4df,#2980b9);box-shadow:0 6px 0 #175a83,0 8px 18px rgba(0,0,0,.25),inset 0 2px 0 rgba(255,255,255,.18);color:#fff;font-family:'Tajawal',sans-serif;font-size:1rem;font-weight:900;line-height:1;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+      .ffPausePill:active{transform:translateY(4px);box-shadow:0 2px 0 #175a83,0 4px 10px rgba(0,0,0,.22)} .ffPausePill:focus-visible{outline:3px solid #facc15;outline-offset:3px}
+      .ffPausePill.ffPauseDanger{background:linear-gradient(180deg,#e0564a,#c0392b);border-color:#9d3328;box-shadow:0 6px 0 #7e291f,0 8px 18px rgba(0,0,0,.25)}
+      #ffPauseSoundSlot{display:flex;align-items:center;justify-content:center;gap:8px;min-width:128px;min-height:50px;padding:7px 14px;border:2px solid #1f618d;border-radius:28px;background:linear-gradient(180deg,#3ca4df,#2980b9);box-shadow:0 6px 0 #175a83,0 8px 18px rgba(0,0,0,.25),inset 0 2px 0 rgba(255,255,255,.18);color:#fff;cursor:pointer;user-select:none}
+      #ffPauseSoundSlot #soundToggleBtn{position:static!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;width:30px!important;height:30px!important;min-width:30px!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:#fff!important}
+      #ffPauseSoundState{min-width:62px;text-align:center;color:#fff;font-family:'Tajawal',sans-serif;font-size:1rem;font-weight:900}
+      #ffCountdown{position:fixed;inset:0;z-index:13500;display:none;align-items:center;justify-content:center;pointer-events:none;background:rgba(5,12,22,.12);backdrop-filter:blur(1px)} #ffCountdown.show{display:flex}
+      #ffCountdownValue{font-family:'Press Start 2P',monospace;font-size:clamp(4rem,24vw,8.5rem);line-height:1;color:#fff;text-shadow:0 5px 0 rgba(0,0,0,.5),0 0 35px rgba(56,189,248,.35);animation:ffCountPop .78s ease both}
+      @keyframes ffCountPop{0%{transform:scale(.5);opacity:0}20%{transform:scale(1.12);opacity:1}70%{transform:scale(1);opacity:1}100%{transform:scale(.9);opacity:.15}}
+      #ffBossIntroCard{position:fixed;z-index:11800;top:max(84px,calc(env(safe-area-inset-top) + 66px));left:50%;transform:translate(-50%,-10px);display:none;flex-direction:column;align-items:center;gap:5px;min-width:min(78vw,330px);padding:12px 20px;border:2px solid #7f1d1d;border-radius:18px;background:linear-gradient(180deg,rgba(69,10,10,.94),rgba(23,8,14,.94));color:#fff;box-shadow:0 12px 28px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.08);pointer-events:none;text-align:center}
+      #ffBossIntroCard.show{display:flex;animation:ffBossCardIn .3s ease-out both} #ffBossIntroTitle{color:#fecaca;font-family:'Tajawal',sans-serif;font-size:clamp(1rem,4vw,1.25rem);font-weight:900} #ffBossIntroHp{color:#fff;font-family:'Press Start 2P',monospace;font-size:.62rem;opacity:.8}
+      @keyframes ffBossCardIn{from{opacity:0;transform:translate(-50%,-18px) scale(.96)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+      #ffBossCharge{position:fixed;z-index:11700;top:max(138px,calc(env(safe-area-inset-top) + 122px));left:50%;transform:translateX(-50%);width:min(70vw,300px);height:7px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);display:none;pointer-events:none} #ffBossCharge.show{display:block} #ffBossChargeFill{height:100%;width:0;background:linear-gradient(90deg,#f97316,#ef4444,#dc2626);box-shadow:0 0 12px rgba(239,68,68,.65)}
+      #ffPerfHud{position:fixed;z-index:25000;left:max(8px,env(safe-area-inset-left));bottom:max(8px,env(safe-area-inset-bottom));display:none;min-width:120px;padding:7px 9px;border:1px solid #334155;border-radius:9px;background:rgba(2,6,23,.82);color:#cbd5e1;font:700 10px/1.45 monospace;pointer-events:none;direction:ltr;text-align:left} #ffPerfHud.show{display:block}
+      @media(max-width:520px){#ffPausePanel{width:min(94vw,430px);gap:15px}#ffPauseCard{padding:15px 13px;border-radius:22px}#ffPauseCard .setting-row{min-height:60px;padding:5px 4px;gap:11px}.ffPausePill,#ffPauseSoundSlot{min-width:110px;min-height:46px;padding-left:14px;padding-right:14px}}
     `;
     document.head.appendChild(style);
 
@@ -61,50 +54,36 @@
       <div id="ffPausePanel" role="dialog" aria-modal="true" aria-labelledby="ffPauseTitle">
         <h2 id="ffPauseTitle">إيقاف مؤقت</h2>
         <div id="ffPauseCard">
-          <div class="setting-row">
-            <span id="ffPauseSoundLabel">المؤثرات الصوتية</span>
-            <div id="ffPauseSoundSlot" role="button" tabindex="0" aria-label="Toggle sound">
-              <span id="ffPauseSoundState">مفعل</span>
-            </div>
-          </div>
-          <div id="ffPauseDivider"></div>
-          <div id="ffPauseActions">
-            <button type="button" data-action="resume">متابعة</button>
-            <button type="button" data-action="restart">إعادة اللعب</button>
-            <button type="button" data-action="settings">الإعدادات</button>
-            <button type="button" data-action="menu">القائمة الرئيسية</button>
-          </div>
+          <div class="setting-row"><span id="ffPauseSoundLabel">المؤثرات الصوتية</span><div id="ffPauseSoundSlot" role="button" tabindex="0"><span id="ffPauseSoundState">مفعل</span></div></div>
+          <div class="setting-row"><span>متابعة اللعب</span><button type="button" class="ffPausePill" data-action="resume">متابعة</button></div>
+          <div class="setting-row"><span>إعادة المحاولة</span><button type="button" class="ffPausePill" data-action="restart">إعادة</button></div>
+          <div class="setting-row"><span>إعدادات اللعبة</span><button type="button" class="ffPausePill" data-action="settings">فتح</button></div>
+          <div class="setting-row ffPauseDangerRow"><span>العودة للقائمة</span><button type="button" class="ffPausePill ffPauseDanger" data-action="menu">القائمة</button></div>
         </div>
       </div>`;
-    document.body.append(pauseBtn, pauseOverlay);
+
+    const countdown = document.createElement('div'); countdown.id = 'ffCountdown'; countdown.innerHTML = '<div id="ffCountdownValue">3</div>';
+    const bossIntro = document.createElement('div'); bossIntro.id = 'ffBossIntroCard'; bossIntro.innerHTML = '<div id="ffBossIntroTitle"></div><div id="ffBossIntroHp"></div>';
+    const bossCharge = document.createElement('div'); bossCharge.id = 'ffBossCharge'; bossCharge.innerHTML = '<div id="ffBossChargeFill"></div>';
+    const perfHud = document.createElement('div'); perfHud.id = 'ffPerfHud';
+    document.body.append(pauseBtn, pauseOverlay, countdown, bossIntro, bossCharge, perfHud);
 
     const existingSoundToggle = document.getElementById('soundToggleBtn');
     const pauseSoundSlot = pauseOverlay.querySelector('#ffPauseSoundSlot');
     const pauseSoundState = pauseOverlay.querySelector('#ffPauseSoundState');
-    if (existingSoundToggle && pauseSoundSlot) {
-      pauseSoundSlot.insertBefore(existingSoundToggle, pauseSoundState || null);
-      existingSoundToggle.setAttribute('aria-label', game.lang === 'ar' ? 'تشغيل أو كتم الصوت' : 'Toggle sound');
-    }
+    if (existingSoundToggle && pauseSoundSlot) pauseSoundSlot.insertBefore(existingSoundToggle, pauseSoundState || null);
     const updateSoundState = () => {
       const ar = game.lang === 'ar';
       const off = !!game.sound?.muted || game.sound?.sfxEnabled === false;
       if (pauseSoundState) pauseSoundState.textContent = ar ? (off ? 'مكتوم' : 'مفعل') : (off ? 'Muted' : 'Enabled');
       if (pauseSoundSlot) pauseSoundSlot.setAttribute('aria-pressed', off ? 'false' : 'true');
     };
-    if (existingSoundToggle) existingSoundToggle.addEventListener('click', () => setTimeout(updateSoundState, 0));
     if (pauseSoundSlot) {
       pauseSoundSlot.addEventListener('click', e => { if (e.target !== existingSoundToggle && !e.target.closest?.('#soundToggleBtn')) existingSoundToggle?.click(); });
       pauseSoundSlot.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); existingSoundToggle?.click(); } });
     }
+    existingSoundToggle?.addEventListener('click', () => setTimeout(updateSoundState, 0));
 
-    // Temporary LAB testing price. Restore the final value after boss/revive QA.
-    try { if (window.CONFIG) window.CONFIG.REVIVE_COST = 1; } catch (_) {}
-
-    const perfHud = document.createElement('div');
-    perfHud.id = 'ffPerfHud';
-    document.body.appendChild(perfHud);
-
-    const activePauseStates = new Set(['PLAYING', 'BOSS_WARNING', 'BOSS_INTRO']);
     const updatePauseLabels = () => {
       const ar = game.lang === 'ar';
       const labels = ar
@@ -136,12 +115,23 @@
         try { (stage2 ? game.sound.startCursedAmbiance : game.sound.startRuinsAmbiance)?.call(game.sound); } catch (_) {}
       }
     };
+    const canPauseNow = () => {
+      if (!activePauseStates.has(game.state)) return false;
+      if (document.documentElement.classList.contains('ff-approved-splash-active')) return false;
+      const start = document.getElementById('startScreen');
+      if (start && start.classList.contains('active') && !start.classList.contains('hidden')) return false;
+      const hud = document.getElementById('gameHud');
+      if (!hud || hud.classList.contains('hidden')) return false;
+      const end = document.getElementById('gameOverScreen');
+      if (end && end.classList.contains('active') && !end.classList.contains('hidden')) return false;
+      return true;
+    };
     const setPaused = (paused) => {
-      if (paused && !activePauseStates.has(game.state)) return false;
+      if (paused && !canPauseNow()) return false;
       game.__ffPaused = !!paused;
       updatePauseLabels();
       pauseOverlay.classList.toggle('show', !!paused);
-      pauseBtn.classList.toggle('show', !paused && activePauseStates.has(game.state));
+      pauseBtn.classList.toggle('show', !paused && canPauseNow());
       if (paused) {
         stopGameAudio();
         requestAnimationFrame(() => pauseOverlay.querySelector('[data-action="resume"]')?.focus());
@@ -198,7 +188,7 @@
 
     const handleBack = e => {
       if (game.__ffPaused) { e?.preventDefault?.(); setPaused(false); return; }
-      if (activePauseStates.has(game.state)) { e?.preventDefault?.(); setPaused(true); }
+      if (canPauseNow()) { e?.preventDefault?.(); setPaused(true); }
     };
     document.addEventListener('backbutton', handleBack, false);
     window.addEventListener('popstate', handleBack, false);
@@ -210,153 +200,59 @@
     window.FFPerformance = { getStats: () => ({ ...perf, samples: undefined }) };
     let perfLast = performance.now(), bucketStart = perfLast, frames = 0, sumFrame = 0, dropSince = 0, lastDropLog = 0;
     function perfLoop(ts) {
-      const dt = ts - perfLast; perfLast = ts; frames++; sumFrame += dt;
-      if (ts - bucketStart >= 500) {
-        const span = ts - bucketStart;
-        const fps = frames * 1000 / Math.max(1, span);
-        const frameMs = sumFrame / Math.max(1, frames);
-        perf.fps = Math.round(fps);
-        perf.frameMs = Math.round(frameMs * 10) / 10;
-        perf.samples.push({ t:ts, fps });
-        while (perf.samples.length && ts - perf.samples[0].t > 5000) perf.samples.shift();
-        perf.minFps = Math.round(Math.min(...perf.samples.map(s => s.fps), fps));
-        if (fps < 45) {
-          if (!dropSince) dropSince = ts;
-          if (ts - dropSince > 1000 && ts - lastDropLog > 4000) {
-            perf.drops++; lastDropLog = ts;
-            console.warn(`[FF PERF] sustained FPS drop: ${perf.fps} FPS, ${perf.frameMs}ms/frame`);
-          }
-        } else dropSince = 0;
-        if (perfEnabled) perfHud.textContent = `FPS ${perf.fps}\nFrame ${perf.frameMs} ms\nMin(5s) ${perf.minFps}\nDrops ${perf.drops}`;
-        bucketStart = ts; frames = 0; sumFrame = 0;
+      frames++;
+      const frame = ts - perfLast; perfLast = ts; sumFrame += frame;
+      if (frame > 32) { perf.drops++; dropSince++; }
+      if (ts - bucketStart >= 1000) {
+        perf.fps = frames * 1000 / (ts - bucketStart); perf.frameMs = sumFrame / Math.max(1, frames); perf.minFps = Math.min(perf.minFps, perf.fps);
+        perf.samples.push({ t:Math.round(ts), fps:+perf.fps.toFixed(1), ms:+perf.frameMs.toFixed(2), drops:dropSince }); if (perf.samples.length > 180) perf.samples.shift();
+        if (perfEnabled) perfHud.textContent = `FPS ${perf.fps.toFixed(1)}\nFrame ${perf.frameMs.toFixed(1)} ms\nDrops ${perf.drops}\nState ${game.state}`;
+        if (dropSince >= 5 && ts - lastDropLog > 5000) { console.warn('[FF-LAB] frame-drop burst', { fps:+perf.fps.toFixed(1), frameMs:+perf.frameMs.toFixed(1), state:game.state, boss:game.boss?.active ? game.boss.type : null }); lastDropLog = ts; }
+        frames = 0; sumFrame = 0; dropSince = 0; bucketStart = ts;
       }
       requestAnimationFrame(perfLoop);
     }
     requestAnimationFrame(perfLoop);
 
-    const originalLaunchDash = typeof game.launchDash === 'function' ? game.launchDash.bind(game) : null;
-    if (originalLaunchDash) {
-      game.launchDash = function() {
-        if (this.activeWorld !== 0) return originalLaunchDash();
-        if (this.__ffLaunchAnimating) return;
-        this.__ffLaunchAnimating = true;
-        this.state = 'LAUNCH';
-        this.screenShake = Math.max(this.screenShake || 0, 11);
-        this.sound?.playCageBreak?.();
-
-        const x0 = this.bird.x, y0 = this.bird.y;
-        const settleY = (cfg.CANVAS_HEIGHT || 640) / 2 - 28;
-        const token = (this.__ffLaunchToken || 0) + 1;
-        this.__ffLaunchToken = token;
-        for (let i = 0; i < 16; i++) {
-          this.particles.push({ x:x0+(Math.random()-.5)*50, y:y0+(Math.random()-.5)*58, vx:(Math.random()-.5)*11, vy:-2-Math.random()*7, size:1.5+Math.random()*2.5, color:'#64748b', life:.9, isBar:true, rot:Math.random()*Math.PI, vrot:(Math.random()-.5)*.35 });
-          this.particles.push({ x:x0+(Math.random()-.5)*34, y:y0+(Math.random()-.5)*34, vx:(Math.random()-.5)*10, vy:(Math.random()-.5)*9, size:1.5+Math.random()*2.5, color:'#f59e0b', life:.65 });
-        }
-        const start = performance.now();
-        const animate = now => {
-          if (this.__ffLaunchToken !== token) return;
-          const elapsed = now - start;
-          if (elapsed < 300) {
-            const p = easeOutCubic(elapsed / 300);
-            this.bird.x = x0 + 52 * p;
-            this.bird.y = y0 - 18 * p;
-            this.bird.rotation = -0.28 * p;
-            this.bird.wingCycle = Math.sin(elapsed * .04);
-          } else {
-            const p = easeInOutCubic((elapsed - 300) / 360);
-            this.bird.x = (x0 + 52) + (80 - (x0 + 52)) * p;
-            this.bird.y = (y0 - 18) + (settleY - (y0 - 18)) * p;
-            this.bird.rotation = -0.28 * (1 - p);
-            this.bird.wingCycle = Math.sin(elapsed * .035);
-          }
-          if (elapsed < 660) requestAnimationFrame(animate);
-          else {
-            this.bird.x = 80; this.bird.y = settleY; this.bird.rotation = 0; this.bird.velocity = -3.2;
-            this.state = 'PLAYING'; this.spawnTimer = 60; this.__ffLaunchAnimating = false;
-            document.getElementById('gameHud')?.classList.remove('hidden');
-          }
-        };
-        requestAnimationFrame(animate);
+    let countdownActive = false;
+    const originalEnterStory = typeof game.enterStoryState === 'function' ? game.enterStoryState.bind(game) : null;
+    if (originalEnterStory) {
+      game.enterStoryState = function() {
+        if (countdownActive) return;
+        countdownActive = true;
+        const start = document.getElementById('startScreen');
+        const end = document.getElementById('gameOverScreen');
+        const shop = document.getElementById('shopScreen');
+        start?.classList.remove('active'); start?.classList.add('hidden');
+        end?.classList.remove('active'); end?.classList.add('hidden');
+        shop?.classList.remove('active'); shop?.classList.add('hidden');
+        hud.classList.remove('hidden');
+        game.state = 'COUNTDOWN'; game.__ffPaused = false; pauseBtn.classList.remove('show'); stopGameAudio();
+        let value = 3; const valueEl = document.getElementById('ffCountdownValue');
+        const render = () => { valueEl.textContent = value > 0 ? value : (game.lang === 'ar' ? 'انطلق!' : 'GO!'); valueEl.style.animation = 'none'; void valueEl.offsetWidth; valueEl.style.animation = 'ffCountPop .78s ease both'; };
+        countdown.classList.add('show'); render();
+        const tick = setInterval(() => {
+          value--;
+          if (value >= 0) { render(); return; }
+          clearInterval(tick); countdown.classList.remove('show'); countdownActive = false;
+          originalEnterStory();
+        }, 720);
       };
     }
 
-    const originalGameOver = typeof game.gameOver === 'function' ? game.gameOver.bind(game) : null;
-    if (originalGameOver) {
-      game.gameOver = function(isVictory = false) {
-        if (isVictory && this.activeWorld === 0 && !this.__ffVictoryAllowFinish) {
-          if (this.state === 'BOSS_OUTRO') {
-            const w = cfg.CANVAS_WIDTH || 360;
-            this.__ffVictoryCine = {
-              phase:'depart', frame:0,
-              birdX:this.bird.x, birdY:this.bird.y,
-              owlX:this.owl.x, owlY:this.owl.y,
-              endX:w + 120
-            };
-            this.state = 'FLY_AWAY';
-            this.bossFeathers = []; this.powerOrbs = [];
-            return;
-          }
-          if (this.state === 'FLY_AWAY' && this.__ffVictoryCine?.phase === 'depart') return;
-        }
-        return originalGameOver(isVictory);
+    const originalDraw = typeof game.draw === 'function' ? game.draw.bind(game) : null;
+    if (originalDraw) {
+      game.draw = function() {
+        const r = originalDraw();
+        if (this.__ffPaused) return r;
+        return r;
       };
     }
 
     const originalUpdate = typeof game.update === 'function' ? game.update.bind(game) : null;
     if (originalUpdate) {
       game.update = function() {
-        if (this.__ffPaused) return;
-
-        const enteringOutro = this.activeWorld === 0 && this.state === 'BOSS_OUTRO' && (!this.__ffVictoryCine || this.__ffVictoryCine.phase !== 'approach') && (!this.__ffVictoryCine || this.__ffVictoryCine.phase !== 'dialogue');
-        if (enteringOutro) {
-          this.__ffVictoryCine = { phase:'approach', frame:0 };
-          this.bossFeathers = []; this.powerOrbs = [];
-          try { this.sound?.stopBossAmbiance?.(); } catch (_) {}
-        }
-
-        const cine = this.__ffVictoryCine;
-        if (this.activeWorld === 0 && this.state === 'BOSS_OUTRO' && cine?.phase === 'approach') {
-          const storyCompleted = this.storyCompleted;
-          this.storyCompleted = true;
-          const r = originalUpdate();
-          this.storyCompleted = storyCompleted;
-          cine.frame++;
-          const targetBirdX = (cfg.CANVAS_WIDTH || 360) / 2 - 52;
-          const targetOwlX = (cfg.CANVAS_WIDTH || 360) / 2 + 52;
-          const targetY = (cfg.CANVAS_HEIGHT || 640) / 2 - 32;
-          this.bird.x += (targetBirdX - this.bird.x) * .075;
-          this.bird.y += (targetY - this.bird.y) * .065;
-          this.owl.x += (targetOwlX - this.owl.x) * .07;
-          this.owl.y += (targetY - this.owl.y) * .06;
-          this.bird.rotation += (0 - this.bird.rotation) * .15;
-          this.bird.wingCycle = Math.sin(this.frame * .45);
-          if ((Math.abs(this.bird.x-targetBirdX)<2.5 && Math.abs(this.owl.x-targetOwlX)<3) || cine.frame > 105) {
-            this.bird.x = targetBirdX; this.owl.x = targetOwlX;
-            this.bird.y = targetY; this.owl.y = targetY;
-            cine.phase = 'dialogue';
-          }
-          return r;
-        }
-
-        if (this.activeWorld === 0 && this.state === 'FLY_AWAY' && cine?.phase === 'depart') {
-          const r = originalUpdate();
-          cine.frame++;
-          const p = clamp(cine.frame / 90, 0, 1);
-          const e = easeInQuad(p);
-          const lift = easeInOutCubic(p);
-          this.bird.x = cine.birdX + (cine.endX - cine.birdX) * e;
-          this.owl.x = cine.owlX + (cine.endX + 42 - cine.owlX) * e;
-          this.bird.y = cine.birdY - 58 * lift;
-          this.owl.y = cine.owlY - 62 * lift;
-          this.bird.rotation = -0.08 - 0.2 * e;
-          this.bird.wingCycle = Math.sin(this.frame * .72);
-          if (p >= 1 && !this.__ffVictoryAllowFinish) {
-            this.__ffVictoryAllowFinish = true;
-            originalGameOver(true);
-          }
-          return r;
-        }
-
+        if (this.__ffPaused || countdownActive) return;
         return originalUpdate();
       };
     }
@@ -386,9 +282,9 @@
     }
 
     const uiWatch = () => {
-      const show = !game.__ffPaused && activePauseStates.has(game.state) && !document.getElementById('settingsScreen')?.classList.contains('active');
+      const show = !game.__ffPaused && canPauseNow() && !document.getElementById('settingsScreen')?.classList.contains('active');
       pauseBtn.classList.toggle('show', show);
-      if (!activePauseStates.has(game.state) && game.__ffPaused) setPaused(false);
+      if (!canPauseNow() && game.__ffPaused) setPaused(false);
       requestAnimationFrame(uiWatch);
     };
     requestAnimationFrame(uiWatch);
@@ -404,5 +300,4 @@
     if (install() || attempts > 100) clearInterval(timer);
   }, 80);
   setTimeout(install, 900);
-  setTimeout(install, 1800);
 })();
