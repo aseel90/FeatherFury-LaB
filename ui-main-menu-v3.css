@@ -1,0 +1,32 @@
+/* Feather Fury main menu v3 — selected bird avatar moved into top HUD. */
+#startScreen .ff-local-icon{display:block;object-fit:contain;pointer-events:none;user-select:none}
+#startScreen .ff-shop-coin{min-height:44px!important;padding:6px 8px 6px 10px!important;display:inline-flex!important;align-items:center!important;gap:7px!important;cursor:pointer!important;transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease!important;outline:none!important}
+#startScreen .ff-shop-coin:hover,#startScreen .ff-shop-coin:focus-visible{border-color:rgba(112,226,255,.78)!important;box-shadow:0 7px 18px rgba(0,0,0,.24),0 0 14px rgba(39,216,255,.18),inset 0 1px 0 rgba(255,255,255,.10)!important}
+#startScreen .ff-shop-coin:active{transform:scale(.96)!important}
+#startScreen .ff-coin-icon{width:25px;height:25px;flex:0 0 25px}
+#startScreen .ff-coin-plus{width:22px;height:22px;flex:0 0 22px;margin-left:2px;padding:3px;border-radius:50%;background:rgba(39,216,255,.12);border:1px solid rgba(89,211,255,.32)}
+#startScreen .ff-settings-icon{width:24px;height:24px;margin:auto}
+
+#startScreen .ff-top-right-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex:0 0 auto;direction:ltr}
+#startScreen .ff-bird-avatar-btn{width:54px;height:54px;min-width:54px;min-height:54px;padding:3px;border:1px solid rgba(91,210,255,.42);border-radius:17px;background:linear-gradient(180deg,rgba(17,49,83,.88),rgba(5,18,39,.92));box-shadow:0 7px 18px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.10),0 0 12px rgba(39,216,255,.09);display:grid;place-items:center;overflow:hidden;cursor:pointer;outline:none;transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease}
+#startScreen .ff-bird-avatar-btn:hover,#startScreen .ff-bird-avatar-btn:focus-visible{border-color:rgba(127,232,255,.86);box-shadow:0 7px 18px rgba(0,0,0,.26),0 0 14px rgba(39,216,255,.24),inset 0 1px 0 rgba(255,255,255,.13)}
+#startScreen .ff-bird-avatar-btn:active{transform:scale(.94)}
+#startScreen .ff-bird-avatar-btn .preview-canvas-wrap{position:relative!important;opacity:1!important;pointer-events:none!important;width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;display:grid!important;place-items:center!important;overflow:hidden!important;border:0!important;border-radius:14px!important;background:radial-gradient(circle at 50% 42%,rgba(61,183,255,.20),rgba(3,14,31,.04) 64%,rgba(0,0,0,.12))!important;box-shadow:none!important;margin:0!important;padding:0!important}
+#startScreen .ff-bird-avatar-btn #previewBirdCanvas{display:block!important;opacity:1!important;width:46px!important;height:46px!important;max-width:46px!important;max-height:46px!important;margin:auto!important;transform:none!important}
+#startScreen .ff-bird-avatar-fallback{width:100%;height:100%;display:block;object-fit:cover;object-position:center;border-radius:13px;pointer-events:none}
+
+#startScreen .worlds-carousel{touch-action:pan-y!important;user-select:none;-webkit-user-select:none}
+#startScreen .world-card.ff-world-changing .ff-world-thumb{opacity:.58;transform:scale(1.035) translateY(2px)}
+#startScreen .world-card.ff-world-changing .world-title{opacity:.76;transform:translateY(-1px)}
+#startScreen .world-title{transition:opacity .18s ease,transform .18s ease!important}
+#startScreen .ff-world-dots{flex:0 0 auto;height:12px;margin:-2px 0 0;display:flex;align-items:center;justify-content:center;gap:7px;direction:ltr}
+#startScreen .ff-world-dot{width:7px;height:7px;border-radius:999px;background:rgba(145,181,221,.30);border:1px solid rgba(164,207,245,.20);transition:width .16s ease,background .16s ease,box-shadow .16s ease}
+#startScreen .ff-world-dot.is-active{width:18px;background:var(--ff-menu-cyan);border-color:rgba(170,244,255,.72);box-shadow:0 0 9px rgba(39,216,255,.50)}
+#startScreen .ff-world-dot.is-locked{background:rgba(105,115,139,.20);border-color:rgba(122,134,159,.14)}
+#startScreen .ff-secondary-menu-actions{display:none!important}
+#startScreen #startStoryBtn.ff-disabled,#startScreen #startStoryBtn:disabled{opacity:.58!important;filter:saturate(.52)!important;cursor:not-allowed!important;transform:none!important;background:linear-gradient(180deg,#315f78,#234862)!important;box-shadow:0 4px 0 #183247,0 8px 16px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.12)!important}
+
+@media(max-width:370px){#startScreen .ff-top-right-actions{gap:6px}#startScreen .ff-bird-avatar-btn{width:48px;height:48px;min-width:48px;min-height:48px;border-radius:15px}#startScreen .ff-bird-avatar-btn .preview-canvas-wrap{width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important}#startScreen .ff-bird-avatar-btn #previewBirdCanvas{width:41px!important;height:41px!important;max-width:41px!important;max-height:41px!important}}
+@media(max-height:680px){#startScreen .ff-world-dots{height:9px;gap:6px;margin-top:-3px}#startScreen .ff-world-dot{width:6px;height:6px}#startScreen .ff-world-dot.is-active{width:15px}}
+@media (orientation:portrait) and (max-height:600px){#startScreen .ff-world-dots{display:none}#startScreen .ff-shop-coin{min-height:40px!important;padding:5px 7px 5px 9px!important;gap:6px!important}#startScreen .ff-coin-icon{width:22px;height:22px;flex-basis:22px}#startScreen .ff-coin-plus{width:19px;height:19px;flex-basis:19px}#startScreen .ff-bird-avatar-btn{width:44px;height:44px;min-width:44px;min-height:44px;border-radius:14px;padding:2px}#startScreen .ff-bird-avatar-btn .preview-canvas-wrap{width:39px!important;height:39px!important;min-width:39px!important;min-height:39px!important}#startScreen .ff-bird-avatar-btn #previewBirdCanvas{width:38px!important;height:38px!important;max-width:38px!important;max-height:38px!important}}
+@media(orientation:landscape) and (max-height:560px){#startScreen .ff-world-dots{display:none}#startScreen .ff-bird-avatar-btn{width:46px;height:44px;min-width:46px;min-height:44px;border-radius:14px}#startScreen .ff-bird-avatar-btn .preview-canvas-wrap{width:39px!important;height:38px!important;min-width:39px!important;min-height:38px!important}#startScreen .ff-bird-avatar-btn #previewBirdCanvas{width:38px!important;height:37px!important;max-width:38px!important;max-height:37px!important}}
