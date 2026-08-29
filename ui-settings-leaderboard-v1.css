@@ -1,0 +1,107 @@
+/* Feather Fury — Settings + Leaderboard v1 */
+#settingsScreen.ff-settings-screen,
+#leaderboardScreen.ff-leaderboard-screen{
+  position:absolute!important; inset:0!important; width:100%!important; height:100%!important;
+  min-height:100dvh; box-sizing:border-box; overflow:hidden;
+  padding:calc(env(safe-area-inset-top,0px) + clamp(18px,4.4vh,34px))
+          calc(env(safe-area-inset-right,0px) + clamp(14px,4vw,24px))
+          calc(env(safe-area-inset-bottom,0px) + clamp(18px,3.2vh,28px))
+          calc(env(safe-area-inset-left,0px) + clamp(14px,4vw,24px))!important;
+  background:
+    linear-gradient(180deg,rgba(8,34,57,.72),rgba(12,51,73,.66) 42%,rgba(17,70,78,.72)),
+    url('assets/ui/loading-hq/feather-fury-background.webp') center/cover no-repeat!important;
+  color:#f3fbff; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
+  font-family:'Tajawal','Changa',sans-serif;
+}
+#settingsScreen.ff-settings-screen.active,
+#leaderboardScreen.ff-leaderboard-screen.active{display:flex!important}
+#settingsScreen.ff-settings-screen{flex-direction:column;align-items:center;justify-content:center;gap:clamp(12px,2.2vh,20px)}
+#leaderboardScreen.ff-leaderboard-screen{flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:clamp(12px,2.4vh,20px)}
+
+.ff-screen-heading{display:flex;align-items:center;justify-content:center;gap:10px;margin:0!important;color:#e9fbff!important;font-size:clamp(1.5rem,6vw,2rem)!important;text-shadow:0 2px 12px rgba(42,221,255,.28)!important}
+.ff-screen-heading::before{content:"";width:30px;height:30px;background:center/contain no-repeat;filter:drop-shadow(0 0 8px rgba(76,217,255,.42))}
+#settingsScreen .ff-screen-heading::before{background-image:url('assets/ui/icons/settings.svg')}
+#leaderboardScreen .ff-screen-heading::before{background-image:url('assets/ui/icons/trophy.svg')}
+
+#settingsScreen .settings-panel{
+  width:min(92vw,430px)!important; max-height:min(68dvh,570px); overflow:auto; box-sizing:border-box;
+  padding:clamp(14px,3.6vw,22px)!important; margin:0!important;
+  border:1px solid rgba(111,224,255,.45); border-radius:24px;
+  background:linear-gradient(145deg,rgba(19,86,106,.78),rgba(15,62,88,.72));
+  box-shadow:0 18px 50px rgba(3,28,49,.26),inset 0 1px 0 rgba(255,255,255,.12);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  scrollbar-width:thin; scrollbar-color:rgba(77,213,239,.65) transparent;
+}
+#settingsScreen .setting-row{
+  min-height:62px; display:flex!important; align-items:center; justify-content:space-between; gap:12px;
+  margin:0!important; padding:10px 4px!important; border:0!important; border-bottom:1px solid rgba(177,232,245,.13)!important;
+}
+#settingsScreen .setting-row:last-child{border-bottom:0!important;padding-top:14px!important}
+.ff-setting-label{display:flex;align-items:center;gap:10px;min-width:0;font-weight:800;font-size:clamp(.92rem,3.6vw,1.06rem);color:#eafcff}
+.ff-setting-icon{width:26px;height:26px;object-fit:contain;flex:0 0 26px;filter:drop-shadow(0 0 7px rgba(83,218,255,.32))}
+#settingsScreen .secondary-btn,#settingsScreen #resetDataBtn{
+  min-width:108px!important; min-height:42px; margin:0!important; padding:8px 13px!important; box-sizing:border-box;
+  border:1px solid rgba(96,220,247,.55)!important; border-radius:14px!important;
+  background:linear-gradient(180deg,rgba(45,135,158,.84),rgba(24,91,119,.86))!important;
+  color:#fff!important; font-family:inherit!important; font-size:.91rem!important; font-weight:900!important;
+  box-shadow:0 7px 18px rgba(4,37,58,.18)!important; display:inline-flex!important;align-items:center;justify-content:center;gap:7px;
+}
+#settingsScreen #resetDataBtn{background:linear-gradient(180deg,rgba(191,77,91,.88),rgba(129,48,67,.9))!important;border-color:rgba(255,151,163,.6)!important}
+#settingsScreen .secondary-btn:active,#settingsScreen #resetDataBtn:active{transform:translateY(1px) scale(.985)}
+.ff-btn-icon{width:18px;height:18px;object-fit:contain;flex:0 0 18px}
+#settingsScreen .version-info{margin:0!important;color:rgba(231,249,255,.65)!important;font-size:clamp(.72rem,2.7vw,.84rem)!important;gap:3px!important}
+#settingsScreen .version-info>div{font-size:clamp(1.35rem,5.4vw,1.7rem)!important;color:#f7d86b!important;text-shadow:0 2px 9px rgba(0,0,0,.22)!important}
+#settingsScreen #closeSettingsBtn{
+  width:min(76vw,260px)!important;min-height:48px;margin:0!important;padding:10px 18px!important;border-radius:16px!important;
+  display:flex!important;align-items:center;justify-content:center;gap:9px;background:linear-gradient(180deg,#37c2d8,#2187ae)!important;
+  border:1px solid rgba(198,247,255,.7)!important;color:#fff!important;font-family:inherit!important;font-weight:900!important;box-shadow:0 9px 24px rgba(2,48,77,.22)!important
+}
+
+#leaderboardScreen .shop-header{width:min(92vw,480px)!important;max-width:none!important;display:grid!important;grid-template-columns:48px 1fr 48px;align-items:center;margin:0!important;padding:0!important}
+#leaderboardScreen .shop-header h2{grid-column:2;margin:0!important;text-align:center}
+#leaderboardScreen #closeLeaderboardBtn{grid-column:3;width:44px!important;height:44px!important;min-width:44px!important;padding:0!important;margin:0!important;border-radius:14px!important;border:1px solid rgba(117,227,249,.45)!important;background:rgba(24,102,132,.72)!important;display:grid!important;place-items:center;font-size:0!important;justify-self:end;box-shadow:0 8px 20px rgba(4,36,55,.18)!important}
+#leaderboardScreen #closeLeaderboardBtn img{width:22px;height:22px}
+#leaderboardScreen .leaderboard-content{
+  width:min(92vw,480px)!important;max-width:none!important;max-height:min(68dvh,600px);overflow:auto;box-sizing:border-box;
+  margin:0!important;padding:clamp(14px,3.6vw,20px)!important;border-radius:24px!important;
+  background:linear-gradient(145deg,rgba(19,86,106,.8),rgba(15,62,88,.73))!important;border:1px solid rgba(111,224,255,.45);
+  box-shadow:0 18px 50px rgba(3,28,49,.26),inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)
+}
+#leaderboardList{gap:9px!important}
+#leaderboardList li.ff-leader-row{display:grid!important;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;padding:12px 13px!important;background:rgba(55,144,162,.22)!important;border:1px solid rgba(169,231,242,.13)!important;border-radius:16px!important;font-weight:800!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+#leaderboardList li.ff-leader-row.ff-you{background:rgba(43,177,203,.3)!important;border-color:rgba(84,225,255,.55)!important;box-shadow:0 0 0 1px rgba(63,205,235,.08),0 7px 18px rgba(0,69,89,.12)}
+.ff-rank-name{display:flex;align-items:center;gap:10px;min-width:0}
+.ff-rank-badge{width:31px;height:31px;display:grid;place-items:center;flex:0 0 31px;border-radius:10px;background:rgba(15,67,91,.68);border:1px solid rgba(155,225,241,.2);font:900 .82rem 'Changa',sans-serif;color:#c9f6ff}
+.ff-leader-row[data-rank="1"] .ff-rank-badge{color:#ffe27b;border-color:rgba(255,223,104,.55);background:rgba(162,121,24,.28)}
+.ff-leader-row[data-rank="2"] .ff-rank-badge{color:#eef6ff;border-color:rgba(213,230,241,.5);background:rgba(112,137,150,.27)}
+.ff-leader-row[data-rank="3"] .ff-rank-badge{color:#ffc493;border-color:rgba(231,155,91,.5);background:rgba(134,78,42,.28)}
+.ff-player-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#eefcff;font-size:clamp(.9rem,3.5vw,1.02rem)}
+.ff-score{display:flex;align-items:center;gap:6px;color:#ffdf69;font-family:'Changa',sans-serif;font-weight:900;font-size:clamp(.92rem,3.5vw,1.04rem)}
+.ff-score img{width:18px;height:18px}
+#leaderboardScreen [data-i18n="leaderboardSubtitle"]{margin-top:13px!important;color:#b7dce6!important;font-size:.78rem!important}
+
+@media (max-width:350px){
+  #settingsScreen.ff-settings-screen,#leaderboardScreen.ff-leaderboard-screen{padding-inline:calc(env(safe-area-inset-left,0px) + 10px)!important;padding-right:calc(env(safe-area-inset-right,0px) + 10px)!important}
+  #settingsScreen .settings-panel{width:96vw!important;padding:11px!important;border-radius:20px}
+  #settingsScreen .setting-row{min-height:55px;gap:8px}.ff-setting-icon{width:22px;height:22px;flex-basis:22px}.ff-setting-label{gap:7px;font-size:.86rem}
+  #settingsScreen .secondary-btn,#settingsScreen #resetDataBtn{min-width:92px!important;min-height:38px;padding:7px 9px!important;font-size:.8rem!important}
+  #leaderboardScreen .leaderboard-content,#leaderboardScreen .shop-header{width:96vw!important}
+}
+@media (max-height:610px){
+  #settingsScreen.ff-settings-screen,#leaderboardScreen.ff-leaderboard-screen{justify-content:flex-start!important;padding-top:calc(env(safe-area-inset-top,0px) + 10px)!important;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 10px)!important;gap:8px}
+  #settingsScreen .settings-panel{max-height:70dvh;padding:10px 14px!important}.ff-screen-heading{font-size:1.25rem!important}.ff-screen-heading::before{width:24px;height:24px}
+  #settingsScreen .setting-row{min-height:47px;padding:5px 3px!important}.ff-setting-icon{width:21px;height:21px;flex-basis:21px}.ff-setting-label{font-size:.84rem}
+  #settingsScreen .secondary-btn,#settingsScreen #resetDataBtn{min-height:35px;min-width:90px!important;padding:5px 9px!important;font-size:.78rem!important}
+  #settingsScreen .version-info{display:none!important}#settingsScreen #closeSettingsBtn{min-height:39px!important;width:min(60vw,220px)!important;padding:6px 15px!important}
+  #leaderboardScreen .leaderboard-content{max-height:76dvh;padding:10px!important}#leaderboardList li.ff-leader-row{padding:8px 10px!important}.ff-rank-badge{width:27px;height:27px;flex-basis:27px}
+}
+@media (orientation:landscape) and (max-height:540px){
+  #settingsScreen.ff-settings-screen{display:grid!important;grid-template-columns:minmax(250px,440px) minmax(170px,250px);grid-template-rows:auto auto;justify-content:center!important;align-content:center;column-gap:18px;row-gap:8px}
+  #settingsScreen .ff-screen-heading{grid-column:1/3}#settingsScreen .settings-panel{grid-column:1;grid-row:2;max-height:76dvh;width:100%!important}
+  #settingsScreen .version-info{display:flex!important;grid-column:2;grid-row:2;align-self:center}#settingsScreen #closeSettingsBtn{grid-column:2;grid-row:2;align-self:end;justify-self:center;margin-bottom:8px!important;width:min(190px,90%)!important}
+  #leaderboardScreen.ff-leaderboard-screen{padding-block:calc(env(safe-area-inset-top,0px) + 8px) calc(env(safe-area-inset-bottom,0px) + 8px)!important}
+  #leaderboardScreen .leaderboard-content{max-height:73dvh;width:min(72vw,620px)!important}#leaderboardScreen .shop-header{width:min(72vw,620px)!important}
+}
+@media (min-width:700px) and (min-height:700px){
+  #settingsScreen .settings-panel{width:min(70vw,520px)!important}#leaderboardScreen .leaderboard-content,#leaderboardScreen .shop-header{width:min(70vw,560px)!important}
+}
