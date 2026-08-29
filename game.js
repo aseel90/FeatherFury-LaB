@@ -96,11 +96,13 @@
     'character-ability-ui-v1.js?v=1',
     'character-ability-fx-v1.js?v=1',
 
-    // World 1 approved final visual owners. These MUST remain last so legacy visuals cannot win.
     'world1-qa-fix-v2.js?v=1',
     'owl-guardian-v2.js?v=2',
     'world1-phase2-owl-dialogue-v3.js?v=2',
-    'world1-owl-dialogue-layer-fix-v3.js?v=1',
+    'world1-owl-dialogue-layer-fix-v3.js?v=1'
+  ];
+
+  const finalWorld1Visuals = [
     'crow-king-ingame-v4.js?v=2',
     'crow-minions-ingame-v3.js?v=1',
     'world1-cursed-woods-background-v3.js?v=2',
@@ -136,6 +138,9 @@
       await awaitReady('__FF_W3_ENEMY_PNG_V1_READY__');
       await loadScript('w3-environment-png-v1.js?v=4');
       await awaitReady('__FF_W3_ENVIRONMENT_PNG_V1_READY__');
+
+      // Re-assert World 1's approved final renderers after every other world's owner has loaded.
+      for (const src of finalWorld1Visuals) await loadScript(src);
 
       window.__FF_PATCH_BOOTING__ = false;
       releaseBootstrapGate();
