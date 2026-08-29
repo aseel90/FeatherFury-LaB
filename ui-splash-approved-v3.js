@@ -127,12 +127,17 @@ function finish(){
   status.textContent='Ready to Fly!';
   paint();
   clearInterval(timer);
+
+  // Reveal the already-built menu while the opaque splash still covers it.
+  // WebKit can otherwise defer painting descendants that were visibility:hidden
+  // until the same frame the splash starts fading, producing a brief menu race.
+  root.classList.remove('ff-approved-splash-active');
+
   setTimeout(()=>{
     splash.classList.add('ff-approved-leaving');
-    root.classList.remove('ff-approved-splash-active');
     setTimeout(()=>splash.remove(),380);
   },220);
 }
 window.addEventListener('pagehide',()=>clearInterval(timer),{once:true});
-window.__FF_SPLASH_APPROVED_SCREEN_V3__={version:'3.2.0',direction:'ltr',finish,fail,mark,get progress(){return progress;}};
+window.__FF_SPLASH_APPROVED_SCREEN_V3__={version:'3.2.1',direction:'ltr',finish,fail,mark,get progress(){return progress;}};
 })();
