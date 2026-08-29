@@ -65,8 +65,8 @@ if (!/phase:\s*['"]approach['"]/.test(outroLayer) || !/phase:\s*['"]depart['"]/.
 
 if (/startup-menu-guard-v1\.js/.test(index)) fail('obsolete startup-menu-guard-v1.js is still loaded by index.html');
 if (/patch-manifest\.js|patch-runner\.js/.test(index)) fail('legacy patch runner/manifest boot path is still loaded by index.html');
-if (!/game\.js\?v=2\.4\.4/.test(index)) fail('index.html is not pinned to approved game.js v2.4.4');
-if (!/ui-splash-approved-v3\.css\?v=10/.test(index)) fail('approved splash CSS is not loaded');
+if (!/game\.js\?v=2\.4\.5/.test(index)) fail('index.html is not pinned to approved game.js v2.4.5');
+if (!/ui-splash-approved-v3\.css\?v=1/.test(index)) fail('approved splash CSS is not loaded');
 if (!/ui-splash-approved-v3\.js\?v=11/.test(index)) fail('approved splash JS is not pinned to v11');
 if (/cdn\.jsdelivr\.net\/gh\/aseel90\/FeatherFury-LaB@|fetch\(BASE/.test(index)) fail('index.html still bootstraps from a historical remote commit');
 
