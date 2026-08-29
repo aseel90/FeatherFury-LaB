@@ -61,7 +61,9 @@ const readState = () => page.evaluate(() => {
       const rect = idOrEl => {
         const el = typeof idOrEl === 'string' ? document.querySelector(idOrEl) : idOrEl;
         if (!el) return null;
+        const style = getComputedStyle(el);
         const r = el.getBoundingClientRect();
+        if (style.display === 'none' || style.visibility === 'hidden' || r.width <= 0 || r.height <= 0) return null;
         return { left:r.left, right:r.right, top:r.top, bottom:r.bottom, width:r.width, height:r.height };
       };
       return {
