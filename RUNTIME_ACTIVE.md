@@ -1,5 +1,7 @@
 # Feather Fury active runtime map
 
+> **Snapshot companion:** the canonical architecture, boot contracts, full patch order, known debt and change protocol live in `FEATHER_FURY_GAME_SPEC.md`. If this snapshot drifts, update it from the actual loader/spec rather than restoring older patches.
+
 This file records the single active runtime chain used by `main` after the August 29 stabilization.
 
 ## Boot ownership
@@ -9,7 +11,7 @@ This file records the single active runtime chain used by `main` after the Augus
 - `patch-runner.js`, `patch-manifest.js`, and `startup-menu-guard-v1.js` are not part of boot.
 
 ## Active owners
-- Core runtime: `stable-runtime-w3-clean-v1.js`
+- Core runtime: `stable-runtime-w3-clean-v1.js` — **temporary recovery transformer**; it currently fetches a pinned historical `game.js` from jsDelivr at runtime, transforms it, and evaluates it. The final private/offline/Android architecture must materialize this core locally.
 - Runtime compatibility bridge: `runtime-config-bridge-v1.js` exposes the legacy lexical `CONFIG` object as `window.CONFIG` for runtime patches that require it. It owns no renderer or visual UI.
 - Playable characters: `character-roster-v1.js` after `hero-blue-ninja-v1.js`, `hero-static-smooth-v2.js`, `hero-blue-effects-v1.js`, `fierce-falcon-v1.js`, and `skin-routing-hardfix-v2.js`
 - World 1 background: `world1-cursed-woods-background-v3.js` + `world1-final-art-lock-v1.js`
