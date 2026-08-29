@@ -1,0 +1,110 @@
+/* Feather Fury HUD v1 — transparent gameplay HUD, no black panels */
+#gameHud.ff-hud-v1{
+  top:0!important;left:0!important;width:100%!important;
+  padding:max(10px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 10px max(12px,env(safe-area-inset-left))!important;
+  gap:8px!important;box-sizing:border-box!important;pointer-events:none!important;
+}
+#gameHud.ff-hud-v1 .hud-top{position:relative!important;display:block!important;width:100%!important;min-height:60px!important}
+#gameHud.ff-hud-v1 .hud-coin-badge{
+  position:absolute!important;left:0!important;top:0!important;margin:0!important;
+  min-height:42px!important;padding:5px 12px 5px 8px!important;gap:7px!important;
+  border:1.5px solid rgba(56,189,248,.55)!important;border-radius:17px!important;
+  background:linear-gradient(145deg,rgba(7,37,61,.82),rgba(16,64,91,.64))!important;
+  box-shadow:0 5px 16px rgba(2,18,33,.22),inset 0 1px 0 rgba(255,255,255,.12)!important;
+  backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+  color:#ffd23f!important;font-size:clamp(.72rem,2.8vw,.86rem)!important;
+}
+#gameHud.ff-hud-v1 .hud-coin-badge>svg{display:none!important}
+#gameHud.ff-hud-v1 .ff-hud-coin-icon{width:25px;height:25px;display:block;flex:0 0 25px;filter:drop-shadow(0 2px 3px rgba(16,71,97,.35))}
+#gameHud.ff-hud-v1 .score-container{
+  position:absolute!important;left:50%!important;top:0!important;transform:translateX(-50%)!important;
+  min-width:106px!important;max-width:44vw!important;margin:0!important;padding:5px 14px 6px!important;
+  border:1.5px solid rgba(125,211,252,.42)!important;border-radius:17px!important;
+  background:linear-gradient(160deg,rgba(8,40,66,.76),rgba(21,75,104,.56))!important;
+  box-shadow:0 5px 16px rgba(2,18,33,.18),inset 0 1px 0 rgba(255,255,255,.10)!important;
+  backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+}
+#gameHud.ff-hud-v1 .score-badge{
+  font-size:clamp(1.18rem,5vw,1.55rem)!important;line-height:1.05!important;color:#fff!important;
+  text-shadow:0 2px 5px rgba(4,26,43,.65)!important;
+}
+#gameHud.ff-hud-v1 .stage-badge{
+  margin-top:3px!important;padding:0!important;border:0!important;background:transparent!important;
+  max-width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+  color:#7dd3fc!important;font-family:'Tajawal',sans-serif!important;font-size:clamp(.58rem,2.4vw,.72rem)!important;
+  font-weight:900!important;text-shadow:0 1px 3px rgba(4,26,43,.55)!important;
+}
+#gameHud.ff-hud-v1 .fever-bar-container{
+  align-self:center!important;width:min(76vw,330px)!important;min-height:34px!important;margin:0 auto!important;
+  padding:5px 9px!important;gap:7px!important;border:1.5px solid rgba(56,189,248,.46)!important;border-radius:18px!important;
+  background:linear-gradient(135deg,rgba(8,46,72,.72),rgba(24,81,105,.52))!important;
+  box-shadow:0 5px 16px rgba(2,18,33,.16),inset 0 1px 0 rgba(255,255,255,.09)!important;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+}
+#gameHud.ff-hud-v1 .fever-label{display:flex!important;align-items:center!important;gap:5px!important;color:#ffd166!important;font-family:'Tajawal',sans-serif!important;font-size:.7rem!important;font-weight:900!important;text-shadow:none!important;white-space:nowrap!important}
+#gameHud.ff-hud-v1 .ff-hud-fever-icon{width:17px;height:17px;display:block;flex:0 0 17px}
+#gameHud.ff-hud-v1 .fever-bar-bg{height:10px!important;border:1px solid rgba(125,211,252,.34)!important;border-radius:999px!important;background:rgba(14,60,83,.78)!important;box-shadow:inset 0 2px 4px rgba(3,31,48,.35)!important}
+#gameHud.ff-hud-v1 .fever-bar-fill{border-radius:999px!important;background:linear-gradient(90deg,#22d3ee,#38bdf8,#facc15)!important;box-shadow:0 0 7px rgba(56,189,248,.36)!important}
+#gameHud.ff-hud-v1 .fever-bar-fill.max{box-shadow:0 0 12px rgba(250,204,21,.8)!important}
+#gameHud.ff-hud-v1 #ffAbilityHud{
+  align-self:center!important;width:auto!important;min-width:0!important;max-width:min(82vw,340px)!important;margin:0 auto!important;
+  padding:5px 12px!important;border:1px solid color-mix(in srgb,var(--ff-hud-accent,#38bdf8) 58%,transparent)!important;
+  border-radius:999px!important;background:linear-gradient(135deg,rgba(11,49,72,.68),rgba(25,73,99,.5))!important;
+  box-shadow:0 4px 13px rgba(2,18,33,.14)!important;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  color:#e8f8ff!important;font-size:clamp(.62rem,2.5vw,.72rem)!important;text-shadow:0 1px 3px rgba(2,29,45,.48)!important;
+}
+#ffPauseBtn.ff-hud-pause-v1{
+  top:max(10px,env(safe-area-inset-top))!important;right:max(12px,env(safe-area-inset-right))!important;
+  width:44px!important;height:44px!important;padding:0!important;border:1.5px solid rgba(56,189,248,.56)!important;border-radius:15px!important;
+  background:linear-gradient(145deg,rgba(8,46,72,.90),rgba(25,83,111,.78))!important;
+  box-shadow:0 5px 16px rgba(2,18,33,.24),inset 0 1px 0 rgba(255,255,255,.13)!important;
+  backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);color:#fff!important;
+}
+#ffPauseBtn.ff-hud-pause-v1 img{width:21px;height:21px;display:block;pointer-events:none}
+#ffBossHud{
+  align-self:center;width:min(82vw,360px);margin:1px auto 0;padding:7px 10px 8px;
+  border:1.5px solid rgba(167,139,250,.62);border-radius:18px;
+  background:linear-gradient(135deg,rgba(31,48,83,.78),rgba(35,72,103,.58));
+  box-shadow:0 7px 20px rgba(6,24,43,.20),inset 0 1px 0 rgba(255,255,255,.10);
+  backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);box-sizing:border-box;
+  opacity:1;transform:translateY(0);transition:opacity .18s ease,transform .18s ease;
+}
+#ffBossHud.ff-hidden{display:none!important}
+#ffBossHud .ff-boss-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;color:#f8fafc;font-family:'Tajawal',sans-serif;font-size:.72rem;font-weight:900}
+#ffBossHud .ff-boss-title{display:flex;align-items:center;gap:6px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ffBossHud .ff-boss-title img{width:18px;height:18px;flex:0 0 18px}
+#ffBossHud .ff-boss-hp{color:#c4b5fd;font-family:'Press Start 2P',monospace;font-size:.55rem;white-space:nowrap}
+#ffBossHud .ff-boss-track{height:9px;border-radius:999px;overflow:hidden;border:1px solid rgba(196,181,253,.34);background:rgba(43,65,91,.78);box-shadow:inset 0 2px 4px rgba(5,28,46,.32)}
+#ffBossHud .ff-boss-fill{height:100%;width:100%;border-radius:999px;background:linear-gradient(90deg,#8b5cf6,#38bdf8,#22d3ee);transition:width .18s ease;box-shadow:0 0 8px rgba(56,189,248,.4)}
+.boss-warning{left:6%!important;width:88%!important;padding:12px 16px!important;border:1.5px solid rgba(248,113,113,.72)!important;border-radius:18px!important;background:linear-gradient(135deg,rgba(127,29,29,.78),rgba(153,27,27,.62))!important;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);box-shadow:0 8px 28px rgba(80,20,25,.28)!important}
+.game-hint{max-width:86%!important;white-space:normal!important;background:linear-gradient(135deg,rgba(7,69,96,.78),rgba(14,116,144,.68))!important;border:1px solid rgba(103,232,249,.48)!important;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 6px 18px rgba(5,42,60,.18)!important}
+@media(max-width:370px){
+  #gameHud.ff-hud-v1{padding-left:max(8px,env(safe-area-inset-left))!important;padding-right:max(8px,env(safe-area-inset-right))!important}
+  #gameHud.ff-hud-v1 .hud-coin-badge{min-height:38px!important;padding:4px 8px 4px 6px!important;border-radius:14px!important;font-size:.67rem!important}
+  #gameHud.ff-hud-v1 .ff-hud-coin-icon{width:22px;height:22px;flex-basis:22px}
+  #gameHud.ff-hud-v1 .score-container{min-width:88px!important;padding:4px 9px 5px!important;border-radius:14px!important}
+  #gameHud.ff-hud-v1 .hud-top{min-height:54px!important}
+  #ffPauseBtn.ff-hud-pause-v1{width:40px!important;height:40px!important;border-radius:13px!important}
+  #ffPauseBtn.ff-hud-pause-v1 img{width:19px;height:19px}
+  #gameHud.ff-hud-v1 .fever-bar-container{width:min(78vw,290px)!important;min-height:31px!important;padding:4px 7px!important}
+  #ffBossHud{width:min(84vw,310px);padding:6px 8px}
+}
+@media(min-width:700px){
+  #gameHud.ff-hud-v1{padding-left:max(22px,env(safe-area-inset-left))!important;padding-right:max(22px,env(safe-area-inset-right))!important}
+  #gameHud.ff-hud-v1 .hud-coin-badge{min-height:46px!important;padding:6px 14px 6px 9px!important}
+  #gameHud.ff-hud-v1 .score-container{min-width:132px!important}
+  #gameHud.ff-hud-v1 .fever-bar-container{width:min(52vw,390px)!important}
+  #ffBossHud{width:min(56vw,430px)}
+}
+@media(orientation:landscape) and (max-height:520px){
+  #gameHud.ff-hud-v1{padding-top:max(6px,env(safe-area-inset-top))!important;gap:4px!important}
+  #gameHud.ff-hud-v1 .hud-top{min-height:45px!important}
+  #gameHud.ff-hud-v1 .hud-coin-badge{min-height:36px!important;padding:3px 8px!important}
+  #gameHud.ff-hud-v1 .score-container{padding:3px 10px 4px!important}
+  #gameHud.ff-hud-v1 .score-badge{font-size:1.05rem!important}
+  #gameHud.ff-hud-v1 .stage-badge{font-size:.56rem!important}
+  #ffPauseBtn.ff-hud-pause-v1{top:max(6px,env(safe-area-inset-top))!important;width:38px!important;height:38px!important}
+  #gameHud.ff-hud-v1 .fever-bar-container{position:absolute!important;top:0!important;left:max(112px,calc(env(safe-area-inset-left) + 105px))!important;width:min(31vw,290px)!important;min-height:34px!important;margin:0!important}
+  #gameHud.ff-hud-v1 #ffAbilityHud{position:absolute!important;top:38px!important;left:max(112px,calc(env(safe-area-inset-left) + 105px))!important;max-width:min(31vw,290px)!important}
+  #ffBossHud{width:min(44vw,370px);padding:5px 9px 6px;margin-top:0}
+}
