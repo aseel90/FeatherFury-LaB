@@ -91,6 +91,21 @@
     ctx.restore();
   }
 
+  function beginWorld1FlyAway(game) {
+    if (!game || game.activeWorld !== 0 || game.state !== 'BOSS_OUTRO' || !game.storyCompleted) return false;
+
+    game.state = 'FLY_AWAY';
+    game.storyCompleted = true;
+    game.__ffW1FlyAwayStarted = true;
+    if (game.__ffVictoryCine && typeof game.__ffVictoryCine === 'object') game.__ffVictoryCine.phase = 'fly-away';
+
+    // Leave the dialogue cleanly, then let the core FLY_AWAY motion finish the scene.
+    game.__ffW1OwlDialogueSceneV3 = null;
+    hideCinematicHud();
+    try { game.sound?.playWhoosh?.(); } catch (_) {}
+    return true;
+  }
+
   function install() {
     const game = window.game;
     if (!game || typeof game.update !== 'function' || typeof game.draw !== 'function' || typeof game.drawOwl !== 'function') return false;
@@ -120,8 +135,31 @@
         this.__ffW1OwlDialogueSceneV3 = null;
       }
 
+      if (this.activeWorld === 0 && this.state === 'FLY_AWAY' && this.owl && this.bird) {
+        // Fly out as one pair. The core moves both characters; this gentle join keeps
+        // the owl beside the selected bird instead of leaving a large gap between them.
+        const pairX = this.bird.x + 70;
+        const pairY = this.bird.y - 6;
+        this.owl.x += (pairX - this.owl.x) * 0.18;
+        this.owl.y += (pairY - this.owl.y) * 0.18;
+      }
+
       return result;
     };
+
+    const interceptOutroContinue = e => {
+      if (game.activeWorld !== 0 || game.state !== 'BOSS_OUTRO' || !game.storyCompleted) return;
+      e?.preventDefault?.();
+      e?.stopPropagation?.();
+      e?.stopImmediatePropagation?.();
+      beginWorld1FlyAway(game);
+    };
+    const interceptOutroKey = e => {
+      if (!['Space', 'ArrowUp', 'KeyW', 'Enter'].includes(e?.code)) return;
+      interceptOutroContinue(e);
+    };
+    document.addEventListener('pointerdown', interceptOutroContinue, true);
+    document.addEventListener('keydown', interceptOutroKey, true);
 
     const priorDraw = game.draw.bind(game);
     game.draw = function(...args) {
@@ -191,17 +229,19 @@
     if (priorReset) {
       game.reset = function(...args) {
         this.__ffW1OwlDialogueSceneV3 = null;
+        this.__ffW1FlyAwayStarted = false;
         return priorReset(...args);
       };
     }
 
     game.__ffW1OwlDialogueLayerFixV3Installed = true;
     window.__FF_W1_OWL_DIALOGUE_LAYER_FIX_V3__ = {
-      version: 'world1-owl-dialogue-layer-fix-v3',
+      version: 'world1-owl-dialogue-layer-fix-v3.2',
       fullSizeIntroRemoved: true,
       speakerScaleMode: 'fixed',
       backgroundScaleMode: 'fixed-through-fly-away',
       talkingAnimation: 'effects-only',
+      outroTransition: 'dialogue-to-fly-away-pair',
       layoutFor: getLayout
     };
     console.log('[FF-LAB] world1-owl-dialogue-layer-fix-v3-installed');

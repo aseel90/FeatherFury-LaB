@@ -14,6 +14,7 @@ This file records the single active runtime chain used by `main` after the Augus
 - World 1 background: `world1-cursed-woods-background-v3.js` + `world1-final-art-lock-v1.js`
 - World 1 boss art: `crow-king-ingame-v4.js`
 - World 1 obstacle art: `world1-cursed-obstacles-v5.js`
+- World 1 final ground/dialogue ownership: `world1-ground-obstacle-polish-v2.js` + `world1-owl-dialogue-layer-fix-v3.js`; the dialogue layer also owns the `BOSS_OUTRO → FLY_AWAY` transition
 - World 2 boss behavior: `w2-boss-runtime-v10.js`
 - World 2 boss final art: `w2-emperor-png-v5.js`
 - World 3 runtime cleanup: `w3-runtime-cleanup-v1.js`
@@ -26,6 +27,7 @@ This file records the single active runtime chain used by `main` after the Augus
 - `w2-v7-compat-v1.js`, `w2-boss-combat-v5.js`, `w2-boss-combat-v6.js`, `w2-boss-tuning-v8.js`, `w2-boss-phase2-relief-v9.js` — superseded by World 2 Runtime V10
 - `w3-critical-fix-v5.js` — superseded by V6 and the cleaned World 3 runtime
 - `startup-menu-guard-v1.js` — deleted; startup state is owned by `game.js`
+- `world1-ground-gap-polish-v1.js` — retired; its ground renderer duplicated `world1-ground-obstacle-polish-v2.js` and could repaint ground above the World 1 outro dialogue
 
 ## Permanent integrity gate
 `.github/workflows/repo-safety.yml` runs `scripts/runtime-integrity-check.js` on every push/PR to `main`. The gate rejects missing active owners, active/retired overlap, historical HTML/UI bootstrap loaders, invalid pause visibility ownership, and regressions that restore the fever bar or duplicate top boss HUD.

@@ -51,13 +51,16 @@ const requiredActive = [
 ];
 for (const file of requiredActive) if (!seen.has(file)) fail(`approved owner is not active: ${file}`);
 
+const requiredRetired = ['world1-ground-gap-polish-v1.js'];
+for (const file of requiredRetired) if (!retired.includes(file)) fail(`superseded runtime owner is not retired: ${file}`);
+
 const order = requiredActive.reduce((o, f) => (o[f] = active.findIndex(x => x.startsWith(f)), o), {});
 if (!(order['character-roster-v1.js'] < order['crow-king-ingame-v4.js'])) fail('character roster must load before final World 1 visual owners');
 if (!(order['crow-king-ingame-v4.js'] < order['world1-final-art-lock-v1.js'])) fail('Crow King V4 must load before the final World 1 art lock');
 
 if (/startup-menu-guard-v1\.js/.test(index)) fail('obsolete startup-menu-guard-v1.js is still loaded by index.html');
 if (/patch-manifest\.js|patch-runner\.js/.test(index)) fail('legacy patch runner/manifest boot path is still loaded by index.html');
-if (!/game\.js\?v=2\.4\.1/.test(index)) fail('index.html is not pinned to approved game.js v2.4.1');
+if (!/game\.js\?v=2\.4\.2/.test(index)) fail('index.html is not pinned to approved game.js v2.4.2');
 if (!/ui-splash-approved-v3\.css\?v=9/.test(index)) fail('approved splash CSS is not loaded');
 if (/cdn\.jsdelivr\.net\/gh\/aseel90\/FeatherFury-LaB@|fetch\(BASE/.test(index)) fail('index.html still bootstraps from a historical remote commit');
 const labUi = read('lab-ui.js');

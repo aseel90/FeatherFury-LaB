@@ -65,8 +65,7 @@
     'world1-cursed-obstacles-v5.js?v=2',
     'world1-final-art-lock-v1.js?v=4',
     'world1-ground-obstacle-polish-v2.js?v=4',
-    'world1-ground-gap-polish-v1.js?v=2',
-    'world1-owl-dialogue-layer-fix-v3.js?v=2'
+    'world1-owl-dialogue-layer-fix-v3.js?v=3'
   ];
 
   const RETIRED_PATCHES = [
@@ -78,11 +77,12 @@
     'w2-boss-combat-v6.js',
     'w2-boss-tuning-v8.js',
     'w2-boss-phase2-relief-v9.js',
-    'w3-critical-fix-v5.js'
+    'w3-critical-fix-v5.js',
+    'world1-ground-gap-polish-v1.js'
   ];
 
   window.__FF_RUNTIME_MAP__ = Object.freeze({
-    version: 'approved-runtime-v1',
+    version: 'approved-runtime-v1.1',
     core: CORE_RUNTIME,
     active: ACTIVE_PATCHES.slice(),
     retired: RETIRED_PATCHES.slice()
