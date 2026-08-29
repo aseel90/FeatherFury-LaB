@@ -124,6 +124,13 @@
 
       for (const src of corePatches) await loadScript(src);
 
+      // Lock the approved playable-character renderer before any final world renderer can
+      // capture or restore an older drawBirdSkin implementation.
+      if (!window.__FF_CHARACTER_ROSTER_V1__ || typeof window.drawBirdSkin !== 'function') {
+        throw new Error('approved character roster renderer did not initialize');
+      }
+      const approvedCharacterRenderer = window.drawBirdSkin;
+
       // Final World 2 image owner and outro/dialogue fixes.
       await loadScript('w2-emperor-png-v5.js?v=6');
       await awaitReady('__FF_W2_EMPEROR_PNG_V5_READY__');
@@ -142,10 +149,18 @@
       // Re-assert World 1's approved final renderers after every other world's owner has loaded.
       for (const src of finalWorld1Visuals) await loadScript(src);
 
+      // Character visuals must be the final owner of drawBirdSkin. World patches are allowed
+      // to wrap game.draw, but they must never put the legacy bird renderer back on screen.
+      window.drawBirdSkin = approvedCharacterRenderer;
+      window.__FF_CHARACTER_RENDER_LOCK__ = 'approved-roster-v1';
+      try { window.game?.updatePreview?.(); } catch (_) {}
+      try { window.game?.renderShop?.(); } catch (_) {}
+      try { window.FFStoreUI?.render?.(); } catch (_) {}
+
       window.__FF_PATCH_BOOTING__ = false;
       releaseBootstrapGate();
       window.__FF_RUNTIME_APPROVED_STACK__ = {
-        version: '2026-08-29-runtime-lock-1',
+        version: '2026-08-29-runtime-lock-2',
         world1: 'final-art-lock + crow-king-ingame-v4',
         world2: 'emperor-runtime-v10 + png-v5',
         world3: 'clean-runtime + png-environment'
