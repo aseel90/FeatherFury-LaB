@@ -3,11 +3,17 @@
   if (window.__FF_WORLD_SELECT_V1__) return;
 
   const THUMBS = [
-    'menu-bg-ruins.svg',
-    'menu-bg-ice.svg',
-    'menu-bg-storm.svg',
-    'menu-bg-volcano.svg'
+    'assets/ui/world-thumbnails/world-1.webp',
+    'assets/ui/world-thumbnails/world-2.webp',
+    'assets/ui/world-thumbnails/world-3.webp',
+    'assets/ui/world-thumbnails/world-4.webp'
   ];
+
+  THUMBS.forEach(src => {
+    const image = new Image();
+    image.decoding = 'async';
+    image.src = src;
+  });
 
   function ensureStructure() {
     const screen = document.getElementById('startScreen');
