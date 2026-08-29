@@ -21,11 +21,11 @@
     decorateLanguageButton();
   }
   function ensureButtonIcon(btn,file){
-    if(!btn)return; const label=[...btn.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim()||btn.textContent.trim();
+    if(!btn)return; if(btn.querySelector(`img.ff-btn-icon[src$="${file}"]`))return; const label=[...btn.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim()||btn.textContent.trim();
     btn.innerHTML='';const im=document.createElement('img');im.className='ff-btn-icon';im.src=A+file;im.alt='';const sp=document.createElement('span');sp.textContent=label;btn.append(im,sp);
   }
   function decorateLanguageButton(){
-    const b=document.getElementById('langToggleBtn'); if(!b)return; const label=txt(b).replace(/^\s+/,'') || 'Language';
+    const b=document.getElementById('langToggleBtn'); if(!b)return; if(b.querySelector('img.ff-btn-icon[src$="language.svg"]') && b.querySelector('span') && !b.querySelector('svg'))return; const label=txt(b).replace(/^\s+/,'') || 'Language';
     b.removeAttribute('style');b.innerHTML='';const im=document.createElement('img');im.className='ff-btn-icon';im.src=A+'language.svg';im.alt='';const sp=document.createElement('span');sp.textContent=label;b.append(im,sp);
   }
 
@@ -33,7 +33,7 @@
     const s=document.getElementById('leaderboardScreen'); if(!s)return;
     s.classList.add('ff-leaderboard-screen');s.removeAttribute('style');
     const h=s.querySelector('.shop-header h2');if(h)h.classList.add('ff-screen-heading');
-    const c=document.getElementById('closeLeaderboardBtn');if(c){c.removeAttribute('style');c.innerHTML=`<img src="${A}back.svg" alt="">`}
+    const c=document.getElementById('closeLeaderboardBtn');if(c){c.removeAttribute('style');if(!c.querySelector('img'))c.innerHTML=`<img src="${A}back.svg" alt="">`}
     const content=s.querySelector('.leaderboard-content');if(content)content.removeAttribute('style');
     s.querySelector('[data-i18n="leaderboardSubtitle"]')?.removeAttribute('style');
     const list=document.getElementById('leaderboardList');if(list)list.removeAttribute('style');
@@ -42,6 +42,7 @@
   function decorateRows(){
     const list=document.getElementById('leaderboardList');if(!list)return;
     [...list.children].forEach((li,index)=>{
+      if(li.classList.contains('ff-leader-row') && li.querySelector('.ff-rank-badge') && li.querySelector('.ff-score img'))return;
       const raw=li.textContent.replace(/⭐/g,'').trim();
       const spans=li.querySelectorAll(':scope > span');
       let left=spans[0]?.textContent.trim()||''; let score=(spans[1]?.textContent.match(/\d+/)||raw.match(/\d+(?=\s*$)/)||['0'])[0];
