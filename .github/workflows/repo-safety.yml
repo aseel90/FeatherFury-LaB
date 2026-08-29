@@ -35,6 +35,9 @@ jobs:
             node --check "$file"
           done
 
+      - name: Runtime ownership and boot integrity
+        run: node scripts/runtime-integrity-check.js
+
       - name: Critical file truncation guard
         shell: bash
         run: |
@@ -60,7 +63,6 @@ jobs:
           check_min_size "lab-ui.js" 700
           check_min_size "lab-ui.css" 5000
 
-          # lab-ui.js is intentionally a small loader; verify its loader marker instead of old bundle size.
           if ! grep -q "GOOD_UI" lab-ui.js; then
             echo "::error::lab-ui.js is missing the pinned full-UI loader marker"
             exit 1
