@@ -2,6 +2,8 @@
 
 This file is the first reference for any future change in `FeatherFury-LaB`.
 
+> **Canonical technical architecture:** read `FEATHER_FURY_GAME_SPEC.md` before changing runtime ownership, boot order, worlds, bosses, characters, persistence, UI ownership, or patch order. `GAME_PLAN.md` remains the design/approval history; when old file ownership in `GAME_PLAN.md` conflicts with the current loader/spec, the current loader and `FEATHER_FURY_GAME_SPEC.md` win for technical runtime facts.
+
 ## 1. Repository roles
 
 - `FeatherFury` = stable/production source. Do not modify unless explicitly approved.
@@ -122,7 +124,7 @@ If a core-file edit is required, protect the working version first and verify th
 
 ## 12. Approved-system lock / no re-experimenting
 
-`GAME_PLAN.md` is the product-development source of truth for systems that have already been approved.
+`GAME_PLAN.md` is the design/approval source of truth for systems that have already been approved. Current technical/runtime ownership is governed by `FEATHER_FURY_GAME_SPEC.md` and the actual loader/gates.
 
 When a visual/gameplay system is marked **APPROVED / LOCKED**:
 
@@ -136,6 +138,6 @@ When a visual/gameplay system is marked **APPROVED / LOCKED**:
 ### World 1 current lock
 
 - **Cursed Woods obstacles: APPROVED / LOCKED.** Keep `world1-cursed-obstacles-v5.js` and its image-based trimmed-asset + stable collision/movement approach. Do not redesign or replace it while polishing the background.
-- **Cursed Woods background renderer: APPROVED TECHNIQUE.** Continue using the existing Canvas 2D `drawRuinsBackground` patch path in `cursed-woods-v1.js`; no WebGL, DOM/CSS background layer, new engine, or parallel renderer for this task.
+- **Cursed Woods background renderer: APPROVED TECHNIQUE.** Continue using the active Canvas 2D `drawRuinsBackground` ownership in `world1-cursed-woods-background-v3.js` + `world1-final-art-lock-v1.js`; no WebGL, DOM/CSS background layer, new engine, or parallel renderer for this task. `cursed-woods-v1.js` is legacy/not active in the current loader.
 - **Current final task for World 1:** background visual polish only. Gameplay geometry, obstacles, collisions, bird behavior, HUD and boss systems are out of scope.
 - After the background is visually approved and regression-checked, mark **World 1 complete** and stop feature experimentation on it unless a specific bug is reported.
