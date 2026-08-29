@@ -67,7 +67,7 @@ for (let i = 1; i < depOrder.length; i++) {
 }
 
 for (const requiredId of [
-  'startScreen','previewBirdCanvas','startStoryBtn','settingsBtn','closeSettingsBtn','closeShopBtn','closeLeaderboardBtn','restartBtn','reviveBtn','shopBtnGameOver',
+  'htmlTag','startScreen','previewBirdCanvas','startStoryBtn','settingsBtn','closeSettingsBtn','closeShopBtn','closeLeaderboardBtn','restartBtn','reviveBtn','shopBtnGameOver',
   'sfxToggleBtn','gfxToggleBtn','langToggleBtn','shopTotalCoins','skinsGrid','endGameTitle','finalScore','highScore','earnedCoins','mainMenuBtn',
   'gameHud','settingsScreen','shopScreen','leaderboardScreen','resetDataBtn','startEndlessBtnGameOver','currentScoreDisplay','sessionCoinDisplay','stageDisplay','feverBarFill'
 ]) {
