@@ -17,7 +17,7 @@ const index = read('index.html');
 const runtimeDoc = read('RUNTIME_ACTIVE.md');
 
 const activeMatch = game.match(/const ACTIVE_PATCHES = \[([\s\S]*?)\n\s*\];/);
-const retiredMatch = game.match(/const RETIRED_PATCHES = new Set\(\[([\s\S]*?)\n\s*\]\);/);
+const retiredMatch = game.match(/const RETIRED_PATCHES = (?:new Set\()?\[([\s\S]*?)\n\s*\](?:\))?;/);
 if (!activeMatch) fail('ACTIVE_PATCHES block not found');
 if (!retiredMatch) fail('RETIRED_PATCHES block not found');
 
