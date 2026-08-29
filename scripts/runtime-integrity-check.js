@@ -69,7 +69,7 @@ for (let i = 1; i < depOrder.length; i++) {
 for (const requiredId of [
   'htmlTag','startScreen','startStoryBtn','startTotalCoins','leaderboardBtn','shopBtnStart','worldCard','previewBirdCanvas','activeSkinName',
   'sfxToggleBtn','gfxToggleBtn','langToggleBtn','shopTotalCoins','skinsGrid','endGameTitle','finalScore','highScore','earnedCoins','mainMenuBtn',
-  'gameHud','settingsScreen','shopScreen','leaderboardScreen'
+  'gameHud','settingsScreen','shopScreen','leaderboardScreen','resetDataBtn','startEndlessBtnGameOver','currentScoreDisplay','sessionCoinDisplay','stageDisplay','feverBarFill'
 ]) {
   const dq = `id=\"${requiredId}\"`;
   const sq = `id='${requiredId}'`;
@@ -77,7 +77,7 @@ for (const requiredId of [
 }
 
 for (const legacyDirect of ['lab-ui.js','ui-settings-leaderboard-v1.js','ui-store-v1.js','ui-main-menu-v3.js','ui-world-select-v1.js','ui-end-screens-v1.js','ui-hud-v1.js','ui-foundation-v1.js']) {
-  if (new RegExp(`<script[^>]+src=["']${legacyDirect.replace('.', '\\.')}[^"']*`, 'i').test(index)) fail(`UI patch must boot after runtime, not directly from index: ${legacyDirect}`);
+  if (new RegExp(`<script[^>]+src=[\"']${legacyDirect.replace('.', '\\\\.')}[^\"']*`, 'i').test(index)) fail(`UI patch must boot after runtime, not directly from index: ${legacyDirect}`);
 }
 
 const uiBoot = read('ui-runtime-boot-v1.js');
