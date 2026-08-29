@@ -19,7 +19,7 @@ This file records the single active runtime chain used by `main` after the Augus
 - World 2 boss behavior: `w2-boss-runtime-v10.js`
 - World 2 boss final art: `w2-emperor-png-v5.js`
 - World 3 runtime cleanup: `w3-runtime-cleanup-v1.js`
-- World 3 final enemies/environment: `w3-enemy-png-v1.js`, `w3-voltbat-png-v1.js`, `w3-enemy-png-v1.js`, `w3-environment-png-v1.js`
+- World 3 final enemies/environment: `w3-enemy-png-v1.js`, `w3-voltbat-png-v1.js`, `w3-environment-png-v1.js`
 
 ## Retired / not loaded
 - `boss-crowking-v1.js` — superseded by Crow King V4
