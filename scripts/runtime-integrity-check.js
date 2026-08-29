@@ -65,9 +65,28 @@ if (!/phase:\s*['"]approach['"]/.test(outroLayer) || !/phase:\s*['"]depart['"]/.
 
 if (/startup-menu-guard-v1\.js/.test(index)) fail('obsolete startup-menu-guard-v1.js is still loaded by index.html');
 if (/patch-manifest\.js|patch-runner\.js/.test(index)) fail('legacy patch runner/manifest boot path is still loaded by index.html');
-if (!/game\.js\?v=2\.4\.3/.test(index)) fail('index.html is not pinned to approved game.js v2.4.3');
-if (!/ui-splash-approved-v3\.css\?v=9/.test(index)) fail('approved splash CSS is not loaded');
+if (!/game\.js\?v=2\.4\.4/.test(index)) fail('index.html is not pinned to approved game.js v2.4.4');
+if (!/ui-splash-approved-v3\.css\?v=10/.test(index)) fail('approved splash CSS is not loaded');
+if (!/ui-splash-approved-v3\.js\?v=11/.test(index)) fail('approved splash JS is not pinned to v11');
 if (/cdn\.jsdelivr\.net\/gh\/aseel90\/FeatherFury-LaB@|fetch\(BASE/.test(index)) fail('index.html still bootstraps from a historical remote commit');
+
+const requiredDom = [
+  'class="top-bar"',
+  'class="start-main-content"',
+  'class="title-container"',
+  'class="worlds-carousel"',
+  'id="worldCard"',
+  'id="previewBirdCanvas"',
+  'id="sessionCoinDisplay"',
+  'id="currentScoreDisplay"',
+  'id="highScore"',
+  'id="earnedCoins"',
+  'id="sfxToggleBtn"',
+  'id="resetDataBtn"'
+];
+for (const token of requiredDom) if (!index.includes(token)) fail(`index.html is missing current UI DOM contract: ${token}`);
+if (!/id=['"]startStoryBtn['"]/.test(index)) fail('index.html is missing startStoryBtn');
+if (/class=['"][^'"]*menu-card|id=['"]startBtn['"]/.test(index)) fail('legacy main-menu DOM leaked into index.html');
 const labUi = read('lab-ui.js');
 if (!labUi.includes('FF_LAB_RUNTIME_SAFE')) fail('lab-ui.js is not the local safe helper');
 if (/cdn\.jsdelivr\.net|createElement\(['"]script['"]\)/.test(labUi)) fail('lab-ui.js still contains a remote/nested script loader');
