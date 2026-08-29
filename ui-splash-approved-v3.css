@@ -207,29 +207,42 @@ html.ff-approved-splash-active #gameHud{
   .ff-approved-loader{width:min(82vw,490px)}
 }
 
-@media(orientation:landscape) and (max-height:560px){
+@media(orientation:landscape){
   .ff-approved-bg{object-position:50% 52%}
+}
+
+@media(orientation:landscape) and (min-height:561px){
   .ff-approved-stage{
-    left:70%;
+    bottom:calc(max(env(safe-area-inset-bottom),0px) + clamp(116px,16vh,148px));
+  }
+}
+
+@media(orientation:landscape) and (max-height:560px){
+  .ff-approved-stage{
+    left:72%;
     top:calc(max(env(safe-area-inset-top),2px) + 1vh);
     bottom:calc(max(env(safe-area-inset-bottom),2px) + 1vh);
-    width:min(54vw,620px);
+    width:min(50vw,600px);
+    box-sizing:border-box;
+    padding-right:max(env(safe-area-inset-right),0px);
   }
-  .ff-approved-logo{width:min(34vw,360px);max-width:72%;max-height:28%}
-  .ff-approved-heroes{width:min(52vw,600px);max-height:75%;margin-top:-8px}
+  .ff-approved-logo{width:min(32vw,350px);max-width:72%;max-height:28%}
+  .ff-approved-heroes{width:min(48vw,580px);max-height:75%;margin-top:-8px}
   .ff-approved-loader{
-    left:25%;
+    left:24%;
     bottom:calc(max(env(safe-area-inset-bottom),4px) + 6vh);
-    width:min(42vw,430px);
+    width:min(38vw,410px);
+    box-sizing:border-box;
+    padding-left:max(env(safe-area-inset-left),0px);
   }
   .ff-approved-status{font-size:clamp(12px,2.4vw,17px)}
 }
 
 @media(orientation:landscape) and (max-height:390px){
-  .ff-approved-stage{left:70%;top:2px;bottom:2px;width:53vw}
-  .ff-approved-logo{max-height:26%;width:31vw}
-  .ff-approved-heroes{max-height:76%;width:51vw;margin-top:-6px}
-  .ff-approved-loader{left:24%;bottom:calc(max(env(safe-area-inset-bottom),2px) + 3vh);width:40vw}
+  .ff-approved-stage{left:72%;top:2px;bottom:2px;width:50vw}
+  .ff-approved-logo{max-height:26%;width:30vw}
+  .ff-approved-heroes{max-height:76%;width:47vw;margin-top:-6px}
+  .ff-approved-loader{left:24%;bottom:calc(max(env(safe-area-inset-bottom),2px) + 3vh);width:38vw}
   .ff-approved-status{margin-bottom:4px;font-size:12px}
   .ff-approved-track{height:15px}
   .ff-approved-percent{margin-top:4px;font-size:9px}
