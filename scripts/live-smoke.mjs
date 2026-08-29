@@ -56,6 +56,21 @@ const readState = () => page.evaluate(() => {
     birdButton: !!document.querySelector('#startScreen .ff-bird-avatar-btn'),
     previewInk,
     pauseVisible: document.getElementById('ffPauseOverlay')?.classList.contains('show') || false,
+    pauseButtonVisible: visible(document.getElementById('ffPauseBtn')),
+    hudLayout: (() => {
+      const rect = idOrEl => {
+        const el = typeof idOrEl === 'string' ? document.querySelector(idOrEl) : idOrEl;
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return { left:r.left, right:r.right, top:r.top, bottom:r.bottom, width:r.width, height:r.height };
+      };
+      return {
+        coin: rect('#gameHud .hud-coin-badge'),
+        score: rect('#gameHud .score-container'),
+        pause: rect('#ffPauseBtn'),
+        ability: rect('#ffAbilityHud')
+      };
+    })(),
     gameState: window.game?.state || null,
     currentWorld: window.game?.currentWorldIndex ?? null,
     splashPresent: !!document.getElementById('ffApprovedBootSplash'),
@@ -75,8 +90,34 @@ try {
 
   await page.locator('#startStoryBtn').click({ timeout: 5_000 });
   await page.waitForFunction(() => ['STORY','PLAYING'].includes(window.game?.state), null, { timeout: 10_000 });
+  await page.waitForFunction(() => {
+    const btn = document.getElementById('ffPauseBtn');
+    return !!btn && btn.classList.contains('show') && getComputedStyle(btn).display !== 'none';
+  }, null, { timeout: 8_000 });
+
   const afterPlay = await readState();
   if (afterPlay.startActive || afterPlay.gameState === 'MENU') throw new Error(`PLAY did not leave menu: ${JSON.stringify(afterPlay)}`);
+  if (!afterPlay.pauseButtonVisible) throw new Error(`Pause button is missing after PLAY: ${JSON.stringify(afterPlay)}`);
+
+  const { coin, score, pause, ability } = afterPlay.hudLayout || {};
+  if (!coin || !score || !pause) throw new Error(`HUD row is incomplete: ${JSON.stringify(afterPlay.hudLayout)}`);
+  const topDelta = Math.max(coin.top, score.top, pause.top) - Math.min(coin.top, score.top, pause.top);
+  if (!(coin.right < score.left && score.right < pause.left) || topDelta > 16) {
+    throw new Error(`HUD row alignment failed: ${JSON.stringify(afterPlay.hudLayout)}`);
+  }
+  if (ability && ability.top < Math.max(coin.bottom, score.bottom, pause.bottom) - 2) {
+    throw new Error(`Ability chip overlaps top HUD: ${JSON.stringify(afterPlay.hudLayout)}`);
+  }
+
+  await page.locator('#ffPauseBtn').click({ timeout: 5_000 });
+  await page.waitForFunction(() => document.getElementById('ffPauseOverlay')?.classList.contains('show'), null, { timeout: 5_000 });
+  const paused = await readState();
+  if (!paused.pauseVisible) throw new Error(`Pause overlay did not open: ${JSON.stringify(paused)}`);
+  const resume = page.locator('#ffPauseOverlay [data-action="resume"]');
+  if (await resume.count()) {
+    await resume.click({ timeout: 5_000 });
+    await page.waitForFunction(() => !document.getElementById('ffPauseOverlay')?.classList.contains('show'), null, { timeout: 5_000 });
+  }
 
   const criticalEvents = events.filter(e => e.type === 'pageerror' || e.type === 'requestfailed' || /approved runtime boot failed|clean stable runtime failed|post-runtime UI boot failed/i.test(e.text));
   if (criticalEvents.length) throw new Error(`Critical browser events: ${JSON.stringify(criticalEvents.slice(-20))}`);

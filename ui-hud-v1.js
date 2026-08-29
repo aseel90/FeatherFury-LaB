@@ -31,17 +31,19 @@
     const hud = document.getElementById('gameHud');
     if (!hud) return null;
     hud.classList.add('ff-hud-v1');
+    hud.dataset.ffHudContract = 'v4';
 
+    const top = hud.querySelector('.hud-top');
     const coin = hud.querySelector('.hud-coin-badge');
     addImg(coin, 'ff-hud-coin-icon', ICONS.coin, true);
 
     const pause = document.getElementById('ffPauseBtn');
-    const top = hud.querySelector('.hud-top');
-    if (pause) {
-      if (top && pause.parentElement !== top) top.appendChild(pause);
+    if (pause && top) {
+      if (pause.parentElement !== top) top.appendChild(pause);
       pause.classList.add('ff-hud-pause-v1');
-      if (!pause.querySelector('img')) pause.innerHTML = `<img src="${ICONS.pause}" alt="" aria-hidden="true">`;
+      pause.innerHTML = `<img src="${ICONS.pause}" alt="" aria-hidden="true">`;
       pause.setAttribute('aria-label', game?.lang === 'en' ? 'Pause' : 'إيقاف مؤقت');
+      pause.dataset.ffHudPause = 'v4';
     }
 
     removeRetiredHud();
@@ -57,7 +59,7 @@
     let lastLang = game.lang;
     let last = 0;
     const tick = now => {
-      if (now - last > 250) {
+      if (now - last > 180) {
         last = now;
         ensureHud(game);
         if (game.lang !== lastLang) {
@@ -71,18 +73,20 @@
     requestAnimationFrame(tick);
 
     window.__FF_UI_HUD_V1__ = {
-      version: 'ui-hud-v1.2',
+      version: 'ui-hud-v1.4',
+      layout: 'coins-score-pause',
+      pauseInHudRow: true,
       feverBar: false,
       duplicateBossBar: false
     };
-    console.log('[FF-LAB] ui-hud-v1.2-installed');
+    console.log('[FF-LAB] ui-hud-v1.4-installed');
     return true;
   }
 
   let tries = 0;
   const timer = setInterval(() => {
     tries += 1;
-    if (install() || tries > 200) clearInterval(timer);
+    if (install() || tries > 260) clearInterval(timer);
   }, 75);
   setTimeout(install, 1400);
 })();

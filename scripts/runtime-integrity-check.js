@@ -70,14 +70,14 @@ if (!/ui-splash-approved-v3\.css\?v=1/.test(index)) fail('approved splash CSS is
 if (!/ui-splash-approved-v3\.js\?v=12/.test(index)) fail('approved splash JS is not pinned to v12');
 if (/cdn\.jsdelivr\.net\/gh\/aseel90\/FeatherFury-LaB@|fetch\(BASE/.test(index)) fail('index.html still bootstraps from a historical remote commit');
 
-if (!/ui-runtime-boot-v1\.js\?v=1/.test(index)) fail('post-runtime UI boot loader is not active');
+if (!/ui-runtime-boot-v1\.js\?v=2/.test(index)) fail('post-runtime UI boot loader is not active');
 if (/ui-main-menu-v2\.js/.test(index)) fail('retired main-menu V2 JS is still loaded directly');
 for (const legacyDirect of ['lab-ui.js','ui-settings-leaderboard-v1.js','ui-store-v1.js','ui-main-menu-v3.js','ui-world-select-v1.js','ui-end-screens-v1.js','ui-hud-v1.js','ui-foundation-v1.js']) {
   const re = new RegExp(`<script[^>]+src=["']${legacyDirect.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}`);
   if (re.test(index)) fail(`runtime-dependent UI is still loaded directly by index.html: ${legacyDirect}`);
 }
 const uiBoot = read('ui-runtime-boot-v1.js');
-for (const token of ['__FF_RUNTIME_APPROVED_STACK__','__FF_MENU_UI_READY__','ui-world-select-v1.js?v=8','ui-main-menu-v3.js?v=5']) {
+for (const token of ['__FF_RUNTIME_APPROVED_STACK__','__FF_MENU_UI_READY__','ui-world-select-v1.js?v=8','ui-main-menu-v3.js?v=5','core-gameplay-ux-v1.js?v=2','ui-hud-v1.js?v=4']) {
   if (!uiBoot.includes(token)) fail(`ui-runtime-boot-v1.js is missing menu boot contract: ${token}`);
 }
 const splashJs = read('ui-splash-approved-v3.js');
@@ -104,7 +104,7 @@ const requiredDom = [
 ];
 for (const token of requiredDom) if (!index.includes(token)) fail(`index.html is missing current UI DOM contract: ${token}`);
 for (const compatId of ['htmlTag','startTotalCoins','leaderboardBtn','shopBtnStart']) {
-  if (!new RegExp(`id=[\"']${compatId}[\"']`).test(index)) fail(`legacy core compatibility hook missing: ${compatId}`);
+  if (!new RegExp(`id=["']${compatId}["']`).test(index)) fail(`legacy core compatibility hook missing: ${compatId}`);
 }
 if (!/id=['"]startStoryBtn['"]/.test(index)) fail('index.html is missing startStoryBtn');
 if (/class=['"][^'"]*menu-card|id=['"]startBtn['"]/.test(index)) fail('legacy main-menu DOM leaked into index.html');
@@ -118,6 +118,9 @@ if (hidden < 0 || shown < hidden) fail('pause visibility lock is missing or orde
 
 const hud = read('ui-hud-v1.css');
 if (!/\.fever-bar-container[\s\S]*#ffBossHud[\s\S]*display:none\s*!important/.test(hud)) fail('HUD must hide fever bar and duplicate top boss HUD');
+if (!/grid-template-columns:76px minmax\(96px,118px\) 42px/.test(hud)) fail('HUD top row contract is missing');
+const uiHudJs = read('ui-hud-v1.js');
+if (!/pauseInHudRow:\s*true/.test(uiHudJs)) fail('HUD pause ownership marker is missing');
 
 const markerChecks = [
   ['character-roster-v1.js', '__FF_CHARACTER_ROSTER_V1__'],
