@@ -32,6 +32,31 @@
     window.game?.renderShop?.();
   };
 
+  const syncBirdButtonToSettings = (btn, settings) => {
+    if (!btn || !settings) return;
+    const sync = () => {
+      const rect = settings.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const cs = getComputedStyle(settings);
+      const w = `${rect.width}px`, h = `${rect.height}px`;
+      for (const prop of ['width','min-width','max-width','flex-basis']) btn.style.setProperty(prop, w, 'important');
+      for (const prop of ['height','min-height','max-height']) btn.style.setProperty(prop, h, 'important');
+      btn.style.setProperty('border-radius', cs.borderRadius, 'important');
+      btn.style.setProperty('border', cs.border, 'important');
+      btn.style.setProperty('background', cs.background, 'important');
+      btn.style.setProperty('box-shadow', cs.boxShadow, 'important');
+      btn.style.setProperty('padding', '0', 'important');
+      btn.style.setProperty('margin', '0', 'important');
+      btn.style.setProperty('box-sizing', 'border-box', 'important');
+    };
+    requestAnimationFrame(sync);
+    setTimeout(sync, 80);
+    if (!btn.__ffSizeObserver && window.ResizeObserver) {
+      btn.__ffSizeObserver = new ResizeObserver(sync);
+      btn.__ffSizeObserver.observe(settings);
+    }
+  };
+
   const attachBirdAvatar = (screen, topBar) => {
     const settings = document.getElementById('settingsBtn');
     if (!settings || !topBar) return null;
@@ -70,6 +95,7 @@
       fallback.setAttribute('aria-hidden','true');
       btn.append(fallback);
     }
+    syncBirdButtonToSettings(btn, settings);
     return btn;
   };
 
