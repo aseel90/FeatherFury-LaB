@@ -14,16 +14,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install image tools
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y imagemagick webp
       - name: Upscale and sharpen world thumbnails
         shell: bash
         run: |
           set -e
-          # One-time visual quality lift for the portrait world cards.
           for f in assets/ui/world-thumbnails/world-*.webp; do
             tmp="${f%.webp}.hq.webp"
-            ffmpeg -y -loglevel error -i "$f" \
-              -vf "scale=720:480:flags=lanczos,unsharp=5:5:0.55:5:5:0" \
-              -c:v libwebp -quality 88 "$tmp"
+            convert "$f" -filter Lanczos -resize 720x480! -unsharp 0x0.75+0.65+0.02 -quality 88 "$tmp"
             mv "$tmp" "$f"
           done
       - name: Commit upgraded thumbnails
