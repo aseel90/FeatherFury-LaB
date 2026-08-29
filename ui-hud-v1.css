@@ -15,6 +15,10 @@ html body #gameHud.ff-hud-v1 .hud-top{
   left:max(calc(env(safe-area-inset-left) + 12px),12px)!important;
   right:max(calc(env(safe-area-inset-right) + 12px),12px)!important;
   height:44px!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
   margin:0!important;
   padding:0!important;
   display:grid!important;

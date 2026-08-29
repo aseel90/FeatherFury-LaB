@@ -54,7 +54,7 @@ if (!/ui-runtime-boot-v1\.js\?v=6/.test(index)) fail('post-runtime UI boot loade
 if (!/<div class="game-wrapper"><div id="app" class="game-container"/.test(index)) fail('stable game wrapper/container contract is missing');
 if (!/id="startScreen" class="overlay-screen active"/.test(index)) fail('startScreen must remain an active overlay screen');
 if (!/ui-world-select-v1\.css\?v=7/.test(index)) fail('index.html is not pinned to Safari-safe world select CSS v7');
-if (!/ui-hud-v1\.css\?v=5/.test(index)) fail('index.html is not pinned to current HUD CSS release');
+if (!/ui-hud-v1\.css\?v=6/.test(index)) fail('index.html is not pinned to current HUD CSS release');
 if (!/ui-splash-approved-v3\.js\?v=12/.test(index)) fail('approved loading splash script is not active');
 if (!/js\/config\.js\?v=2\.3\.4/.test(index)) fail('core config dependency is missing or misordered');
 if (!/js\/audio\.js\?v=2\.3\.2/.test(index)) fail('core audio dependency is missing or misordered');
@@ -94,6 +94,7 @@ if (!/html body #ffPauseOverlay\.show\s*\{[^}]*display\s*:\s*flex\s*!important/i
 const hud = read('ui-hud-v1.css');
 if (!/#ffPauseBtn\.ff-hud-pause-v1/.test(hud)) fail('current HUD must own pause button layout');
 if (!/\.hud-top\s*\{[^}]*grid-template-columns:76px minmax\(96px,118px\) 42px/i.test(hud)) fail('HUD top row must be the approved 76px / flexible score / 42px pause layout');
+if (!/\.hud-top\s*\{[^}]*width:auto\s*!important/i.test(hud)) fail('HUD top row must use auto width so left/right viewport insets bound the row');
 if (!/fever-bar-container[^}]*display\s*:\s*none\s*!important/i.test(hud)) fail('retired fever bar must stay hidden');
 if (!/#ffBossHud[^}]*display\s*:\s*none\s*!important/i.test(hud)) fail('duplicate boss HUD must stay hidden');
 
