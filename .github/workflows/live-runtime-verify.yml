@@ -106,3 +106,60 @@ jobs:
           if [ -n "$ISSUE" ]; then
             gh issue close "$ISSUE" --repo "$REPO" --comment "Live runtime recovered on \`$SHA\`: Loading → complete World Select → PLAY passed with no critical browser/runtime errors."
           fi
+
+      - name: Report live verification status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '[LIVE VERIFY] Runtime Status';
+            const sha = '${{ steps.meta.outputs.sha }}';
+            const outcome = '${{ steps.smoke.outcome }}';
+            const ok = outcome === 'success';
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = [
+              `Status: **${ok ? 'SUCCESS' : 'FAILURE'}**`,
+              '',
+              `Deployed commit: \`${sha}\``,
+              `Run: ${runUrl}`,
+              '',
+              'Browsers:',
+              '- Chromium mobile',
+              '- WebKit iPhone',
+              '',
+              ok
+                ? 'Loading → complete World Select → PLAY and the canonical navigation smoke checks passed on the deployed GitHub Pages build.'
+                : 'The deployed build did not pass the complete live browser smoke contract. See the run diagnostics and the open deployment failure issue.'
+            ].join('\n');
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'all',
+              per_page: 100
+            });
+            const existing = issues.find(i => !i.pull_request && i.title === title);
+            if (existing) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                title,
+                body,
+                state: ok ? 'closed' : 'open'
+              });
+            } else {
+              const created = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body
+              });
+              if (ok) {
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: created.data.number,
+                  state: 'closed'
+                });
+              }
+            }
