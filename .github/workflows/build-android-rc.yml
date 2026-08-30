@@ -1,0 +1,122 @@
+name: Build Android Release Candidate
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - package.json
+      - capacitor.config.json
+      - android-native-v1.js
+      - scripts/materialize-core.js
+      - .github/workflows/build-android-rc.yml
+
+permissions:
+  contents: read
+
+jobs:
+  android-rc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Android SDK 36
+        uses: android-actions/setup-android@v3
+      - run: yes | sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Install Capacitor dependencies
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+          npx cap --version
+
+      - name: Materialize offline game core for native package
+        run: |
+          node scripts/materialize-core.js
+          test -s game-core-stable-v1.js
+          ! grep -Eq 'cdn\.jsdelivr\.net|https?://' game-core-stable-v1.js
+          node --check game-core-stable-v1.js
+          node --check game.js
+          node --check android-native-v1.js
+
+      - name: Prepare clean native web bundle
+        run: |
+          rm -rf www android
+          mkdir -p www
+          rsync -a ./ www/ \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='android/' \
+            --exclude='www/' \
+            --exclude='node_modules/' \
+            --exclude='scripts/' \
+            --exclude='*.md' \
+            --exclude='diff.txt' \
+            --exclude='fix.py' \
+            --exclude='reconstruct_w3.py' \
+            --exclude='last_edit.jsonl' \
+            --exclude='character-lab-v2.html' \
+            --exclude='character-preview-simple.html' \
+            --exclude='characters-preview.html' \
+            --exclude='cursed-obstacle-lab.html' \
+            --exclude='package.json' \
+            --exclude='package-lock.json' \
+            --exclude='capacitor.config.json'
+          test -f www/game-core-stable-v1.js
+          test -f www/android-native-v1.js
+
+      - name: Create Android project and sync plugins
+        run: |
+          npx cap add android
+          npx cap sync android
+
+      - name: Verify Android 16 target and App plugin
+        run: |
+          grep -R "compileSdkVersion = 36\|compileSdk 36\|compileSdk = 36" android/variables.gradle android/app/build.gradle android/build.gradle
+          grep -R "targetSdkVersion = 36\|targetSdk 36\|targetSdk = 36" android/variables.gradle android/app/build.gradle android/build.gradle
+          grep -R "capacitor-app" android/app/capacitor.build.gradle android/capacitor.settings.gradle
+
+      - name: Generate launcher icon densities
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+          declare -A S=( [mdpi]=48 [hdpi]=72 [xhdpi]=96 [xxhdpi]=144 [xxxhdpi]=192 )
+          for d in "${!S[@]}"; do
+            mkdir -p "android/app/src/main/res/mipmap-$d"
+            convert icon.png -resize "${S[$d]}x${S[$d]}" "android/app/src/main/res/mipmap-$d/ic_launcher.png"
+            convert icon.png -resize "${S[$d]}x${S[$d]}" "android/app/src/main/res/mipmap-$d/ic_launcher_round.png"
+          done
+
+      - name: Build debug APK and unsigned release AAB
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug bundleRelease --stacktrace
+
+      - name: Package RC artifacts
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk FeatherFury-RC-debug.apk
+          cp android/app/build/outputs/bundle/release/app-release.aab FeatherFury-RC-unsigned.aab
+
+      - name: Upload Android RC artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: FeatherFury-Android-RC
+          if-no-files-found: error
+          path: |
+            FeatherFury-RC-debug.apk
+            FeatherFury-RC-unsigned.aab

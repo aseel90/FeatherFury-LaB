@@ -1,6 +1,6 @@
 {
   "appId": "com.aseel.featherfury",
-  "appName": "Feather Hero",
+  "appName": "Feather Fury",
   "webDir": "www",
-  "bundledWebRuntime": false
+  "backgroundColor": "#07111f"
 }

@@ -1,48 +1,33 @@
 (() => {
   'use strict';
   if (window.__FF_RUNTIME_FIXES_V1__) return;
+  window.__FF_RUNTIME_FIXES_V1__ = true;
 
-  function setText(id, value) {
-    const el = document.getElementById(id);
-    const next = String(value ?? '');
-    if (el && el.textContent !== next) el.textContent = next;
-  }
+  const text = (id) => document.getElementById(id)?.textContent?.trim() || '';
+  const setText = (id, value) => {
+    const node = document.getElementById(id);
+    if (node && node.textContent !== String(value)) node.textContent = String(value);
+  };
+  const pct = (value) => Math.max(0, Math.min(100, Number(value) || 0));
 
   function installPauseGuard(game) {
-    if (!game || game.__ffFinalPauseGuardV1 || typeof game.update !== 'function') return false;
-    const finalUpdate = game.update.bind(game);
-    game.__ffFinalPauseUpdateBase = finalUpdate;
-    game.update = function(...args) {
+    if (!game || game.__ffFinalPauseGuardV1 || typeof game.update !== 'function') return;
+    const baseUpdate = game.update.bind(game);
+    game.update = function ffFinalPauseUpdateGuard(...args) {
       if (this.__ffPaused) return;
-      return finalUpdate(...args);
+      return baseUpdate(...args);
     };
     game.__ffFinalPauseGuardV1 = true;
-
-    const overlay = document.getElementById('ffPauseOverlay');
-    if (overlay && !overlay.__ffPauseInputGuardV1) {
-      overlay.addEventListener('pointerdown', e => e.stopPropagation(), true);
-      overlay.__ffPauseInputGuardV1 = true;
-    }
-    return true;
   }
 
   function installNavigationContract(game) {
-    if (!game || game.__ffNavigationContractV1) return !!game;
-
-    const ROUTES = Object.freeze({
-      MAIN:'MAIN', GAMEPLAY:'GAMEPLAY', PAUSE:'PAUSE', SETTINGS:'SETTINGS', STORE:'STORE', END:'END', LEADERBOARD:'LEADERBOARD'
-    });
-    const nav = {
-      version:'1.0.0',
-      route:'MAIN',
-      returnStack:[],
-      lastEndKind:'defeat'
-    };
-
+    if (!game || game.__ffNavigationContractV1) return true;
+    const ROUTES = Object.freeze({ MAIN:'MAIN', GAMEPLAY:'GAMEPLAY', PAUSE:'PAUSE', SETTINGS:'SETTINGS', STORE:'STORE', END:'END', LEADERBOARD:'LEADERBOARD' });
+    const nav = { route:ROUTES.MAIN, returnStack:[] };
     const el = id => document.getElementById(id);
     const visible = id => {
       const node = el(id);
-      return !!node && node.classList.contains('active') && !node.classList.contains('hidden');
+      return !!node && !node.classList.contains('hidden') && getComputedStyle(node).display !== 'none';
     };
     const show = id => {
       const node = el(id);
@@ -250,6 +235,8 @@
     nav.routes = ROUTES;
     nav.goMain = goMain;
     nav.back = back;
+    nav.showPause = showPauseRoute;
+    nav.resumeGameplay = resumeGameplay;
     nav.openSettings = openSettings;
     nav.openStore = openStore;
     nav.restartCurrentRun = restartCurrentRun;
@@ -268,57 +255,71 @@
     if (stage) setText('stageName', stage);
     setText('feverText', game.lang === 'en' ? 'FEVER' : 'الحمّى');
 
-    const container = document.querySelector('#gameHud .fever-bar-container');
+    const fever = pct(game.fever);
     const fill = document.getElementById('feverFill');
-    if (!container || !fill) return;
-    container.hidden = false;
-    container.removeAttribute('aria-hidden');
+    if (fill) fill.style.width = `${fever}%`;
+  }
 
-    const cfg = window.CONFIG || {};
-    const maxFever = game.activeWorld === 2 ? 150 : (game.activeWorld === 1 ? 120 : Number(cfg.FEVER_MAX || 100));
-    const duration = game.activeSkin === 'falcon'
-      ? Math.round(Number(cfg.FEVER_DURATION || 360) * 1.25)
-      : Number(cfg.FEVER_DURATION || 360);
-    const pct = game.feverActive
-      ? (Number(game.feverTimer || 0) / Math.max(1, duration)) * 100
-      : (Number(game.fever || 0) / Math.max(1, maxFever)) * 100;
-    const clamped = Math.max(0, Math.min(100, pct));
-    fill.style.width = `${clamped}%`;
-    fill.classList.toggle('max', !!game.feverActive || clamped >= 99.5);
+  function bridgeLegacyDisplays() {
+    const pairs = [
+      ['sessionCoinDisplay', 'runCoins'],
+      ['currentScoreDisplay', 'scoreValue'],
+      ['stageDisplay', 'stageName']
+    ];
+    for (const [legacyId, visibleId] of pairs) {
+      const legacy = document.getElementById(legacyId);
+      const visible = document.getElementById(visibleId);
+      if (!legacy || !visible || legacy.__ffBridgeObserver) continue;
+      const sync = () => { if (legacy.textContent !== visible.textContent) visible.textContent = legacy.textContent; };
+      const observer = new MutationObserver(sync);
+      observer.observe(legacy, { childList:true, characterData:true, subtree:true });
+      legacy.__ffBridgeObserver = observer;
+      sync();
+    }
+  }
+
+  function fixPauseButtonPlacement() {
+    const btn = document.getElementById('ffPauseBtn');
+    const top = document.querySelector('#gameHud .hud-top');
+    if (btn && top && btn.parentElement !== top) top.appendChild(btn);
+  }
+
+  function ensureFever() {
+    const box = document.querySelector('#gameHud .fever-bar-container');
+    if (!box) return;
+    box.classList.remove('hidden');
+    box.removeAttribute('hidden');
   }
 
   function install() {
     const game = window.game;
-    if (!game || window.__FF_RUNTIME_APPROVED_STACK__ !== true) return false;
+    if (!game) return false;
     installPauseGuard(game);
     installNavigationContract(game);
-
-    let last = 0;
-    const tick = now => {
-      if (now - last >= 80) {
-        last = now;
-        syncHudData(game);
-      }
-      requestAnimationFrame(tick);
-    };
+    bridgeLegacyDisplays();
+    fixPauseButtonPlacement();
+    ensureFever();
     syncHudData(game);
-    requestAnimationFrame(tick);
-
-    window.__FF_RUNTIME_FIXES_V1__ = Object.freeze({
-      version: '1.1.0',
-      pauseSimulationFreeze: true,
-      hudDataBridge: true,
-      feverRestored: true,
-      rtlHudPinned: true,
-      navigationContract: true
-    });
-    console.log('[FeatherFury] runtime fixes v1 installed');
     return true;
   }
 
-  let tries = 0;
   const timer = setInterval(() => {
-    tries += 1;
-    if (install() || tries > 240) clearInterval(timer);
-  }, 50);
+    if (!install()) return;
+    const game = window.game;
+    syncHudData(game);
+    fixPauseButtonPlacement();
+    ensureFever();
+  }, 120);
+
+  window.addEventListener('beforeunload', () => clearInterval(timer), { once:true });
+  window.__FF_RUNTIME_FIXES_V1_READY__ = true;
+  window.__FF_RUNTIME_FIXES_V1_INFO__ = Object.freeze({
+    version: '1.2.0',
+    pauseSimulationFreeze: true,
+    navigationContract: true,
+    hudDataBridge: true,
+    feverRestored: true,
+    rtlHudDirectionFixed: true
+  });
+  console.log('[FeatherFury] runtime fixes v1 installed');
 })();

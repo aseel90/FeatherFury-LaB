@@ -3,14 +3,13 @@ name: Materialize Local Game Core
 on:
   push:
     branches: [main]
-    paths:
-      - scripts/materialize-core-trigger.txt
 
 permissions:
   contents: write
 
 jobs:
   materialize:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
