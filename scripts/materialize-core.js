@@ -25,6 +25,11 @@ vm.createContext(sandbox);
 vm.runInContext(wrapper, sandbox, { filename: 'stable-runtime-w3-clean-v1.js' });
 if (!captured) throw new Error('Failed to capture transformed core runtime');
 captured = captured.replace(/\n\/\/# sourceURL=ff-stable-runtime-w3-clean-v1\.js\s*$/, '\n');
+captured = captured
+  .split('\n')
+  .map(line => line.replace(/[ \t]+$/, ''))
+  .join('\n')
+  .replace(/\n*$/, '\n');
 fs.writeFileSync(CORE_FILE, captured);
 
 let loader = fs.readFileSync('game.js', 'utf8');
