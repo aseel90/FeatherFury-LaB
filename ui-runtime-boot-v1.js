@@ -11,7 +11,8 @@
     'ui-world-select-v1.js?v=8',
     'ui-main-menu-v3.js?v=5',
     'ui-end-screens-v1.js?v=1',
-    'ui-hud-v1.js?v=5'
+    'ui-hud-v1.js?v=5',
+    'ui-runtime-fixes-v1.js?v=1'
   ];
 
   const waitFor = (test, timeout = 60000, label = 'condition') => {
