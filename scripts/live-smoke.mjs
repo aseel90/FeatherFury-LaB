@@ -74,6 +74,14 @@ const readState = () => page.evaluate(() => {
     playDisabled: !!document.getElementById('startStoryBtn')?.disabled,
     worldThumb: thumb ? getComputedStyle(thumb).backgroundImage : null,
     worldKicker: document.querySelector('#worldCard .ff-world-kicker')?.textContent?.trim() || null,
+    worldStars: (() => {
+      const imgs = [...document.querySelectorAll('#worldStars img.ff-star-icon')];
+      return {
+        total: imgs.length,
+        filled: imgs.filter(img => (img.getAttribute('src') || '').includes('star-filled')).length,
+        empty: imgs.filter(img => (img.getAttribute('src') || '').includes('star-empty')).length
+      };
+    })(),
     coinIcon: !!document.querySelector('#startScreen .ff-coin-icon'),
     birdButton: !!document.querySelector('#startScreen .ff-bird-avatar-btn'),
     previewInk,
@@ -143,6 +151,9 @@ try {
   const badMenu = !menu.startVisible || !menu.startActive || !menu.logoVisible || !menu.worldCardVisible || !menu.playVisible || menu.playDisabled ||
     !menu.worldThumb?.includes('world-1.webp') || !menu.worldKicker || !menu.coinIcon || !menu.birdButton || !menu.previewInk || menu.pauseVisible;
   if (badMenu) throw new Error(`Main menu contract failed: ${JSON.stringify(menu)}`);
+  if (menu.worldStars?.total !== 3 || menu.worldStars?.filled !== 0 || menu.worldStars?.empty !== 3) {
+    throw new Error(`Fresh-profile world stars must start empty: ${JSON.stringify(menu.worldStars)}`);
+  }
   const worldPlayGap = (menu.menuRects?.play?.top ?? 0) - (menu.menuRects?.card?.bottom ?? 0);
   if (worldPlayGap < 10) throw new Error(`World/PLAY spacing collapsed (${worldPlayGap}px): ${JSON.stringify(menu.menuRects)}`);
   if (menu.storeBalanceStyle?.display !== 'flex' || !/Press Start 2P/i.test(menu.storeBalanceStyle?.fontFamily || '')) {
