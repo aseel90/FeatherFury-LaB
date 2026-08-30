@@ -6,7 +6,7 @@ const cp = require('child_process');
 const BASE_COMMIT = '5b83840d68ad65939b8efae336afd76c47b7bdc1';
 const CORE_FILE = 'game-core-stable-v1.js';
 const CORE_VERSION = 'game-core-stable-v1.js?v=1';
-const LOADER_VERSION = '2.4.9';
+const LOADER_VERSION = '2.5.0';
 
 const base = cp.execFileSync('git', ['show', `${BASE_COMMIT}:game.js`], {
   encoding: 'utf8',
@@ -43,7 +43,7 @@ if (!loader.includes("'stable-runtime-w3-clean-v1.js'")) {
 fs.writeFileSync('game.js', loader);
 
 let index = fs.readFileSync('index.html', 'utf8');
-index = index.replace(/game\.js\?v=2\.4\.\d+/g, `game.js?v=${LOADER_VERSION}`);
+index = index.replace(/game\.js\?v=\d+\.\d+\.\d+/g, `game.js?v=${LOADER_VERSION}`);
 if (!index.includes(`game.js?v=${LOADER_VERSION}`)) {
   throw new Error(`Failed to pin index.html to game.js?v=${LOADER_VERSION}`);
 }
@@ -60,7 +60,7 @@ if (!runtimeDoc.includes('stable-runtime-w3-clean-v1.js` — **retired')) {
 fs.writeFileSync('RUNTIME_ACTIVE.md', runtimeDoc);
 
 let spec = fs.readFileSync('FEATHER_FURY_GAME_SPEC.md', 'utf8');
-spec = spec.replace(/8\. `game\.js\?v=2\.4\.\d+`/, `8. \`game.js?v=${LOADER_VERSION}\``);
+spec = spec.replace(/8\. `game\.js\?v=\d+\.\d+\.\d+`/, `8. \`game.js?v=${LOADER_VERSION}\``);
 spec = spec.replace(
   /1\. loads `stable-runtime-w3-clean-v1\.js\?v=4`;/,
   `1. loads \`${CORE_VERSION}\` from the local application bundle;`
