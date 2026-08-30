@@ -76,8 +76,9 @@ if (!/id="startScreen" class="overlay-screen active"/.test(index)) fail('startSc
 if (!/ui-world-select-v1\.css\?v=8/.test(index)) fail('index.html is not pinned to Safari-safe world select CSS v8');
 if (!/ui-hud-v1\.css\?v=6/.test(index)) fail('index.html is not pinned to current HUD CSS release');
 if (!/ui-store-v1\.css\?v=3/.test(index)) fail('index.html is not pinned to responsive store CSS v3');
-if (!/economy-config-v1\.js\?v=1/.test(index)) fail('index.html is missing the centralized economy v1 config');
+if (!/economy-config-v1\.js\?v=2/.test(index)) fail('index.html is missing the centralized economy v1 config');
 const economy = read('economy-config-v1.js');
+if (!economy.includes("Object.defineProperty(CONFIG, 'REVIVE_COST'") || !economy.includes('Ignore stale writes from legacy patches')) fail('economy config must exclusively own legacy REVIVE_COST');
 for (const token of ['economy-v1.0','pigeon: Object.freeze({ price: 30','falcon: Object.freeze({ price: 55','cyber: Object.freeze({ price: 90','ghost: Object.freeze({ price: 120','king: Object.freeze({ price: 180','coinCosts: Object.freeze([8, 18])','maxPerRun: 2']) {
   if (!economy.includes(token)) fail(`economy-config-v1.js is missing launch economy contract: ${token}`);
 }
@@ -89,7 +90,7 @@ if (!/js\/audio\.js\?v=2\.3\.2/.test(index)) fail('core audio dependency is miss
 if (!/js\/graphics\.js\?v=2\.3\.2/.test(index)) fail('core graphics dependency is missing or misordered');
 for (const w of ['world1','world2','world3']) if (!new RegExp(`js/${w}\\.js\\?v=2\\.3\\.2`).test(index)) fail(`core ${w} dependency is missing`);
 
-const depOrder = ['js/config.js?v=2.3.4','economy-config-v1.js?v=1','js/audio.js?v=2.3.2','js/graphics.js?v=2.3.2','js/world1.js?v=2.3.2','js/world2.js?v=2.3.2','js/world3.js?v=2.3.2','ui-splash-approved-v3.js?v=12','game.js?v=2.5.0','ui-runtime-boot-v1.js?v=15'];
+const depOrder = ['js/config.js?v=2.3.4','economy-config-v1.js?v=2','js/audio.js?v=2.3.2','js/graphics.js?v=2.3.2','js/world1.js?v=2.3.2','js/world2.js?v=2.3.2','js/world3.js?v=2.3.2','ui-splash-approved-v3.js?v=12','game.js?v=2.5.0','ui-runtime-boot-v1.js?v=15'];
 for (let i = 1; i < depOrder.length; i++) {
   if (index.indexOf(depOrder[i - 1]) < 0 || index.indexOf(depOrder[i]) < 0 || index.indexOf(depOrder[i - 1]) > index.indexOf(depOrder[i])) fail(`core dependency order invalid around ${depOrder[i - 1]} -> ${depOrder[i]}`);
 }

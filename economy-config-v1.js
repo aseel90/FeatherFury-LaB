@@ -57,7 +57,24 @@
   } catch (_) {}
 
   try {
-    if (typeof CONFIG !== 'undefined') CONFIG.REVIVE_COST = REVIVE.coinCosts[0];
+    if (typeof CONFIG !== 'undefined') {
+      const legacyReviveCost = () => {
+        const count = Math.max(0, Number(window.game?.__ffReviveCount || 0));
+        const idx = Math.min(count, REVIVE.coinCosts.length - 1);
+        const cost = Number(REVIVE.coinCosts[idx]);
+        return Number.isFinite(cost) ? cost : REVIVE.coinCosts[0];
+      };
+      const desc = Object.getOwnPropertyDescriptor(CONFIG, 'REVIVE_COST');
+      if (!desc || desc.configurable !== false) {
+        Object.defineProperty(CONFIG, 'REVIVE_COST', {
+          configurable: true,
+          enumerable: true,
+          get: legacyReviveCost,
+          // Economy v1 owns revive pricing. Ignore stale writes from legacy patches.
+          set() {}
+        });
+      }
+    }
   } catch (_) {}
 
   window.FFEconomy = api;
