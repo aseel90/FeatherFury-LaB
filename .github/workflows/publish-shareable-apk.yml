@@ -10,6 +10,7 @@ on:
 permissions:
   actions: read
   contents: write
+  issues: write
 
 jobs:
   publish-apk:
@@ -17,6 +18,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Download verified Android RC artifact
+        id: download
         uses: actions/download-artifact@v4
         with:
           name: FeatherFury-Android-RC
@@ -26,11 +28,13 @@ jobs:
           run-id: 33325859450
 
       - name: Verify APK
+        id: verify
         run: |
           test -s share/FeatherFury-RC-debug.apk
           ls -lh share/FeatherFury-RC-debug.apk
 
       - name: Publish public test APK release
+        id: release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -44,5 +48,37 @@ jobs:
               --prerelease \
               --target "00928e54daa8b062b79b6c5b3ebc433c5eff78b5"
           fi
+
+      - name: Report shareable APK status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '[APK SHARE] Publication Status';
+            const status = '${{ job.status }}';
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = [
+              `Status: **${status.toUpperCase()}**`,
+              '',
+              `Commit: \`${context.sha}\``,
+              `Run: ${runUrl}`,
+              '',
+              `- download: ${{ steps.download.outcome }}`,
+              `- verify: ${{ steps.verify.outcome }}`,
+              `- release: ${{ steps.release.outcome }}`,
+              '',
+              status === 'success'
+                ? 'Public APK URL: https://github.com/aseel90/FeatherFury-LaB/releases/download/android-rc-share/FeatherFury-RC-debug.apk'
+                : 'Shareable APK publication failed; inspect the first failing stage above.'
+            ].join('\n');
+            const { data: issues } = await github.rest.issues.listForRepo({ owner: context.repo.owner, repo: context.repo.repo, state: 'all', per_page: 100 });
+            const existing = issues.find(i => !i.pull_request && i.title === title);
+            const state = status === 'success' ? 'closed' : 'open';
+            if (existing) {
+              await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo, issue_number: existing.number, title, body, state });
+            } else {
+              const { data: created } = await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo, title, body });
+              if (status === 'success') await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo, issue_number: created.number, state: 'closed' });
+            }
 
 # Explicit push trigger after initial workflow creation.
