@@ -43,9 +43,9 @@ jobs:
               s = s.replace('2.4.8', '2.4.9')
               p.write_text(s)
           PY
-          grep -q "const LOADER_VERSION = '2.4.9';" scripts/materialize-core.js
-          ! grep -q '2.4.8' scripts/runtime-integrity-check.js
-          grep -q 'game\.js\?v=2\.4\.9' scripts/runtime-integrity-check.js
+          grep -Fq "const LOADER_VERSION = '2.4.9';" scripts/materialize-core.js
+          ! grep -Fq '2.4.8' scripts/runtime-integrity-check.js
+          grep -Fq 'game.js?v=2.4.9' scripts/runtime-integrity-check.js
           git cat-file -e 5b83840d68ad65939b8efae336afd76c47b7bdc1:game.js
 
       - name: Materialize cleaned local core
@@ -63,9 +63,9 @@ jobs:
             node --check game-core-stable-v1.js
             node --check game.js
             ! grep -Eq 'cdn\.jsdelivr\.net|https?://' game-core-stable-v1.js
-            grep -q "CORE_RUNTIME = 'game-core-stable-v1.js?v=1'" game.js
-            grep -q "'stable-runtime-w3-clean-v1.js'" game.js
-            grep -q 'game.js?v=2.4.9' index.html
+            grep -Fq "CORE_RUNTIME = 'game-core-stable-v1.js?v=1'" game.js
+            grep -Fq "'stable-runtime-w3-clean-v1.js'" game.js
+            grep -Fq 'game.js?v=2.4.9' index.html
             node scripts/runtime-integrity-check.js
           } 2>&1 | tee core-validate.log
           code=${PIPESTATUS[0]}
