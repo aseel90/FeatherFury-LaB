@@ -46,6 +46,7 @@ jobs:
       - run: yes | sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
       - name: Install native build dependencies
+        id: deps
         run: |
           sudo apt-get update
           sudo apt-get install -y imagemagick
@@ -53,6 +54,7 @@ jobs:
           npx cap --version
 
       - name: Verify reproducible offline game core
+        id: core
         run: |
           git cat-file -e 5b83840d68ad65939b8efae336afd76c47b7bdc1:game.js
           node scripts/materialize-core.js
@@ -65,6 +67,7 @@ jobs:
           node scripts/runtime-integrity-check.js
 
       - name: Prepare clean native web bundle
+        id: webbundle
         run: |
           rm -rf www android
           mkdir -p www
@@ -93,14 +96,17 @@ jobs:
           ! grep -Eq 'cdn\.jsdelivr\.net|https?://' www/game-core-stable-v1.js
 
       - name: Create Android project and sync plugins
+        id: capacitor
         run: |
           npx cap add android
           npx cap sync android
 
       - name: Install approved Feather Fury launcher icons
+        id: icons
         run: bash scripts/install-android-icons.sh "$GITHUB_WORKSPACE"
 
       - name: Verify Android 16, lifecycle plugin, and icon contract
+        id: verify
         run: |
           grep -R "compileSdkVersion = 36\|compileSdk 36\|compileSdk = 36" android/variables.gradle android/app/build.gradle android/build.gradle
           grep -R "targetSdkVersion = 36\|targetSdk 36\|targetSdk = 36" android/variables.gradle android/app/build.gradle android/build.gradle
@@ -112,17 +118,20 @@ jobs:
           test "$(stat -c%s FeatherFury-GooglePlay-512.png)" -le 1048576
 
       - name: Build debug APK and unsigned release AAB
+        id: gradle
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug bundleRelease --stacktrace
 
       - name: Package RC artifacts
+        id: package
         run: |
           cp android/app/build/outputs/apk/debug/app-debug.apk FeatherFury-RC-debug.apk
           cp android/app/build/outputs/bundle/release/app-release.aab FeatherFury-RC-unsigned.aab
 
       - name: Upload Android RC artifacts
+        id: upload
         uses: actions/upload-artifact@v4
         with:
           name: FeatherFury-Android-RC
@@ -145,6 +154,17 @@ jobs:
               '',
               `Commit: \`${context.sha}\``,
               `Run: ${runUrl}`,
+              '',
+              'Stage outcomes:',
+              `- deps: ${{ steps.deps.outcome }}`,
+              `- core: ${{ steps.core.outcome }}`,
+              `- webbundle: ${{ steps.webbundle.outcome }}`,
+              `- capacitor: ${{ steps.capacitor.outcome }}`,
+              `- icons: ${{ steps.icons.outcome }}`,
+              `- verify: ${{ steps.verify.outcome }}`,
+              `- gradle: ${{ steps.gradle.outcome }}`,
+              `- package: ${{ steps.package.outcome }}`,
+              `- upload: ${{ steps.upload.outcome }}`,
               '',
               status === 'success'
                 ? 'APK debug + unsigned release AAB + Google Play icon were built and uploaded as the `FeatherFury-Android-RC` artifact.'
