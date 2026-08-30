@@ -1,0 +1,4 @@
+Feather Fury final release verification snapshot
+2026-08-30
+Base release-observable head: e85d60375d101c07250e97fa0e82a65c740b061c
+Purpose: trigger Android RC, GitHub Pages deploy, and live Chromium/WebKit verification on one immutable main snapshot.
