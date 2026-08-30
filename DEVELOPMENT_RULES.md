@@ -131,3 +131,19 @@ Update `FEATHER_FURY_GAME_SPEC.md` in the same change whenever you change:
 The canonical navigation map is in `FEATHER_FURY_GAME_SPEC.md` under **UI Navigation Contract**. After UI boot, `window.__FF_UI_NAV__` / `ui-runtime-fixes-v1.js` is the final owner of cross-screen navigation.
 
 Do not add new screen buttons that directly mix `classList.add/remove('active'/'hidden')` with `game.state` changes. Route multi-origin screens through the navigation contract so Back preserves origin (for example Pause -> Settings -> Back -> Pause and End -> Store -> Back -> End). Any intentional navigation change must update the canonical map and live regression test in the same change.
+
+## 14. Future expansion isolation rule
+
+The approved long-term product direction is documented in `FEATHER_FURY_FUTURE_ROADMAP.md`.
+
+The current Adventure/Campaign game is the stable baseline. Future modes and economy layers must be additive and isolated:
+
+- do not rewrite working world/boss/physics/HUD/store/save systems just to add a new mode;
+- new modes must be independently feature-gated and disableable;
+- use new save keys for new systems;
+- future mode navigation must integrate through the canonical navigation owner;
+- locked future-mode cards must not change Adventure availability or require ads/coins to unlock;
+- activate one future phase at a time and keep the old regression gates green;
+- if a new feature causes a regression, disable/revert the new feature before modifying unrelated approved systems.
+
+The planned UI direction is a compact left-side Mode Rail beside the existing World Select, with Adventure as the default and other mode cards unlocked by progression gates.
