@@ -4,7 +4,7 @@
   window.__FF_UI_RUNTIME_BOOT_V1__ = true;
 
   const UI_STACK = [
-    'lab-ui.js?v=6',
+    'lab-ui.js?v=7',
     'ui-foundation-v1.js?v=1',
     'ui-settings-leaderboard-v1.js?v=2',
     'ui-store-v1.js?v=1',
