@@ -42,7 +42,7 @@ Current order:
 5. `js/world2.js?v=2.3.2`
 6. `js/world3.js?v=2.3.2`
 7. `ui-splash-approved-v3.js?v=12`
-8. `game.js?v=2.4.9`
+8. `game.js?v=2.5.0`
 9. `ui-runtime-boot-v1.js?v=8`
 
 Do not reorder these casually.
