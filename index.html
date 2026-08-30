@@ -1,37 +1,52 @@
 <!DOCTYPE html>
-<html lang="en" id="htmlTag">
+<html id="htmlTag" lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#0a1720" />
+  <meta name="theme-color" content="#07111f" />
   <title>Feather Fury</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=2.4.8" />
-  <link rel="stylesheet" href="ui-main-menu-v3.css?v=6" />
-  <link rel="stylesheet" href="ui-world-select-v1.css?v=5" />
+  <link rel="icon" href="icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=2.3.6" />
+  <link rel="stylesheet" href="lab-ui.css?v=1" />
   <link rel="stylesheet" href="ui-foundation-v1.css?v=1" />
-  <link rel="stylesheet" href="ui-end-screens-v1.css?v=1" />
-  <link rel="stylesheet" href="ui-hud-v1.css?v=5" />
-  <link rel="stylesheet" href="ui-settings-leaderboard-v1.css?v=2" />
+  <link rel="stylesheet" href="ui-world-select-v1.css?v=8" />
+  <link rel="stylesheet" href="ui-menu-frame-fix-v1.css?v=1" />
+  <link rel="stylesheet" href="ui-main-menu-v2.css?v=1" />
+  <link rel="stylesheet" href="ui-main-menu-v3.css?v=5" />
   <link rel="stylesheet" href="ui-store-v1.css?v=3" />
+  <link rel="stylesheet" href="ui-hud-v1.css?v=6" />
+  <link rel="stylesheet" href="ui-runtime-fixes-v1.css?v=3" />
+  <link rel="stylesheet" href="ui-end-screens-v1.css?v=2" />
+  <link rel="stylesheet" href="ui-settings-leaderboard-v1.css?v=2" />
+  <link rel="stylesheet" href="ui-splash-approved-v3.css?v=1" />
 </head>
 <body>
-  <div id="app">
-    <div id="startScreen" class="screen active"></div>
-    <div id="gameScreen" class="screen hidden">
-      <canvas id="gameCanvas" width="390" height="844"></canvas>
-    </div>
-    <div id="shopScreen" class="screen hidden"></div>
-    <div id="leaderboardScreen" class="screen hidden"></div>
-    <div id="settingsScreen" class="screen hidden"></div>
-    <div id="gameOverScreen" class="screen hidden"></div>
-    <div id="victoryScreen" class="screen hidden"></div>
-  </div>
+  <svg width="0" height="0" style="position:absolute"><defs><symbol id="coin-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#FFD700" stroke="#8B6914" stroke-width="2"/><circle cx="12" cy="12" r="5" fill="none" stroke="#FFF1A8" stroke-width="1.2"/><path d="M9 12h6M12 9v6" stroke="#8B6914" stroke-width="1.4" stroke-linecap="round"/></symbol><symbol id="star-svg" viewBox="0 0 24 24"><path d="M12 2.6l2.85 5.78 6.38.93-4.62 4.5 1.09 6.35L12 17.15 6.3 20.16l1.09-6.35-4.62-4.5 6.38-.93L12 2.6z" fill="currentColor"/></symbol></defs></svg>
+  <div class="game-wrapper"><div id="app" class="game-container">
+    <canvas id="gameCanvas" width="390" height="844"></canvas>
 
-  <div id="pauseOverlay" class="hidden"></div>
-  <div id="gameToast" class="hidden"></div>
+    <div id="startScreen" class="overlay-screen active">
+      <div class="start-screen-content">
+        <div class="top-bar"><button id="settingsBtn" class="icon-btn" aria-label="Settings">⚙️</button><div class="coin-pill"><svg width="21" height="21" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg><span id="startTotalCoins">0</span></div><button id="leaderboardBtn" class="icon-btn" aria-label="Leaderboard">🏆</button><button id="shopBtnStart" class="icon-btn" aria-label="Shop">🛒</button></div>
+        <div class="start-main-content"><div class="title-container"><div class="game-title">FEATHER<br><span>FURY</span></div></div><div class="world-select-shell"><div class="worlds-carousel"><button id="prevWorldBtn" class="carousel-nav-btn" aria-label="Previous World"></button><div class="world-card" id="worldCard"><div class="world-title" id="worldTitle">الغابة الملعونة</div><div class="world-stars" id="worldStars"><span class="star empty star-small"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span><span class="star empty star-big"><svg width="1.7em" height="1.7em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span><span class="star empty star-small"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span></div><div class="bird-preview"><div class="preview-canvas-wrap"><canvas id="previewBirdCanvas" width="54" height="54"></canvas></div><span id="activeSkinName" class="skin-name-badge">العصفور الكلاسيكي</span></div><div class="world-status" id="worldStatus">جاهز للعب!</div></div><button id="nextWorldBtn" class="carousel-nav-btn" aria-label="Next World"></button></div><div class="start-actions-group"><button id='startStoryBtn' class="arcade-btn" data-i18n="playBtn">بدء المهمة</button><button id='startEndlessBtn' class='arcade-btn secondary-action-btn' data-i18n="endlessBtn">الطور اللانهائي</button></div></div></div>
+      </div>
+    </div>
+
+    <div id="gameHud" class="hud hidden"><div class="hud-top"><div class="hud-coin-badge"><svg width="21" height="21" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg><span id="runCoins">0</span></div><div class="score-container"><div id="scoreValue" class="score-badge">0</div><div id="stageName" class="stage-badge"></div></div><button id="soundToggleBtn" class="icon-btn small-hud-btn" aria-label="Sound"></button></div><div class="fever-bar-container"><div class="fever-label"><span id="feverText"></span></div><div class="fever-track"><div id="feverFill" class="fever-fill"></div></div></div><div id="bossWarning" class="boss-warning hidden"></div><div id="gameHint" class="game-hint hidden"></div></div>
+
+    <div id="gameOverScreen" class="overlay-screen hidden"><div class="game-over-dialog"><h2 id="endGameTitle" class="game-over-title" data-i18n="gameOverTitle">انتهت اللعبة</h2><div class="run-stars-container" id="runStarsContainer"><span class="star empty star-side"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span><span class="star empty star-center"><svg width="1.9em" height="1.9em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span><span class="star empty star-side"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span></div><div class="score-card-modern"><div class="score-row-modern"><span class="label" data-i18n="scoreLabel">النقاط</span><span id="finalScore" class="value score-num">0</span></div><div class="score-row-modern best"><span class="label" data-i18n="bestScoreLabel">أعلى نتيجة</span><span id="highScore" class="value best-num">0</span></div><div class="score-row-modern coins"><span class="label" data-i18n="collectedLabel">جمعت</span><span class="value coins-num"><span id="earnedCoins">0</span> <svg width="18" height="18" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg></span></div></div><div class="game-over-buttons-group"><button id="nextWorldActionBtn" class="arcade-btn next-world-btn hidden" data-i18n="nextWorldBtn">العالم التالي</button><button id="reviveBtn" class="arcade-btn revive-btn" data-i18n="reviveBtn">استمرار (محاولة ثانية)</button><div class="secondary-btn-grid"><button id="restartBtn" class="arcade-btn action-sub-btn restart-btn" data-i18n="restartBtn">إعادة اللعب</button><button id="shopBtnGameOver" class="arcade-btn action-sub-btn shop-btn" data-i18n="shopBtn">المتجر</button><button id="mainMenuBtn" class="arcade-btn action-sub-btn menu-btn" data-i18n="mainMenuBtn">الرئيسية</button></div></div></div></div>
+
+    <div id="settingsScreen" class="overlay-screen hidden"><div class="settings-dialog"><button id="closeSettingsBtn" class="close-btn">×</button><h2 class="dialog-title" data-i18n="settingsTitle">الإعدادات</h2><div class="settings-options"><div class="setting-row"><span data-i18n="langLabel">اللغة</span><button id="langToggleBtn" class="setting-action"></button></div><div class="setting-row"><span data-i18n="sfxLabel">المؤثرات الصوتية</span><button id="sfxToggleBtn" class="setting-action"></button></div><div class="setting-row"><span data-i18n="gfxLabel">الجودة</span><button id="gfxToggleBtn" class="setting-action"></button></div><div class="setting-row danger-row"><span data-i18n="resetLabel">حذف التقدم</span><button id="resetProgressBtn" class="setting-action danger-btn" data-i18n="resetBtn">حذف</button></div></div></div></div>
+
+    <div id="shopScreen" class="overlay-screen hidden"><div class="shop-dialog"><div class="shop-header"><button id="closeShopBtn" class="close-btn">×</button><h2 class="dialog-title" data-i18n="shopTitle">الطيور والمتجر</h2><div class="shop-balance"><svg width="20" height="20" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg><span id="shopTotalCoins">0</span></div></div><div id="skinsGrid" class="skins-grid"></div></div></div>
+
+    <div id="leaderboardScreen" class="overlay-screen hidden"><div class="leaderboard-dialog"><button id="closeLeaderboardBtn" class="close-btn">×</button><h2 class="dialog-title" data-i18n="leaderboardTitle">أفضل النتائج</h2><div id="leaderboardList" class="leaderboard-list"></div></div></div>
+
+    <div id="ffCoreDomCompat" hidden aria-hidden="true"><button id="resetDataBtn" type="button" tabindex="-1"></button><button id="startEndlessBtnGameOver" type="button" tabindex="-1"></button><span id="currentScoreDisplay">0</span><span id="sessionCoinDisplay">0</span><span id="stageDisplay"></span><span id="feverBarFill"></span></div><div id="gameToast" class="game-toast hidden"></div>
+  </div></div>
 
   <script src="js/config.js?v=2.3.4"></script>
   <script src="js/audio.js?v=2.3.2"></script>
@@ -42,5 +57,6 @@
   <script src="ui-splash-approved-v3.js?v=12"></script>
   <script src="game.js?v=2.4.9"></script>
   <script src="ui-runtime-boot-v1.js?v=14"></script>
+  <script src="android-native-v1.js?v=1"></script>
 </body>
 </html>
