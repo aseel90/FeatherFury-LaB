@@ -126,9 +126,9 @@ Current active scope is background + ground + obstacles only. Boss/gameplay tuni
 
 Long-term retention/economy/mode planning is maintained in `FEATHER_FURY_FUTURE_ROADMAP.md`.
 
-Key lock: the current working Adventure/Campaign runtime is the release baseline. New systems (Mode Rail, Fury Run, Boss Rush, Daily Flight, Hero Mastery, Consumables, Rewarded Revive, cosmetics) must be added as isolated layers and must not replace or destabilize approved worlds, bosses, physics, navigation, save contracts, HUD or Store behavior.
+Key lock: the current working Adventure/Campaign runtime is the release baseline. New systems (extended special-mode carousel cards, Fury Run, Boss Rush, Daily Flight, Hero Mastery, Consumables, Rewarded Revive, cosmetics) must be added as isolated layers and must not replace or destabilize approved worlds, bosses, physics, navigation, save contracts, HUD or Store behavior.
 
-Approved navigation direction for future modes: keep the existing world cards as the main focus and add a compact **left-side Mode Rail** with Adventure selected by default. Future mode cards may be visible as locked progression goals and open only after explicit world-completion gates. Initial planning gates are documented in the future roadmap and remain tunable until playtesting.
+Approved navigation direction for future modes: keep **one existing carousel and one card size**. `World 1` is the boundary: numbered worlds continue to its right (`World 2 → World 3 → ...`), while same-size special-mode cards live to its left outside the numbered-world order. `World 1` remains the default selected card for new players. Major special modes may remain visibly locked until the player completes the final available campaign world; once legitimately unlocked, a later world update must not re-lock them.
 
 Implementation proceeds one phase at a time; an old green release baseline plus the new feature must pass before the feature becomes active.
 

@@ -46,67 +46,75 @@ All future feature work follows these rules:
 
 ---
 
-## 3. Main navigation concept — left-side Mode Rail
+## 3. Main navigation concept — one carousel, two logical directions
 
 ### Approved direction
 
-Keep the existing world cards / world carousel as the main visual focus.
+Keep the existing World Select carousel as the navigation surface. **Do not add a compact rail, side menu, small tabs, or a second launcher.**
 
-Add a future **Mode Rail** on the **left side** of the World Select screen:
+`World 1` is the visual and logical boundary/anchor:
 
-- visually related to the existing world cards;
-- smaller vertical/hanging cards so they do not compete with the selected world;
-- feels attached to the world-select scene rather than opening a completely different launcher;
-- locked modes remain visible as goals when appropriate;
-- current Adventure view remains the default and requires no extra tap for a new player.
+- moving **right from World 1** continues the normal campaign order: `World 2 → World 3 → World 4 → ...`;
+- moving **left from World 1** leaves the numbered-world sequence and reveals special-mode cards such as `Adventure`, `Fury Run`, `Boss Rush`, or future replay modes;
+- special-mode cards are **not world numbers** and must never alter `currentWorld` indexing or the canonical numbered-world order;
+- every special-mode card uses the **same card dimensions, visual weight, carousel behavior, and responsive rules as a normal world card**;
+- special modes may use their own artwork/title/lock treatment, but they must feel like first-class cards in the same carousel;
+- a new player still lands on `World 1` by default, so the current PLAY flow remains frictionless.
 
-Conceptual layout:
+Conceptual order:
 
 ```text
-+----------------------------------------------------+
-| [ ADVENTURE ] |                                    |
-|               |        CURRENT WORLD CARD          |
-| [ FURY RUN ]🔒|                                    |
-|               |          <  WORLD 2  >             |
-| [ BOSS RUSH ]🔒                                    |
-|               |            [ PLAY ]                |
-| [ DAILY ]  🔒 |                                    |
-+----------------------------------------------------+
+SPECIAL MODES / OUTSIDE WORLD ORDER                  CAMPAIGN WORLDS
+←───────────────────────────────────────┬────────────────────────────────────→
+
+[ BOSS RUSH 🔒 ] [ FURY RUN 🔒 ] [ ADVENTURE 🔒 ] [ WORLD 1 ] [ WORLD 2 ] [ WORLD 3 ] [ ... ]
+                                                    ↑
+                                          default / boundary anchor
 ```
 
-On narrow devices the rail may collapse to compact icons/tabs, but it must not push the current world card, PLAY button, HUD/menu controls, or safe areas outside the viewport.
+The exact set and order of special-mode cards can evolve, but **their physical card size must match the world cards**. They must not become smaller hanging cards, icons, or a separate rail.
+
+On narrow devices, preserve the same one-card-at-a-time carousel behavior already used for worlds. Responsive work must never shrink special-mode cards into a different UI class just to fit more controls on screen.
 
 ### Mode states
 
-Each mode card has exactly one of these states:
+Each special-mode card has exactly one of these states:
 
-- **ACTIVE** — currently selected mode.
 - **AVAILABLE** — unlocked and selectable.
-- **LOCKED** — visible but unavailable; shows the exact unlock requirement.
+- **LOCKED** — visible but unavailable; shows the exact progression requirement.
 - **HIDDEN** — feature not shipped yet; do not tease unfinished systems unless intentionally planned.
 
 Locked example:
 
 `FURY RUN`
-`Complete World 2 to unlock`
+`Complete the final campaign world to unlock`
 
-The lock should feel like a future goal, not a monetization wall.
+The lock should feel like a long-term progression goal, not a monetization wall.
 
 ---
 
-## 4. Proposed unlock gates — TUNABLE, NOT FINAL BALANCE
+## 4. Proposed unlock gates — FINAL-WORLD MODEL, TUNABLE
 
-These are initial product gates and may be changed after playtesting without changing the architecture.
+The preferred product direction is that major replay modes stay visible to the **left of World 1** but remain locked until the player proves campaign mastery.
 
-| Mode | Initial gate | Reason |
-|---|---|---|
-| Adventure | Available from first launch | This is the existing game and must remain frictionless. |
-| Fury Run | Complete World 2 | Gives replay value before the player exhausts all current campaign content. |
-| Boss Rush | Complete World 3 | The player should first meet the three bosses normally. |
-| Daily Flight | Complete World 1 | Avoids overwhelming a brand-new player while introducing return goals early. |
-| Weekly / Leaderboard | Later release gate | Only after the underlying run/challenge mode is stable and measurable. |
+Primary rule:
 
-Important: unlocking a mode is progression-based, **never ad-gated and never coin-gated**.
+- a major mode such as `Fury Run` may require completing the **final campaign world available for that release**;
+- this requirement must be progression-based, **never ad-gated and never coin-gated**;
+- once a mode has been legitimately unlocked, adding a new campaign world in a later update should **not re-lock it** for that player;
+- new players after a later content update may use the new final-world requirement if product balance calls for it.
+
+Initial planning example for a release whose campaign ends at World 3:
+
+| Card | Initial gate |
+|---|---|
+| Numbered Worlds | Existing world-by-world campaign progression |
+| Adventure / future special adventure card | Complete the final available campaign world, if this becomes a separate mode |
+| Fury Run | Complete the final available campaign world |
+| Boss Rush | Complete the final available campaign world and have encountered all included bosses |
+| Daily / event card | Gate decided later; it may unlock earlier if retention data supports it |
+
+This architecture deliberately avoids hard-coding `World 1`, `World 2`, or `World 3` as permanent mode gates.
 
 ---
 
@@ -404,13 +412,14 @@ Do not skip ahead unless a concrete product reason is documented.
 - update Store without changing current Adventure gameplay unless an item is explicitly activated;
 - add Revive choice architecture behind a safe feature flag first.
 
-### Phase 3 — Mode Rail shell
+### Phase 3 — Extended carousel shell
 
-- add the left-side mode-card UI only;
-- Adventure remains selected by default;
-- future modes are LOCKED/HIDDEN;
+- extend the existing carousel to support same-size special-mode cards to the left of World 1;
+- World 1 remains the default selected boundary card for a new player;
+- numbered worlds remain ordered only to the right of World 1;
+- future special modes are LOCKED/HIDDEN;
 - no Fury Run gameplay yet;
-- prove responsive behavior and navigation without changing current World Select ownership.
+- prove responsive behavior, world indexing and navigation without changing current World Select ownership.
 
 ### Phase 4 — Fury Run v1
 
@@ -470,7 +479,7 @@ A future feature is successful only when **the old game still works exactly as e
 
 Do not hard-code these decisions in advance:
 
-- exact Fury Run unlock world (initial proposal: after World 2);
+- exact final-world unlock policy for Fury Run and whether new players should follow the latest campaign endpoint;
 - Fury Run world sequence/rotation;
 - final hero Coin prices;
 - final Revive costs and maximum count;
