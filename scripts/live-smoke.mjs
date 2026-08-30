@@ -121,6 +121,22 @@ try {
   await page.goto(url.href, { waitUntil: 'domcontentloaded', timeout: 30_000 });
   await page.waitForFunction(() => window.__FF_RUNTIME_APPROVED_STACK__ === true && window.__FF_MENU_UI_READY__ === true, null, { timeout: 70_000 });
   await page.waitForFunction(() => !document.getElementById('ffApprovedBootSplash'), null, { timeout: 10_000 });
+  // WebKit can commit the splash removal one frame before staggered menu opacity
+  // transitions are painted. Wait for the post-splash visual contract separately;
+  // boot readiness itself must remain geometry-based to avoid the 97% deadlock.
+  await page.waitForFunction(() => {
+    const visible = el => {
+      if (!el || el.classList.contains('hidden')) return false;
+      const style = getComputedStyle(el);
+      if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity || 1) <= 0.01) return false;
+      const r = el.getBoundingClientRect();
+      return r.width > 1 && r.height > 1;
+    };
+    return visible(document.getElementById('startScreen')) &&
+      visible(document.querySelector('#startScreen .ff-main-logo')) &&
+      visible(document.getElementById('worldCard')) &&
+      visible(document.getElementById('startStoryBtn'));
+  }, null, { timeout: 5_000 });
 
   const menu = await readState();
   const badMenu = !menu.startVisible || !menu.startActive || !menu.logoVisible || !menu.worldCardVisible || !menu.playVisible || menu.playDisabled ||
