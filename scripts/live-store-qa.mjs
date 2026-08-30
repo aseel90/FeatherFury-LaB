@@ -101,7 +101,27 @@ try {
         if (b.height < 40 || b.width < 60) throw new Error(`Purchase button touch target too small at ${vp.name}: ${JSON.stringify(entry)}`);
         if (entry.disabled) throw new Error(`Seeded rich profile still has disabled purchase at ${vp.name}: ${JSON.stringify(entry)}`);
       }
-      if (!['auto','scroll'].includes(layout.scroll?.overflowY)) throw new Error(`Store items are not scrollable at ${vp.name}: ${JSON.stringify(layout.scroll)}`);
+      if (!['auto','scroll'].includes(layout.scroll?.overflowY)) throw new Error(`Store items do not preserve overflow behavior at ${vp.name}: ${JSON.stringify(layout.scroll)}`);
+
+      const economyContract = await page.evaluate(() => ({
+        version: window.FFEconomy?.version || null,
+        prices: ['pigeon','falcon','cyber','ghost','king'].map(key => [key, window.FFEconomy?.heroPrice?.(key)]),
+        rewards: ['eagle','phoenix'].map(key => [key, window.FFEconomy?.canPurchaseHero?.(key)]),
+        reviveCosts: [...(window.FFEconomy?.revive?.coinCosts || [])],
+        reviveMax: window.FFEconomy?.revive?.maxPerRun ?? null,
+        kingBonusEvery: window.__FF_CHARACTER_ABILITIES_V2__?.constants?.kingBonusEvery ?? null
+      }));
+      const expectedPrices = [30,55,90,120,180];
+      const visiblePrices = layout.cards.map(entry => Number(entry.price));
+      if (economyContract.version !== 'economy-v1.0' || JSON.stringify(visiblePrices) !== JSON.stringify(expectedPrices)) {
+        throw new Error(`Launch hero prices mismatch at ${vp.name}: ${JSON.stringify({economyContract,visiblePrices})}`);
+      }
+      if (layout.cards.some(entry => /Phoenix|Eagle/i.test(entry.name)) || economyContract.rewards.some(([,purchasable]) => purchasable !== false)) {
+        throw new Error(`World reward heroes became coin-purchasable at ${vp.name}: ${JSON.stringify({economyContract,cards:layout.cards})}`);
+      }
+      if (JSON.stringify(economyContract.reviveCosts) !== JSON.stringify([8,18]) || economyContract.reviveMax !== 2 || economyContract.kingBonusEvery !== 3) {
+        throw new Error(`Launch economy ability/revive contract mismatch at ${vp.name}: ${JSON.stringify(economyContract)}`);
+      }
 
       const before = await page.evaluate(() => ({
         coins: window.game.totalCoins,
@@ -167,10 +187,68 @@ try {
         throw new Error(`Selected character or coins lost after second reload at ${vp.name}: ${JSON.stringify({selected,selectedReload})}`);
       }
 
+      const reviveStart = await page.evaluate(() => {
+        const g = window.game;
+        g.totalCoins = 100;
+        g.__ffReviveCount = 0;
+        g.state = 'GAMEOVER';
+        g.updateCoinDisplays?.();
+        const btn = document.getElementById('reviveBtn');
+        return {
+          coins:g.totalCoins, count:g.__ffReviveCount, disabled:!!btn?.disabled,
+          price:document.querySelector('#reviveBtn .revive-price')?.textContent?.trim() || '',
+          configCost:window.CONFIG?.REVIVE_COST
+        };
+      });
+      if (reviveStart.coins !== 100 || reviveStart.count !== 0 || reviveStart.disabled || reviveStart.configCost !== 8 || !/8/.test(reviveStart.price)) {
+        throw new Error(`First revive contract failed at ${vp.name}: ${JSON.stringify(reviveStart)}`);
+      }
+      await page.evaluate(() => document.getElementById('reviveBtn')?.click());
+      await page.waitForTimeout(460);
+      const reviveSecond = await page.evaluate(() => {
+        const g = window.game;
+        g.state = 'GAMEOVER';
+        g.updateCoinDisplays?.();
+        const btn = document.getElementById('reviveBtn');
+        return {
+          coins:g.totalCoins, count:g.__ffReviveCount, disabled:!!btn?.disabled,
+          price:document.querySelector('#reviveBtn .revive-price')?.textContent?.trim() || '',
+          configCost:window.CONFIG?.REVIVE_COST
+        };
+      });
+      if (reviveSecond.coins !== 92 || reviveSecond.count !== 1 || reviveSecond.disabled || reviveSecond.configCost !== 18 || !/18/.test(reviveSecond.price)) {
+        throw new Error(`Second revive contract failed at ${vp.name}: ${JSON.stringify(reviveSecond)}`);
+      }
+      await page.evaluate(() => document.getElementById('reviveBtn')?.click());
+      await page.waitForTimeout(460);
+      const reviveMax = await page.evaluate(() => {
+        const g = window.game;
+        g.state = 'GAMEOVER';
+        g.updateCoinDisplays?.();
+        const btn = document.getElementById('reviveBtn');
+        return {
+          coins:g.totalCoins, count:g.__ffReviveCount, disabled:!!btn?.disabled,
+          price:document.querySelector('#reviveBtn .revive-price')?.textContent?.trim() || '',
+          configCost:window.CONFIG?.REVIVE_COST
+        };
+      });
+      if (reviveMax.coins !== 74 || reviveMax.count !== 2 || !reviveMax.disabled || !/MAX/i.test(reviveMax.price)) {
+        throw new Error(`Revive cap failed at ${vp.name}: ${JSON.stringify(reviveMax)}`);
+      }
+      const reviveReset = await page.evaluate(() => {
+        const g = window.game;
+        g.reset?.();
+        g.updateCoinDisplays?.();
+        return { count:g.__ffReviveCount, configCost:window.CONFIG?.REVIVE_COST };
+      });
+      if (reviveReset.count !== 0 || reviveReset.configCost !== 8) {
+        throw new Error(`Revive reset failed at ${vp.name}: ${JSON.stringify(reviveReset)}`);
+      }
+
       const critical = events.filter(e => e.type === 'pageerror' || e.type === 'requestfailed' || /approved runtime boot failed|clean stable runtime failed|post-runtime UI boot failed/i.test(e.text));
       if (critical.length) throw new Error(`Critical browser events at ${vp.name}: ${JSON.stringify(critical.slice(-12))}`);
 
-      const report = { ok:true, viewport:vp, url:url.href, layout, before, purchased, afterReload, selected, selectedReload, events };
+      const report = { ok:true, viewport:vp, url:url.href, layout, economyContract, before, purchased, afterReload, selected, selectedReload, reviveStart, reviveSecond, reviveMax, reviveReset, events };
       results.push(report);
       fs.writeFileSync(path.join(OUT, `${vp.name}.json`), JSON.stringify(report, null, 2));
     } catch (error) {
