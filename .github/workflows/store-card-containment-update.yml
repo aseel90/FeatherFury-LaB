@@ -8,15 +8,10 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 jobs:
-  apply-test-deploy:
+  apply-and-test:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -85,7 +80,7 @@ jobs:
           node --check scripts/runtime-integrity-check.js
           node scripts/runtime-integrity-check.js
 
-      - name: Remove one-time updater and commit owner-file update
+      - name: Remove updater and commit owner-file update
         run: |
           rm .github/workflows/store-card-containment-update.yml
           git config user.name "github-actions[bot]"
@@ -93,15 +88,3 @@ jobs:
           git add ui-store-v1.css index.html scripts/live-smoke.mjs scripts/runtime-integrity-check.js .github/workflows/store-card-containment-update.yml
           git commit -m "Keep store Buy buttons inside character cards"
           git push origin HEAD:main
-
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: '.'
-
-      - name: Deploy updated LAB
-        id: deployment
-        uses: actions/deploy-pages@v4
