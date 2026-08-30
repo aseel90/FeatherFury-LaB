@@ -4,6 +4,12 @@
   if (window.__FF_LAB_RUNTIME_SAFE__) return;
   window.__FF_LAB_RUNTIME_SAFE__ = 'FF_LAB_RUNTIME_SAFE';
 
+  const labWorldUnlockEnabled = (() => {
+    try { return new URLSearchParams(window.location.search).get('fflab') === '1'; }
+    catch (_) { return false; }
+  })();
+  window.__FF_LAB_WORLD_UNLOCK__ = labWorldUnlockEnabled;
+
   function unlockLabWorlds() {
     const game = window.game;
     if (!game) return false;
@@ -62,10 +68,12 @@
     return true;
   }
 
-  let unlockTries = 0;
-  const unlockTimer = setInterval(() => {
-    if (unlockLabWorlds() || ++unlockTries > 200) clearInterval(unlockTimer);
-  }, 50);
+  if (labWorldUnlockEnabled) {
+    let unlockTries = 0;
+    const unlockTimer = setInterval(() => {
+      if (unlockLabWorlds() || ++unlockTries > 200) clearInterval(unlockTimer);
+    }, 50);
+  }
 
   let backgroundTries = 0;
   const backgroundTimer = setInterval(() => {
