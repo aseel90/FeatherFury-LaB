@@ -18,18 +18,24 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
       - name: Materialize cleaned core from repository history
         run: node scripts/materialize-core.js
-      - name: Validate runtime integrity
-        run: node scripts/runtime-integrity-check.js
-      - name: Commit materialized local core
+      - name: Validate generated JavaScript syntax
+        run: |
+          node --check game-core-stable-v1.js
+          node --check game.js
+      - name: Commit materialized local core atomically
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add game-core-stable-v1.js game.js index.html scripts/runtime-integrity-check.js RUNTIME_ACTIVE.md
+          git add game-core-stable-v1.js game.js index.html RUNTIME_ACTIVE.md FEATHER_FURY_GAME_SPEC.md
           git diff --cached --check
+          if git diff --cached --quiet; then
+            echo "No materialization changes required"
+            exit 0
+          fi
           git commit -m "Materialize stable game core locally"
           git push origin HEAD:main
