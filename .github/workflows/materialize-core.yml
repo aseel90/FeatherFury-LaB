@@ -1,39 +1,88 @@
 name: Materialize Local Game Core
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
+    paths:
+      - scripts/materialize-core-trigger.txt
+      - scripts/materialize-core.js
+      - scripts/runtime-integrity-check.js
+      - .github/workflows/materialize-core.yml
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   materialize:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout full history
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Fetch historical core source commit
-        run: git fetch --no-tags origin 5b83840d68ad65939b8efae336afd76c47b7bdc1
-      - name: Materialize cleaned core from repository history
-        run: node scripts/materialize-core.js
-      - name: Validate generated JavaScript syntax
+
+      - name: Prepare materialization version gate
+        id: prepare
+        shell: bash
         run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('scripts/materialize-core.js')
+          s = p.read_text()
+          s = s.replace("const LOADER_VERSION = '2.4.8';", "const LOADER_VERSION = '2.4.9';")
+          p.write_text(s)
+
+          p = Path('scripts/runtime-integrity-check.js')
+          s = p.read_text()
+          s = s.replace('game.js?v=2.4.8', 'game.js?v=2.4.9')
+          s = s.replace('approved game.js v2.4.8', 'approved game.js v2.4.9')
+          p.write_text(s)
+          PY
+          git cat-file -e 5b83840d68ad65939b8efae336afd76c47b7bdc1:game.js
+
+      - name: Materialize cleaned local core
+        id: core
+        run: node scripts/materialize-core.js
+
+      - name: Validate generated runtime
+        id: validate
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s game-core-stable-v1.js
           node --check game-core-stable-v1.js
           node --check game.js
           ! grep -Eq 'cdn\.jsdelivr\.net|https?://' game-core-stable-v1.js
-      - name: Commit materialized local core atomically
+          grep -q "CORE_RUNTIME = 'game-core-stable-v1.js?v=1'" game.js
+          grep -q "'stable-runtime-w3-clean-v1.js'" game.js
+          grep -q 'game.js?v=2.4.9' index.html
+          node scripts/runtime-integrity-check.js
+
+      - name: Commit materialized core atomically
+        id: commit
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add game-core-stable-v1.js game.js index.html RUNTIME_ACTIVE.md FEATHER_FURY_GAME_SPEC.md
+          git add \
+            game-core-stable-v1.js \
+            game.js \
+            index.html \
+            RUNTIME_ACTIVE.md \
+            FEATHER_FURY_GAME_SPEC.md \
+            scripts/materialize-core.js \
+            scripts/runtime-integrity-check.js
           git diff --cached --check
           if git diff --cached --quiet; then
             echo "No materialization changes required"
@@ -41,3 +90,61 @@ jobs:
           fi
           git commit -m "Materialize stable game core locally"
           git push origin HEAD:main
+
+      - name: Report core materialization status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '[CORE] Local Materialization Status';
+            const status = '${{ job.status }}';
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = [
+              `Status: **${status.toUpperCase()}**`,
+              '',
+              `Source commit: \`${context.sha}\``,
+              `Run: ${runUrl}`,
+              '',
+              'Stage outcomes:',
+              `- prepare: ${{ steps.prepare.outcome }}`,
+              `- core: ${{ steps.core.outcome }}`,
+              `- validate: ${{ steps.validate.outcome }}`,
+              `- commit: ${{ steps.commit.outcome }}`,
+              '',
+              status === 'success'
+                ? 'The local materialized core passed integrity checks and was committed atomically to `main`.'
+                : 'No core promotion should be trusted until this issue returns to SUCCESS.'
+            ].join('\n');
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'all',
+              per_page: 100
+            });
+            const existing = issues.find(i => !i.pull_request && i.title === title);
+            const state = status === 'success' ? 'closed' : 'open';
+            if (existing) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                title,
+                body,
+                state
+              });
+            } else {
+              const created = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body
+              });
+              if (status === 'success') {
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: created.data.number,
+                  state: 'closed'
+                });
+              }
+            }
