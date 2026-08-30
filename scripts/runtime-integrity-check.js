@@ -112,7 +112,7 @@ if (!/top\.appendChild\(pause\)/.test(uiHudJs)) fail('HUD JS must place pause co
 const runtimeFixes = read('ui-runtime-fixes-v1.js');
 if (!/installPauseGuard/.test(runtimeFixes) || !/syncHudData/.test(runtimeFixes)) fail('runtime fixes must freeze pause and bridge HUD data');
 if (!/installNavigationContract/.test(runtimeFixes) || !/__FF_UI_NAV__/.test(runtimeFixes) || !/game\.returnToMenu\s*=\s*goMain/.test(runtimeFixes)) fail('runtime fixes must own the canonical UI navigation contract');
-if (!canonicalSpec.includes('## 19. UI Navigation Contract') || !canonicalSpec.includes('Pause -> Settings -> Back -> Pause') || !canonicalSpec.includes('Store -> Back -> END')) fail('canonical spec must include the UI navigation route map');
+if (!canonicalSpec.includes('## 19. UI Navigation Contract') || !canonicalSpec.includes('Pause -> Settings -> Back -> Pause') || !canonicalSpec.includes('End -> Store -> Back -> End')) fail('canonical spec must include the UI navigation route map');
 if (!/__ffFinalPauseGuardV1/.test(runtimeFixes)) fail('runtime fixes must install one final pause update guard');
 const runtimeFixCss = read('ui-runtime-fixes-v1.css');
 if (!/direction:ltr\s*!important/i.test(runtimeFixCss)) fail('runtime fixes must pin HUD physical direction');

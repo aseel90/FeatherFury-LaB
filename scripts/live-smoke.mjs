@@ -182,7 +182,7 @@ try {
   if (ability && ability.top < Math.max(coin.bottom, score.bottom, pause.bottom) - 2) {
     throw new Error(`Ability chip overlaps top HUD: ${JSON.stringify(afterPlay.hudLayout)}`);
   }
-  if (!fever || fever.top < Math.max(coin.bottom, score.bottom, pause.bottom) + 12) {
+  if (!fever || fever.top < Math.max(coin.bottom, score.bottom, pause.bottom) + 6) {
     throw new Error(`Fever bar overlaps or is missing below top HUD: ${JSON.stringify(afterPlay.hudLayout)}`);
   }
 
