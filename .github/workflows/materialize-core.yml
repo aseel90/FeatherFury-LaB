@@ -37,17 +37,15 @@ jobs:
           set -euo pipefail
           python - <<'PY'
           from pathlib import Path
-          p = Path('scripts/materialize-core.js')
-          s = p.read_text()
-          s = s.replace("const LOADER_VERSION = '2.4.8';", "const LOADER_VERSION = '2.4.9';")
-          p.write_text(s)
-
-          p = Path('scripts/runtime-integrity-check.js')
-          s = p.read_text()
-          s = s.replace('game.js?v=2.4.8', 'game.js?v=2.4.9')
-          s = s.replace('approved game.js v2.4.8', 'approved game.js v2.4.9')
-          p.write_text(s)
+          for name in ('scripts/materialize-core.js', 'scripts/runtime-integrity-check.js'):
+              p = Path(name)
+              s = p.read_text()
+              s = s.replace('2.4.8', '2.4.9')
+              p.write_text(s)
           PY
+          grep -q "const LOADER_VERSION = '2.4.9';" scripts/materialize-core.js
+          ! grep -q '2.4.8' scripts/runtime-integrity-check.js
+          grep -q 'game\.js\?v=2\.4\.9' scripts/runtime-integrity-check.js
           git cat-file -e 5b83840d68ad65939b8efae336afd76c47b7bdc1:game.js
 
       - name: Materialize cleaned local core
