@@ -58,15 +58,20 @@ jobs:
         id: validate
         shell: bash
         run: |
-          set -euo pipefail
-          test -s game-core-stable-v1.js
-          node --check game-core-stable-v1.js
-          node --check game.js
-          ! grep -Eq 'cdn\.jsdelivr\.net|https?://' game-core-stable-v1.js
-          grep -q "CORE_RUNTIME = 'game-core-stable-v1.js?v=1'" game.js
-          grep -q "'stable-runtime-w3-clean-v1.js'" game.js
-          grep -q 'game.js?v=2.4.9' index.html
-          node scripts/runtime-integrity-check.js
+          set +e
+          {
+            set -euo pipefail
+            test -s game-core-stable-v1.js
+            node --check game-core-stable-v1.js
+            node --check game.js
+            ! grep -Eq 'cdn\.jsdelivr\.net|https?://' game-core-stable-v1.js
+            grep -q "CORE_RUNTIME = 'game-core-stable-v1.js?v=1'" game.js
+            grep -q "'stable-runtime-w3-clean-v1.js'" game.js
+            grep -q 'game.js?v=2.4.9' index.html
+            node scripts/runtime-integrity-check.js
+          } 2>&1 | tee core-validate.log
+          code=${PIPESTATUS[0]}
+          exit $code
 
       - name: Commit materialized core atomically
         id: commit
@@ -99,6 +104,11 @@ jobs:
             const title = '[CORE] Local Materialization Status';
             const status = '${{ job.status }}';
             const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const fs = require('fs');
+            let validationTail = '';
+            if (fs.existsSync('core-validate.log')) {
+              validationTail = fs.readFileSync('core-validate.log', 'utf8').split('\n').slice(-30).join('\n').trim();
+            }
             const body = [
               `Status: **${status.toUpperCase()}**`,
               '',
@@ -113,7 +123,8 @@ jobs:
               '',
               status === 'success'
                 ? 'The local materialized core passed integrity checks and was committed atomically to `main`.'
-                : 'No core promotion should be trusted until this issue returns to SUCCESS.'
+                : 'No core promotion should be trusted until this issue returns to SUCCESS.',
+              ...(status !== 'success' && validationTail ? ['', 'Validation tail:', '```', validationTail, '```'] : [])
             ].join('\n');
             const { data: issues } = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
