@@ -68,44 +68,51 @@
     return false;
   }
 
-  function syncStars(host) {
+  function getEarnedStars(game, index) {
+    const cfg = window.CONFIG || {};
+    const stage1 = Number(cfg.STAGE1_END);
+    const stage2 = Number(cfg.STAGE2_END);
+
+    if (index === 0) {
+      if (game?.w1Completed) return 3;
+      const score = Number(game?.highScore || 0);
+      if (Number.isFinite(stage2) && score >= stage2) return 2;
+      if (Number.isFinite(stage1) && score >= stage1) return 1;
+      return 0;
+    }
+
+    if (index === 1) {
+      if (!game?.w1Completed) return 0;
+      if (game?.w2Completed) return 3;
+      const score = Number(game?.highScoreW2 || 0);
+      if (Number.isFinite(stage2) && score >= stage2) return 2;
+      if (Number.isFinite(stage1) && score >= stage1) return 1;
+      return 0;
+    }
+
+    if (index === 2) {
+      if (!game?.w2Completed) return 0;
+      if (game?.w3Completed) return 3;
+      const score = Number(game?.highScoreW3 || 0);
+      if (Number.isFinite(stage2) && score >= stage2) return 2;
+      if (Number.isFinite(stage1) && score >= stage1) return 1;
+      return 0;
+    }
+
+    return 0;
+  }
+
+  function syncStars(host, game, index) {
     if (!host) return;
+    const total = 3;
+    const filled = Math.max(0, Math.min(total, getEarnedStars(game, index)));
 
-    // The core runtime renders SVG stars as .star nodes and marks
-    // unearned stars with .empty. textContent is empty for those SVGs,
-    // so derive progress from the DOM state before converting to image assets.
-    const runtimeStars = [...host.querySelectorAll('.star')];
-    let total = runtimeStars.length;
-    let filled = runtimeStars.filter(star => !star.classList.contains('empty')).length;
-
-    if (!total) {
-      const oldImgs = [...host.querySelectorAll('img.ff-star-icon')];
-      if (oldImgs.length) {
-        total = oldImgs.length;
-        filled = oldImgs.filter(img => (img.getAttribute('src') || '').includes('star-filled')).length;
-      } else {
-        const text = (host.textContent || '').trim();
-        const filledFromText = (text.match(/[★⭐]/g) || []).length;
-        const emptyFromText = (text.match(/☆/g) || []).length;
-        total = filledFromText + emptyFromText;
-        filled = filledFromText;
-      }
-    }
-
-    // No progress data must never be interpreted as a perfect rating.
-    if (!total) {
-      total = 3;
-      filled = 0;
-    }
-
-    total = Math.max(3, Math.min(5, total));
-    filled = Math.max(0, Math.min(total, filled || 0));
-    host.replaceChildren(...Array.from({length: total}, (_, i) => {
+    host.replaceChildren(...Array.from({ length: total }, (_, i) => {
       const img = document.createElement('img');
       img.className = 'ff-star-icon';
       img.src = i < filled ? STAR_FILLED : STAR_EMPTY;
       img.alt = '';
-      img.setAttribute('aria-hidden','true');
+      img.setAttribute('aria-hidden', 'true');
       img.decoding = 'async';
       return img;
     }));
@@ -118,7 +125,7 @@
     const index = Math.max(0, Math.min(THUMBS.length - 1, raw));
     ui.kicker.textContent = `WORLD ${index + 1}`;
     if (ui.title && WORLD_NAMES[index]) ui.title.textContent = WORLD_NAMES[index];
-    syncStars(ui.stars);
+    syncStars(ui.stars, game, index);
     ui.thumb.style.backgroundImage = `url('${THUMBS[index]}')`;
     ui.card.classList.toggle('ff-locked', isWorldLocked(game, index, ui.card));
     ui.card.dataset.ffWorld = String(index + 1);
