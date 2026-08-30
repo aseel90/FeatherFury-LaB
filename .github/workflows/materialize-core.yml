@@ -18,12 +18,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Fetch historical core source commit
+        run: git fetch --no-tags origin 5b83840d68ad65939b8efae336afd76c47b7bdc1
       - name: Materialize cleaned core from repository history
         run: node scripts/materialize-core.js
       - name: Validate generated JavaScript syntax
         run: |
           node --check game-core-stable-v1.js
           node --check game.js
+          ! grep -Eq 'cdn\.jsdelivr\.net|https?://' game-core-stable-v1.js
       - name: Commit materialized local core atomically
         shell: bash
         run: |
