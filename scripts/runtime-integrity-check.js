@@ -157,7 +157,7 @@ const liveVerify = read('.github/workflows/live-runtime-verify.yml');
 if (!/playwright install --with-deps chromium webkit/.test(liveVerify)) fail('live verify must install Chromium and WebKit');
 if (!/FF_BROWSER=chromium/.test(liveVerify) || !/FF_BROWSER=webkit/.test(liveVerify)) fail('live verify must execute both Chromium and WebKit mobile smoke tests');
 const liveSmoke = read('scripts/live-smoke.mjs');
-if (!liveSmoke.includes('Pause -> Settings contract failed') || !liveSmoke.includes('End -> Store -> Back') || !liveSmoke.includes('Next World map failed')) fail('live smoke must enforce the canonical navigation map');
+if (!liveSmoke.includes('Pause -> Settings contract failed') || !liveSmoke.includes("page.locator('#shopBtnGameOver')") || !liveSmoke.includes("page.locator('#closeShopBtn')") || !liveSmoke.includes('Next World map failed')) fail('live smoke must enforce the canonical navigation map');
 if (!/visualViewport/.test(liveSmoke) || !/logoVisible/.test(liveSmoke) || !/worldCardVisible/.test(liveSmoke)) fail('live smoke must enforce visible menu geometry in the visual viewport');
 
 if (process.exitCode) process.exit(process.exitCode);
