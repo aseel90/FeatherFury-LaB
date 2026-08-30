@@ -7,6 +7,14 @@ on:
     paths:
       - package.json
       - capacitor.config.json
+      - index.html
+      - '*.js'
+      - '*.css'
+      - js/**
+      - assets/**
+      - manifest.json
+      - icon.png
+      - favicon.png
       - android-native-v1.js
       - game.js
       - game-core-stable-v1.js
