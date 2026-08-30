@@ -44,3 +44,5 @@ jobs:
               --prerelease \
               --target "00928e54daa8b062b79b6c5b3ebc433c5eff78b5"
           fi
+
+# Explicit push trigger after initial workflow creation.
