@@ -2,7 +2,7 @@ name: Verify Playable Worlds and Bosses
 
 on:
   workflow_run:
-    workflows: ["Deploy Feather Fury Pages"]
+    workflows: ["Deploy LAB Preview"]
     types: [completed]
   workflow_dispatch:
 
@@ -95,7 +95,14 @@ jobs:
           - World 3 launches and Lord Voltbat/Thunderbird boss activates
           - PLAY HUD + pause control are present in every playable world
           BODY
-            if [ -n "$num" ]; then gh issue edit "$num" --body-file /tmp/body.md --state closed >/dev/null; else num=$(gh issue create --title "$title" --body-file /tmp/body.md | sed 's#.*/##'); gh issue close "$num" >/dev/null; fi
+            if [ -n "$num" ]; then
+              gh issue edit "$num" --body-file /tmp/body.md >/dev/null
+              state=$(gh issue view "$num" --json state --jq '.state')
+              if [ "$state" != 'CLOSED' ]; then gh issue close "$num" >/dev/null; fi
+            else
+              num=$(gh issue create --title "$title" --body-file /tmp/body.md | sed 's#.*/##')
+              gh issue close "$num" >/dev/null
+            fi
           else
             tail -n 260 artifacts/worlds-qa.log > /tmp/tail.txt
             {
@@ -108,7 +115,13 @@ jobs:
               cat /tmp/tail.txt
               echo '```'
             } > /tmp/body.md
-            if [ -n "$num" ]; then gh issue edit "$num" --body-file /tmp/body.md --state open >/dev/null; else gh issue create --title "$title" --body-file /tmp/body.md >/dev/null; fi
+            if [ -n "$num" ]; then
+              gh issue edit "$num" --body-file /tmp/body.md >/dev/null
+              state=$(gh issue view "$num" --json state --jq '.state')
+              if [ "$state" = 'CLOSED' ]; then gh issue reopen "$num" >/dev/null; fi
+            else
+              gh issue create --title "$title" --body-file /tmp/body.md >/dev/null
+            fi
           fi
 
       - name: Fail if QA failed
