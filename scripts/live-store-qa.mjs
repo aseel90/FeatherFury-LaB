@@ -37,10 +37,13 @@ try {
     });
     await context.addInitScript(() => {
       try {
-        localStorage.setItem('fh_lang', 'en');
-        localStorage.setItem('fh_total_coins', '99999');
-        localStorage.setItem('fh_unlocked_skins', '["classic"]');
-        localStorage.setItem('fh_active_skin', 'classic');
+        if (sessionStorage.getItem('__ff_store_qa_seeded') !== '1') {
+          localStorage.setItem('fh_lang', 'en');
+          localStorage.setItem('fh_total_coins', '99999');
+          localStorage.setItem('fh_unlocked_skins', '["classic"]');
+          localStorage.setItem('fh_active_skin', 'classic');
+          sessionStorage.setItem('__ff_store_qa_seeded', '1');
+        }
       } catch (_) {}
     });
     const page = await context.newPage();
