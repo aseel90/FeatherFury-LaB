@@ -15,6 +15,7 @@ on:
       - scripts/materialize-core.js
       - scripts/runtime-integrity-check.js
       - scripts/release-sync-trigger.txt
+      - .github/workflows/live-runtime-verify.yml
       - .github/workflows/build-android-rc.yml
 
 permissions:
