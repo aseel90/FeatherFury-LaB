@@ -60,6 +60,46 @@
     }
   };
 
+  const stabilizeViewport = () => {
+    const screen = document.getElementById('startScreen');
+    if (!screen || screen.classList.contains('hidden') || !screen.classList.contains('active')) return false;
+
+    try { window.scrollTo(0, 0); } catch (_) {}
+    screen.scrollTop = 0;
+    screen.scrollLeft = 0;
+
+    const topBar = screen.querySelector('.top-bar');
+    const main = screen.querySelector('.start-main-content');
+    screen.style.setProperty('transform', 'none', 'important');
+
+    if (topBar) {
+      topBar.style.setProperty('transform', 'none', 'important');
+      topBar.style.setProperty('opacity', '1', 'important');
+      topBar.style.setProperty('visibility', 'visible', 'important');
+      topBar.style.setProperty('left', 'max(12px, env(safe-area-inset-left))', 'important');
+      topBar.style.setProperty('right', 'max(12px, env(safe-area-inset-right))', 'important');
+      topBar.style.setProperty('width', 'auto', 'important');
+      topBar.style.setProperty('direction', 'ltr', 'important');
+      topBar.style.setProperty('justify-content', 'space-between', 'important');
+    }
+
+    if (main) {
+      main.style.setProperty('transform', 'none', 'important');
+      main.style.setProperty('opacity', '1', 'important');
+      main.style.setProperty('visibility', 'visible', 'important');
+      main.style.setProperty('left', '0', 'important');
+      main.style.setProperty('right', '0', 'important');
+      main.style.setProperty('width', '100%', 'important');
+    }
+
+    for (const node of screen.querySelectorAll('.title-container,.worlds-carousel,.start-actions-group')) {
+      node.style.setProperty('transform', 'none', 'important');
+      node.style.setProperty('opacity', '1', 'important');
+      node.style.setProperty('visibility', 'visible', 'important');
+    }
+    return true;
+  };
+
   const attachBirdAvatar = (screen, topBar) => {
     const settings = document.getElementById('settingsBtn');
     if (!settings || !topBar) return null;
@@ -140,6 +180,7 @@
       carousel.addEventListener('pointerup',e=>{ if(x==null||id!==e.pointerId)return; const dx=e.clientX-x,dy=e.clientY-y; x=y=id=null; if(Math.abs(dx)<42||Math.abs(dx)<=Math.abs(dy)*1.1)return; const b=document.getElementById(dx<0?'nextWorldBtn':'prevWorldBtn'); if(b&&!b.disabled)b.click(); });
       carousel.addEventListener('pointercancel',()=>{x=y=id=null;});
     }
+    stabilizeViewport();
     return {screen,main,carousel,dots,birdButton};
   }
 
@@ -151,6 +192,7 @@
   };
 
   function apply() {
+    stabilizeViewport();
     const ui=ensure(), g=window.game; if(!ui||!g)return;
     const i=Math.max(0,Math.min(3,Number.isInteger(g.currentWorldIndex)?g.currentWorldIndex:0));
     const lang=g.lang==='ar'?'ar':'en', isLocked=locked(g,i);
@@ -180,6 +222,14 @@
   }
 
   let tries=0; const timer=setInterval(()=>{tries++;ensure();if(hook()||tries>160)clearInterval(timer);},50);
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)apply();});
-  window.__FF_MAIN_MENU_V3__={apply,openShop};
+  const settle = () => {
+    requestAnimationFrame(() => { stabilizeViewport(); requestAnimationFrame(stabilizeViewport); });
+    setTimeout(stabilizeViewport, 140);
+  };
+  document.addEventListener('ff:menu-ready', settle);
+  window.addEventListener('pageshow', settle);
+  window.addEventListener('orientationchange', settle);
+  window.visualViewport?.addEventListener?.('resize', settle);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden){apply();settle();}});
+  window.__FF_MAIN_MENU_V3__={apply,openShop,stabilizeViewport};
 })();
