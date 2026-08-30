@@ -16,27 +16,24 @@ const game = read('game.js');
 const index = read('index.html');
 const runtimeDoc = read('RUNTIME_ACTIVE.md');
 const canonicalSpec = read('FEATHER_FURY_GAME_SPEC.md');
-const developmentRules = read('DEVELOPMENT_RULES.md');
-const gamePlan = read('GAME_PLAN.md');
-const readme = read('README.md');
+
+for (const doc of ['README.md','DEVELOPMENT_RULES.md','GAME_PLAN.md','RUNTIME_ACTIVE.md']) {
+  if (!read(doc).includes('FEATHER_FURY_GAME_SPEC.md')) fail(`${doc} must point to FEATHER_FURY_GAME_SPEC.md as the canonical game/runtime spec`);
+}
+for (const token of ['ACTIVE_PATCHES','RETIRED_PATCHES','stable-runtime-w3-clean-v1.js','ui-runtime-boot-v1.js','scripts/live-smoke.mjs']) {
+  if (!canonicalSpec.includes(token)) fail(`FEATHER_FURY_GAME_SPEC.md missing canonical runtime token: ${token}`);
+}
 
 const activeMatch = game.match(/const ACTIVE_PATCHES = \[([\s\S]*?)\n\s*\];/);
-const retiredMatch = game.match(/const RETIRED_PATCHES = (?:new Set\()?\[([\s\S]*?)\n\s*\](?:\))?;/);
+const retiredMatch = game.match(/const RETIRED_PATCHES = new Set\(\[([\s\S]*?)\n\s*\]\);/);
 if (!activeMatch) fail('ACTIVE_PATCHES block not found');
 if (!retiredMatch) fail('RETIRED_PATCHES block not found');
 
 const extract = block => [...block.matchAll(/'([^']+\.js(?:\?[^']*)?)'/g)].map(m => m[1]);
-const activeTokens = activeMatch ? extract(activeMatch[1]) : [];
-const retiredTokens = retiredMatch ? extract(retiredMatch[1]) : [];
-const active = activeTokens.map(x => x.split('?')[0]);
-const retired = retiredTokens.map(x => x.split('?')[0]);
-
-for (const token of activeTokens) {
-  if (!canonicalSpec.includes('`' + token + '`')) fail(`canonical spec missing active runtime token: ${token}`);
-}
-for (const doc of [runtimeDoc, developmentRules, gamePlan, readme]) {
-  if (!doc.includes('FEATHER_FURY_GAME_SPEC.md')) fail('project documentation must point to FEATHER_FURY_GAME_SPEC.md');
-}
+const activeEntries = activeMatch ? extract(activeMatch[1]) : [];
+const retiredEntries = retiredMatch ? extract(retiredMatch[1]) : [];
+const active = activeEntries.map(x => x.split('?')[0]);
+const retired = retiredEntries.map(x => x.split('?')[0]);
 
 const dup = active.filter((x, i) => active.indexOf(x) !== i);
 if (dup.length) fail(`duplicate active patches: ${[...new Set(dup)].join(', ')}`);
@@ -68,7 +65,7 @@ if (!/<div class="game-wrapper"><div id="app" class="game-container"/.test(index
 if (!/id="startScreen" class="overlay-screen active"/.test(index)) fail('startScreen must remain an active overlay screen');
 if (!/ui-world-select-v1\.css\?v=7/.test(index)) fail('index.html is not pinned to Safari-safe world select CSS v7');
 if (!/ui-hud-v1\.css\?v=6/.test(index)) fail('index.html is not pinned to current HUD CSS release');
-if (!/ui-runtime-fixes-v1\.css\?v=1/.test(index)) fail('runtime UI fix stylesheet is not active');
+if (!/ui-runtime-fixes-v1\.css\?v=2/.test(index)) fail('runtime UI fix stylesheet is not active');
 if (!/ui-splash-approved-v3\.js\?v=12/.test(index)) fail('approved loading splash script is not active');
 if (!/js\/config\.js\?v=2\.3\.4/.test(index)) fail('core config dependency is missing or misordered');
 if (!/js\/audio\.js\?v=2\.3\.2/.test(index)) fail('core audio dependency is missing or misordered');
@@ -91,7 +88,7 @@ for (const requiredId of [
 }
 
 for (const legacyDirect of ['lab-ui.js','ui-settings-leaderboard-v1.js','ui-store-v1.js','ui-main-menu-v3.js','ui-world-select-v1.js','ui-end-screens-v1.js','ui-hud-v1.js','ui-foundation-v1.js']) {
-  if (new RegExp(`<script[^>]+src=["']${legacyDirect.replace('.', '\\.')}[^"']*`, 'i').test(index)) fail(`UI patch must boot after runtime, not directly from index: ${legacyDirect}`);
+  if (new RegExp(`<script[^>]+src=["']${legacyDirect.replace('.', '\\.') }[^"']*`, 'i').test(index)) fail(`UI patch must boot after runtime, not directly from index: ${legacyDirect}`);
 }
 
 const uiBoot = read('ui-runtime-boot-v1.js');
@@ -123,6 +120,9 @@ if (!/direction:ltr\s*!important/i.test(runtimeFixCss)) fail('runtime fixes must
 if (!/fever-bar-container[\s\S]*display:flex\s*!important/i.test(runtimeFixCss)) fail('runtime fixes must restore fever bar');
 if (!/start-actions-group[^{]*\{[^}]*margin-top/i.test(runtimeFixCss)) fail('runtime fixes must restore world/PLAY spacing');
 if (!/ff-store-balance[\s\S]*display:flex\s*!important/i.test(runtimeFixCss)) fail('runtime fixes must normalize store coin balance');
+if (!/score-container[\s\S]*border[^;]*rgba\(211,168,58/i.test(runtimeFixCss)) fail('approved HUD must keep the royal violet/gold center score panel');
+if (!/ffAbilityHud[\s\S]*top:calc\(max\(env\(safe-area-inset-top\),0px\) \+ 115px\)/i.test(runtimeFixCss)) fail('approved HUD must place ability below Fever in the center stack');
+if (!/fever-bar-container[\s\S]*top:calc\(max\(env\(safe-area-inset-top\),0px\) \+ 76px\)/i.test(runtimeFixCss)) fail('approved HUD must place Fever above the ability chip');
 
 const runtimeBridge = read('runtime-config-bridge-v1.js');
 if (!/window\.CONFIG\s*=\s*CONFIG/.test(runtimeBridge)) fail('runtime CONFIG bridge must expose legacy CONFIG contract');

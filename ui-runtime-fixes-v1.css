@@ -1,18 +1,320 @@
-/* Feather Fury runtime UI fixes v1 — post-runtime ownership only. */
-html body #gameHud.ff-hud-v1 .hud-top{direction:ltr!important}
-html body #gameHud.ff-hud-v1 .hud-coin-badge{border-color:rgba(255,218,74,.64)!important;background:linear-gradient(180deg,rgba(95,62,7,.90),rgba(44,27,5,.90))!important;box-shadow:inset 0 1px 0 rgba(255,247,184,.18),0 5px 14px rgba(0,0,0,.18)!important}
-html body #gameHud.ff-hud-v1 .score-container{border-color:rgba(83,218,255,.58)!important;background:linear-gradient(180deg,rgba(8,55,88,.92),rgba(5,27,51,.92))!important}
-html body #ffPauseBtn.ff-hud-pause-v1{border-color:rgba(126,231,255,.62)!important;background:linear-gradient(180deg,rgba(15,70,105,.95),rgba(6,33,60,.95))!important}
-html body #gameHud.ff-hud-v1 .fever-bar-container{position:absolute!important;top:calc(max(env(safe-area-inset-top),0px) + 91px)!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;width:min(64vw,238px)!important;height:30px!important;margin:0!important;padding:4px 7px 5px!important;display:flex!important;visibility:visible!important;opacity:1!important;flex-direction:column!important;justify-content:center!important;gap:3px!important;border:1px solid rgba(255,209,61,.48)!important;border-radius:12px!important;background:linear-gradient(180deg,rgba(54,34,7,.90),rgba(18,18,27,.90))!important;box-shadow:inset 0 1px 0 rgba(255,245,185,.12),0 5px 14px rgba(0,0,0,.16)!important;box-sizing:border-box!important;pointer-events:none!important}
-html body #gameHud.ff-hud-v1 .fever-label{display:flex!important;align-items:center!important;justify-content:center!important;height:8px!important;margin:0!important;padding:0!important;color:#ffe46f!important;font:900 8px/1 'Press Start 2P',monospace!important;letter-spacing:.05em!important}
-html body #gameHud.ff-hud-v1 .fever-track{width:100%!important;height:8px!important;overflow:hidden!important;border-radius:999px!important;background:rgba(3,8,20,.88)!important;border:1px solid rgba(255,221,91,.22)!important}
-html body #gameHud.ff-hud-v1 .fever-fill{height:100%!important;width:0;border-radius:999px!important;background:linear-gradient(90deg,#f4c430 0%,#ff9f1c 58%,#ff4d4d 100%)!important;box-shadow:0 0 10px rgba(255,170,35,.42)!important;transition:width .10s linear!important}
-html body #gameHud.ff-hud-v1 .fever-fill.max{background:linear-gradient(90deg,#fff176,#ffbd2e,#ff5b3d)!important;box-shadow:0 0 14px rgba(255,212,71,.76)!important}
-#bossWarning{top:calc(max(env(safe-area-inset-top),0px) + 128px)!important}
+/* Feather Fury runtime UI fixes v2 — approved compact royal HUD + post-runtime repairs. */
+
+/* Physical layout never mirrors with Arabic: coins left, score center, Pause right. */
+html body #gameHud.ff-hud-v1 .hud-top{
+  direction:ltr!important;
+  top:calc(max(env(safe-area-inset-top),0px) + 8px)!important;
+  left:max(calc(env(safe-area-inset-left) + 12px),12px)!important;
+  right:max(calc(env(safe-area-inset-right) + 12px),12px)!important;
+  height:56px!important;
+  grid-template-columns:82px minmax(128px,140px) 44px!important;
+  gap:8px!important;
+  align-items:center!important;
+}
+
+/* Approved Feather Fury palette: deep royal violet + restrained antique gold. */
+html body #gameHud.ff-hud-v1 .hud-coin-badge{
+  width:82px!important;
+  min-width:82px!important;
+  max-width:82px!important;
+  height:42px!important;
+  padding:0 10px!important;
+  gap:7px!important;
+  border:1.5px solid rgba(211,168,58,.94)!important;
+  border-radius:22px!important;
+  background:linear-gradient(180deg,rgba(31,25,69,.96),rgba(13,15,38,.95))!important;
+  box-shadow:inset 0 1px 0 rgba(255,240,176,.10),0 5px 13px rgba(0,0,0,.18)!important;
+  backdrop-filter:blur(5px)!important;
+  -webkit-backdrop-filter:blur(5px)!important;
+  color:#fff3b4!important;
+  font-size:.66rem!important;
+}
+html body #gameHud.ff-hud-v1 .ff-hud-coin-icon{
+  width:23px!important;
+  height:23px!important;
+  flex-basis:23px!important;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.30))!important;
+}
+
+html body #gameHud.ff-hud-v1 .score-container{
+  position:relative!important;
+  width:140px!important;
+  min-width:128px!important;
+  max-width:140px!important;
+  height:54px!important;
+  padding:5px 12px 6px!important;
+  gap:3px!important;
+  border:1.5px solid rgba(211,168,58,.90)!important;
+  border-radius:22px 22px 18px 18px!important;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(116,75,171,.22),transparent 48%),
+    linear-gradient(180deg,rgba(31,25,72,.97),rgba(13,16,43,.96))!important;
+  box-shadow:inset 0 1px 0 rgba(255,239,184,.10),0 6px 15px rgba(0,0,0,.19)!important;
+  backdrop-filter:blur(5px)!important;
+  -webkit-backdrop-filter:blur(5px)!important;
+  overflow:visible!important;
+}
+html body #gameHud.ff-hud-v1 .score-container::before{
+  content:""!important;
+  position:absolute!important;
+  top:-5px!important;
+  left:50%!important;
+  width:9px!important;
+  height:9px!important;
+  transform:translateX(-50%) rotate(45deg)!important;
+  border:1px solid rgba(221,181,72,.92)!important;
+  border-radius:2px!important;
+  background:linear-gradient(135deg,#8c61cb,#493173)!important;
+  box-shadow:0 0 7px rgba(133,91,199,.35)!important;
+}
+html body #gameHud.ff-hud-v1 .score-badge{
+  font-size:1rem!important;
+  color:#fff!important;
+  text-shadow:0 1px 2px rgba(0,0,0,.60)!important;
+}
+html body #gameHud.ff-hud-v1 .stage-badge{
+  max-width:116px!important;
+  color:#bdeeff!important;
+  font-size:.69rem!important;
+  font-weight:900!important;
+  line-height:1.05!important;
+  text-shadow:0 1px 2px rgba(0,0,0,.48)!important;
+}
+
+html body #ffPauseBtn.ff-hud-pause-v1{
+  width:44px!important;
+  height:44px!important;
+  min-width:44px!important;
+  max-width:44px!important;
+  border:1.5px solid rgba(211,168,58,.90)!important;
+  border-radius:16px!important;
+  background:linear-gradient(180deg,rgba(36,31,84,.97),rgba(15,18,49,.96))!important;
+  box-shadow:inset 0 1px 0 rgba(255,242,190,.10),0 5px 13px rgba(0,0,0,.18)!important;
+  backdrop-filter:blur(5px)!important;
+  -webkit-backdrop-filter:blur(5px)!important;
+}
+html body #ffPauseBtn.ff-hud-pause-v1 img{
+  width:18px!important;
+  height:18px!important;
+  filter:brightness(1.18) drop-shadow(0 1px 1px rgba(0,0,0,.35))!important;
+}
+
+/* Fever is centered immediately below the top row. */
+html body #gameHud.ff-hud-v1 .fever-bar-container{
+  position:absolute!important;
+  top:calc(max(env(safe-area-inset-top),0px) + 76px)!important;
+  left:50%!important;
+  right:auto!important;
+  transform:translateX(-50%)!important;
+  width:min(64vw,280px)!important;
+  height:32px!important;
+  margin:0!important;
+  padding:4px 9px 5px!important;
+  display:flex!important;
+  visibility:visible!important;
+  opacity:1!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  gap:3px!important;
+  border:1.5px solid rgba(211,168,58,.88)!important;
+  border-radius:15px!important;
+  background:linear-gradient(180deg,rgba(25,22,35,.96),rgba(8,11,23,.96))!important;
+  box-shadow:inset 0 1px 0 rgba(255,241,183,.09),0 5px 13px rgba(0,0,0,.16)!important;
+  backdrop-filter:blur(4px)!important;
+  -webkit-backdrop-filter:blur(4px)!important;
+  box-sizing:border-box!important;
+  pointer-events:none!important;
+}
+html body #gameHud.ff-hud-v1 .fever-bar-container::before{
+  content:"✦"!important;
+  position:absolute!important;
+  left:10px!important;
+  top:5px!important;
+  color:#f1cd63!important;
+  font-size:11px!important;
+  line-height:1!important;
+  text-shadow:0 0 7px rgba(241,205,99,.32)!important;
+}
+html body #gameHud.ff-hud-v1 .fever-label{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  height:9px!important;
+  margin:0!important;
+  padding:0!important;
+  color:#e6c458!important;
+  font:900 10px/1 'Tajawal',sans-serif!important;
+  letter-spacing:0!important;
+  text-shadow:0 1px 1px rgba(0,0,0,.55)!important;
+}
+html body #gameHud.ff-hud-v1 .fever-track{
+  width:100%!important;
+  height:8px!important;
+  overflow:hidden!important;
+  border-radius:999px!important;
+  background:rgba(2,5,15,.94)!important;
+  border:1px solid rgba(196,162,71,.34)!important;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.65)!important;
+}
+html body #gameHud.ff-hud-v1 .fever-fill{
+  height:100%!important;
+  width:0;
+  border-radius:999px!important;
+  background:linear-gradient(90deg,#7253c9 0%,#b678d6 42%,#e4bd55 100%)!important;
+  box-shadow:0 0 8px rgba(156,103,205,.42)!important;
+  transition:width .10s linear!important;
+}
+html body #gameHud.ff-hud-v1 .fever-fill.max{
+  background:linear-gradient(90deg,#9b76ef,#d39be3,#f0cf68)!important;
+  box-shadow:0 0 11px rgba(229,197,96,.55)!important;
+}
+
+/* Character ability / Royal Fortune sits below Fever, centered and intentionally smaller. */
+html body #gameHud.ff-hud-v1 #ffAbilityHud{
+  position:absolute!important;
+  top:calc(max(env(safe-area-inset-top),0px) + 115px)!important;
+  left:50%!important;
+  right:auto!important;
+  bottom:auto!important;
+  transform:translateX(-50%)!important;
+  width:max-content!important;
+  min-width:142px!important;
+  max-width:min(55%,220px)!important;
+  min-height:30px!important;
+  margin:0!important;
+  padding:5px 14px!important;
+  border:1.5px solid rgba(107,133,214,.78)!important;
+  border-radius:999px!important;
+  background:linear-gradient(180deg,rgba(29,27,70,.94),rgba(13,17,46,.94))!important;
+  box-shadow:inset 0 1px 0 rgba(210,221,255,.08),0 4px 11px rgba(0,0,0,.15)!important;
+  backdrop-filter:blur(4px)!important;
+  -webkit-backdrop-filter:blur(4px)!important;
+  color:#f5f7ff!important;
+  font-family:'Tajawal',sans-serif!important;
+  font-size:.69rem!important;
+  font-weight:900!important;
+  line-height:1.1!important;
+  letter-spacing:0!important;
+  text-align:center!important;
+  text-shadow:0 1px 2px rgba(0,0,0,.55)!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+/* Keep boss warning clear of the approved HUD stack. */
+#bossWarning{top:calc(max(env(safe-area-inset-top),0px) + 154px)!important}
+
+/* Previously approved menu/store fixes stay owned here. */
 #startScreen .start-actions-group{margin-top:clamp(16px,2vh,22px)!important}
-#shopScreen .ff-store-balance{display:flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;min-height:40px!important;padding:6px 10px!important;border:1.5px solid rgba(255,218,74,.58)!important;border-radius:14px!important;background:linear-gradient(180deg,rgba(91,59,8,.92),rgba(39,24,5,.92))!important;color:#ffe16c!important;font:900 .68rem/1 'Press Start 2P','Tajawal',sans-serif!important;box-shadow:inset 0 1px 0 rgba(255,247,184,.16),0 6px 16px rgba(0,0,0,.22)!important;direction:ltr!important}
-#shopScreen .ff-store-balance .ff-store-coin-icon{width:21px!important;height:21px!important;flex:0 0 21px!important;filter:drop-shadow(0 1px 1px rgba(0,0,0,.28))!important}
+#shopScreen .ff-store-balance{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+  min-height:40px!important;
+  padding:6px 10px!important;
+  border:1.5px solid rgba(255,218,74,.58)!important;
+  border-radius:14px!important;
+  background:linear-gradient(180deg,rgba(91,59,8,.92),rgba(39,24,5,.92))!important;
+  color:#ffe16c!important;
+  font:900 .68rem/1 'Press Start 2P','Tajawal',sans-serif!important;
+  box-shadow:inset 0 1px 0 rgba(255,247,184,.16),0 6px 16px rgba(0,0,0,.22)!important;
+  direction:ltr!important;
+}
+#shopScreen .ff-store-balance .ff-store-coin-icon{
+  width:21px!important;height:21px!important;flex:0 0 21px!important;
+  filter:drop-shadow(0 1px 1px rgba(0,0,0,.28))!important;
+}
 #shopScreen #shopTotalCoins{color:#ffe16c!important;font:inherit!important;line-height:1!important}
+
+@media(max-width:340px){
+  html body #gameHud.ff-hud-v1 .hud-top{
+    left:max(calc(env(safe-area-inset-left) + 8px),8px)!important;
+    right:max(calc(env(safe-area-inset-right) + 8px),8px)!important;
+    height:52px!important;
+    grid-template-columns:70px 116px 40px!important;
+    gap:5px!important;
+  }
+  html body #gameHud.ff-hud-v1 .hud-coin-badge{
+    width:70px!important;min-width:70px!important;max-width:70px!important;height:38px!important;
+    padding-inline:7px!important;font-size:.57rem!important;gap:5px!important;
+  }
+  html body #gameHud.ff-hud-v1 .ff-hud-coin-icon{width:20px!important;height:20px!important;flex-basis:20px!important}
+  html body #gameHud.ff-hud-v1 .score-container{
+    width:116px!important;min-width:116px!important;max-width:116px!important;height:48px!important;
+    padding-inline:8px!important;
+  }
+  html body #gameHud.ff-hud-v1 .score-badge{font-size:.88rem!important}
+  html body #gameHud.ff-hud-v1 .stage-badge{max-width:96px!important;font-size:.60rem!important}
+  html body #ffPauseBtn.ff-hud-pause-v1{width:40px!important;height:40px!important;min-width:40px!important;max-width:40px!important;border-radius:14px!important}
+  html body #gameHud.ff-hud-v1 .fever-bar-container{
+    top:calc(max(env(safe-area-inset-top),0px) + 69px)!important;
+    width:min(70vw,230px)!important;height:29px!important;
+  }
+  html body #gameHud.ff-hud-v1 #ffAbilityHud{
+    top:calc(max(env(safe-area-inset-top),0px) + 104px)!important;
+    min-width:126px!important;max-width:62%!important;min-height:27px!important;font-size:.62rem!important;
+  }
+  #bossWarning{top:calc(max(env(safe-area-inset-top),0px) + 139px)!important}
+}
+
 @media(max-height:680px){#startScreen .start-actions-group{margin-top:12px!important}}
+
+@media(max-height:600px){
+  html body #gameHud.ff-hud-v1 .hud-top{
+    top:calc(max(env(safe-area-inset-top),0px) + 5px)!important;
+    height:50px!important;
+  }
+  html body #gameHud.ff-hud-v1 .hud-coin-badge{height:36px!important}
+  html body #gameHud.ff-hud-v1 .score-container{height:46px!important}
+  html body #ffPauseBtn.ff-hud-pause-v1{width:38px!important;height:38px!important;min-width:38px!important;max-width:38px!important}
+  html body #gameHud.ff-hud-v1 .fever-bar-container{
+    top:calc(max(env(safe-area-inset-top),0px) + 63px)!important;
+    width:min(62vw,220px)!important;height:27px!important;
+  }
+  html body #gameHud.ff-hud-v1 #ffAbilityHud{
+    top:calc(max(env(safe-area-inset-top),0px) + 96px)!important;
+    min-height:25px!important;padding:4px 11px!important;
+  }
+  #bossWarning{top:calc(max(env(safe-area-inset-top),0px) + 128px)!important}
+}
+
 @media(max-height:590px){#startScreen .start-actions-group{margin-top:9px!important}}
-@media(max-height:600px){html body #gameHud.ff-hud-v1 .fever-bar-container{top:calc(max(env(safe-area-inset-top),0px) + 82px)!important;width:min(62vw,220px)!important;height:27px!important}#bossWarning{top:calc(max(env(safe-area-inset-top),0px) + 116px)!important}}
+
+@media(min-width:700px) and (min-height:650px){
+  html body #gameHud.ff-hud-v1 .hud-top{
+    left:max(calc(env(safe-area-inset-left) + 20px),20px)!important;
+    right:max(calc(env(safe-area-inset-right) + 20px),20px)!important;
+    height:62px!important;
+    grid-template-columns:94px 158px 48px!important;
+  }
+  html body #gameHud.ff-hud-v1 .hud-coin-badge{width:94px!important;min-width:94px!important;max-width:94px!important;height:46px!important}
+  html body #gameHud.ff-hud-v1 .score-container{width:158px!important;min-width:158px!important;max-width:158px!important;height:58px!important}
+  html body #ffPauseBtn.ff-hud-pause-v1{width:48px!important;height:48px!important;min-width:48px!important;max-width:48px!important}
+  html body #gameHud.ff-hud-v1 .fever-bar-container{top:calc(max(env(safe-area-inset-top),0px) + 84px)!important;width:300px!important}
+  html body #gameHud.ff-hud-v1 #ffAbilityHud{top:calc(max(env(safe-area-inset-top),0px) + 123px)!important;min-width:156px!important}
+  #bossWarning{top:calc(max(env(safe-area-inset-top),0px) + 163px)!important}
+}
+
+@media(orientation:landscape) and (max-height:540px) and (min-width:600px){
+  html body #gameHud.ff-hud-v1 .hud-top{
+    top:calc(max(env(safe-area-inset-top),0px) + 4px)!important;
+    left:max(calc(env(safe-area-inset-left) + 10px),10px)!important;
+    right:max(calc(env(safe-area-inset-right) + 10px),10px)!important;
+    height:44px!important;
+    grid-template-columns:72px 118px 38px!important;
+  }
+  html body #gameHud.ff-hud-v1 .hud-coin-badge{width:72px!important;min-width:72px!important;max-width:72px!important;height:34px!important}
+  html body #gameHud.ff-hud-v1 .score-container{width:118px!important;min-width:118px!important;max-width:118px!important;height:42px!important}
+  html body #ffPauseBtn.ff-hud-pause-v1{width:38px!important;height:38px!important;min-width:38px!important;max-width:38px!important}
+  html body #gameHud.ff-hud-v1 .fever-bar-container{
+    top:calc(max(env(safe-area-inset-top),0px) + 54px)!important;
+    width:min(42vw,230px)!important;height:25px!important;
+  }
+  html body #gameHud.ff-hud-v1 #ffAbilityHud{
+    top:calc(max(env(safe-area-inset-top),0px) + 85px)!important;
+    min-width:120px!important;min-height:24px!important;padding:3px 10px!important;font-size:.59rem!important;
+  }
+  #bossWarning{top:calc(max(env(safe-area-inset-top),0px) + 115px)!important}
+}

@@ -18,19 +18,16 @@ const context = await browser.newContext({
   viewport: { width: 390, height: 844 },
   deviceScaleFactor: 2,
   isMobile: true,
-  hasTouch: true
+  hasTouch: true,
+  userAgent: ENGINE === 'webkit'
+    ? 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'
+    : undefined
 });
 const page = await context.newPage();
 const events = [];
-const origin = new URL(BASE).origin;
-
-page.on('console', msg => {
-  if (msg.type() === 'error' || msg.type() === 'warning') events.push({ type: `console:${msg.type()}`, text: msg.text() });
-});
-page.on('pageerror', err => events.push({ type: 'pageerror', text: err?.stack || String(err) }));
-page.on('requestfailed', req => {
-  if (req.url().startsWith(origin)) events.push({ type: 'requestfailed', text: `${req.url()} :: ${req.failure()?.errorText || 'unknown'}` });
-});
+page.on('console', msg => events.push({ type:`console:${msg.type()}`, text:msg.text() }));
+page.on('pageerror', err => events.push({ type:'pageerror', text:err?.stack || String(err) }));
+page.on('requestfailed', req => events.push({ type:'requestfailed', text:`${req.method()} ${req.url()} ${req.failure()?.errorText || ''}` }));
 
 const readState = () => page.evaluate(() => {
   const visible = el => {
@@ -53,9 +50,11 @@ const readState = () => page.evaluate(() => {
   const preview = document.getElementById('previewBirdCanvas');
   let previewInk = false;
   try {
-    const ctx = preview?.getContext('2d', { willReadFrequently: true });
-    const data = ctx?.getImageData(0, 0, preview.width, preview.height)?.data || [];
-    for (let i = 3; i < data.length; i += 4) { if (data[i] > 8) { previewInk = true; break; } }
+    const ctx = preview?.getContext('2d');
+    if (ctx) {
+      const data = ctx.getImageData(0,0,preview.width,preview.height).data;
+      previewInk = data.some((v,i) => (i % 4) === 3 && v > 0);
+    }
   } catch (_) { previewInk = !!preview; }
   const thumb = document.querySelector('#worldCard .ff-world-thumb');
   return {
@@ -64,8 +63,8 @@ const readState = () => page.evaluate(() => {
     runtimeReady: window.__FF_RUNTIME_APPROVED_STACK__ === true,
     menuReady: window.__FF_MENU_UI_READY__ === true,
     runtimeBooting: window.__FF_PATCH_BOOTING__,
-    runtimeMap: window.__FF_RUNTIME_MAP__?.version || null,
-    menuError: window.__FF_MENU_UI_ERROR__ || null,
+    runtimeMap: window.__FF_RUNTIME_MAP__ || null,
+    menuError: window.__FF_MENU_UI_ERROR__ ? String(window.__FF_MENU_UI_ERROR__) : null,
     startVisible: visible(document.getElementById('startScreen')),
     startActive: document.getElementById('startScreen')?.classList.contains('active') || false,
     logoVisible: visible(document.querySelector('#startScreen .ff-main-logo')),
@@ -81,20 +80,18 @@ const readState = () => page.evaluate(() => {
     pauseVisible: document.getElementById('ffPauseOverlay')?.classList.contains('show') || false,
     pauseButtonVisible: visible(document.getElementById('ffPauseBtn')),
     hudLayout: (() => {
-      const rect = idOrEl => {
+      const rectSel = idOrEl => {
         const el = typeof idOrEl === 'string' ? document.querySelector(idOrEl) : idOrEl;
         if (!el) return null;
-        const style = getComputedStyle(el);
         const r = el.getBoundingClientRect();
-        if (style.display === 'none' || style.visibility === 'hidden' || r.width <= 0 || r.height <= 0) return null;
         return { left:r.left, right:r.right, top:r.top, bottom:r.bottom, width:r.width, height:r.height };
       };
       return {
-        coin: rect('#gameHud .hud-coin-badge'),
-        score: rect('#gameHud .score-container'),
-        pause: rect('#ffPauseBtn'),
-        ability: rect('#ffAbilityHud'),
-        fever: rect('#gameHud .fever-bar-container')
+        coin: rectSel('#gameHud .hud-coin-badge'),
+        score: rectSel('#gameHud .score-container'),
+        pause: rectSel('#ffPauseBtn'),
+        ability: rectSel('#ffAbilityHud'),
+        fever: rectSel('#gameHud .fever-bar-container')
       };
     })(),
     hudValues: {
@@ -121,9 +118,6 @@ try {
   await page.goto(url.href, { waitUntil: 'domcontentloaded', timeout: 30_000 });
   await page.waitForFunction(() => window.__FF_RUNTIME_APPROVED_STACK__ === true && window.__FF_MENU_UI_READY__ === true, null, { timeout: 70_000 });
   await page.waitForFunction(() => !document.getElementById('ffApprovedBootSplash'), null, { timeout: 10_000 });
-  // WebKit can commit the splash removal one frame before staggered menu opacity
-  // transitions are painted. Wait for the post-splash visual contract separately;
-  // boot readiness itself must remain geometry-based to avoid the 97% deadlock.
   await page.waitForFunction(() => {
     const visible = el => {
       if (!el || el.classList.contains('hidden')) return false;
@@ -184,6 +178,20 @@ try {
   if (!fever || fever.top < Math.max(coin.bottom, score.bottom, pause.bottom) + 12) {
     throw new Error(`Fever bar overlaps or is missing below top HUD: ${JSON.stringify(afterPlay.hudLayout)}`);
   }
+
+  const savedSkin = await page.evaluate(() => window.game?.activeSkin);
+  await page.evaluate(() => { window.game.activeSkin = 'king'; });
+  await page.waitForFunction(() => {
+    const ability = document.getElementById('ffAbilityHud');
+    return !!ability && !ability.classList.contains('ff-hidden') && getComputedStyle(ability).display !== 'none';
+  }, null, { timeout: 3_000 });
+  const royalLayout = await readState();
+  const royalAbility = royalLayout.hudLayout?.ability;
+  const royalFever = royalLayout.hudLayout?.fever;
+  if (!royalAbility || !royalFever || royalAbility.top < royalFever.bottom + 5) {
+    throw new Error(`Approved Fever/Royal Fortune order failed: ${JSON.stringify(royalLayout.hudLayout)}`);
+  }
+  await page.evaluate(skin => { window.game.activeSkin = skin; }, savedSkin);
 
   await page.locator('#ffPauseBtn').click({ timeout: 5_000 });
   await page.waitForFunction(() => document.getElementById('ffPauseOverlay')?.classList.contains('show'), null, { timeout: 5_000 });
@@ -249,6 +257,7 @@ try {
   fs.writeFileSync(path.join(OUT, 'state.json'), JSON.stringify(report, null, 2));
   console.error(JSON.stringify(report, null, 2));
   process.exitCode = 1;
-} finally {
-  await browser.close();
 }
+
+await context.close().catch(() => {});
+await browser.close().catch(() => {});

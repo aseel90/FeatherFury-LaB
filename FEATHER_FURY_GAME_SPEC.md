@@ -1,20 +1,19 @@
-# Feather Fury — Canonical Game Specification & Runtime Contract
+# Feather Fury — Canonical Game & Runtime Specification
 
-**Repository:** `aseel90/FeatherFury-LaB`  
-**Canonical branch:** `main`  
-**Current audit baseline:** 2026-08-30  
-**Purpose:** this is the technical source of truth used to prevent runtime ownership conflicts, accidental rollback, duplicate patches, stale documentation, and reintroduction of retired systems.
+> **Status:** canonical reference for the current LAB runtime.  
+> **Repository:** `aseel90/FeatherFury-LaB`  
+> **Rule:** when documentation disagrees with executable runtime, update this document in the same change after verifying the runtime.
 
 ---
 
-## 1. Authority order
+## 1. Source-of-truth hierarchy
 
-When code, filenames, comments, screenshots, older plans, and documentation disagree, use this order:
+Use this order when deciding what is actually live:
 
-1. `index.html`, `game.js`, `ui-runtime-boot-v1.js` and the deployed runtime.
-2. `scripts/runtime-integrity-check.js` and `scripts/live-smoke.mjs`.
-3. This file: `FEATHER_FURY_GAME_SPEC.md`.
-4. `RUNTIME_ACTIVE.md`.
+1. `index.html` — direct CSS/script entrypoints and DOM compatibility contract.
+2. `game.js` — approved gameplay patch loader and active/retired patch map.
+3. `ui-runtime-boot-v1.js` — post-runtime UI load order.
+4. `RUNTIME_ACTIVE.md` — quick runtime snapshot.
 5. `DEVELOPMENT_RULES.md`.
 6. `GAME_PLAN.md` for design intent only.
 7. `README.md` for overview only.
@@ -52,7 +51,7 @@ Order matters because older and newer UI generations overlap:
 6. `ui-main-menu-v3.css?v=4`
 7. `ui-store-v1.css?v=2`
 8. `ui-hud-v1.css?v=6`
-9. `ui-runtime-fixes-v1.css?v=1`
+9. `ui-runtime-fixes-v1.css?v=2`
 10. `ui-end-screens-v1.css?v=2`
 11. `ui-settings-leaderboard-v1.css?v=1`
 12. `ui-splash-approved-v3.css?v=1`
@@ -73,49 +72,41 @@ Do not reorder these casually. Cache query versions are part of the deployment c
 
 ---
 
-## 4. Core runtime architecture
+## 4. Core/runtime boot model
 
-`game.js` is an orchestrator, not the full historical game implementation.
+`game.js` is a loader, not the historical gameplay core itself.
 
-Current core entry:
+Current flow:
 
-`stable-runtime-w3-clean-v1.js?v=4`
+`index.html`
+→ direct core dependencies
+→ loading splash
+→ `game.js`
+→ `stable-runtime-w3-clean-v1.js`
+→ approved historical core extraction/launch
+→ `ACTIVE_PATCHES` in exact order
+→ `window.__FF_RUNTIME_APPROVED_STACK__ = true`
+→ `ui-runtime-boot-v1.js`
+→ modern post-runtime UI
 
-The current recovery core still synchronously loads a pinned historical `game.js` from jsDelivr, transforms it, and evaluates it. Pinned source commit:
+### Important architectural debt
 
-`5b83840d68ad65939b8efae336afd76c47b7bdc1`
+`stable-runtime-w3-clean-v1.js` currently restores the gameplay core from a pinned historical repository artifact. This works for LAB recovery but is **not** the desired final architecture for offline Android/Capacitor or a future private production repository.
 
-This is accepted temporary recovery debt, **not** the final offline/private/Android architecture. The long-term target is a fully materialized local core with behavior-equivalence tests before switching.
+Do not remove or replace this mechanism casually while gameplay behavior is still patch-dependent. The safe migration is:
 
-### Runtime handshake flags
-
-- `window.game` — instantiated game object.
-- `window.__FF_RUNTIME_APPROVED_STACK__ === true` — core and gameplay patch stack completed.
-- `window.__FF_MENU_UI_READY__ === true` — post-runtime UI and menu contract completed.
-- `window.__FF_RUNTIME_MAP__.version === 'approved-runtime-v1.3'` — runtime map identity.
-- `window.__FF_CHARACTER_ROSTER_V1__` — character roster installed.
-
-The loading splash may exit only after runtime and menu readiness are satisfied.
-
----
-
-## 5. 97% loading regression rule
-
-The August 29 loading failure was a deadlock: splash CSS hid the menu while readiness demanded painted visibility. Permanent contract:
-
-- menu readiness validates DOM/layout geometry, not splash-obscured paint visibility;
-- the menu may be prepainted behind the splash;
-- WebKit receives time to paint the menu before splash fade/removal;
-- no readiness condition may require the splash to disappear before `__FF_MENU_UI_READY__` can become true;
-- `htmlTag` remains a required compatibility hook because the historical core changes document direction through it.
-
-Never “simplify” these hooks without running both Chromium and WebKit live smoke tests.
+1. freeze current behavior with broader automated coverage;
+2. materialize the complete core locally;
+3. prove parity;
+4. then remove historical remote-core dependency.
 
 ---
 
-## 6. Exact active gameplay patch order
+## 5. Runtime patch rules
 
-This list is generated from the executable `ACTIVE_PATCHES` map in the current `game.js`. The order is behavior because many files wrap the same lifecycle methods.
+### `ACTIVE_PATCHES`
+
+The following list is generated from the executable `ACTIVE_PATCHES` map in the current `game.js`. The order is behavior because many files wrap the same lifecycle methods.
 
 1. `runtime-config-bridge-v1.js?v=1`
 2. `boss-fight-core-v1.js?v=2`
@@ -146,54 +137,63 @@ This list is generated from the executable `ACTIVE_PATCHES` map in the current `
 27. `w3-challenge-audio-v3.js?v=3`
 28. `w3-final-balance-v4.js?v=3`
 29. `w3-critical-fix-v6.js?v=3`
-30. `w3-runtime-cleanup-v1.js?v=5`
-31. `hero-blue-ninja-v1.js?v=3`
-32. `hero-static-smooth-v2.js?v=2`
-33. `hero-blue-effects-v1.js?v=4`
-34. `fierce-falcon-v1.js?v=4`
-35. `skin-routing-hardfix-v2.js?v=3`
-36. `character-roster-v1.js?v=3`
-37. `character-abilities-v2.js?v=3`
-38. `mountain-eagle-stability-v3.js?v=2`
-39. `character-ability-ui-v1.js?v=2`
-40. `character-ability-fx-v1.js?v=2`
-41. `world1-qa-fix-v2.js?v=2`
-42. `owl-guardian-v2.js?v=3`
-43. `world1-phase2-owl-dialogue-v3.js?v=3`
-44. `crow-king-ingame-v4.js?v=2`
-45. `crow-minions-ingame-v3.js?v=2`
-46. `world1-crow-contrast-v1.js?v=2`
-47. `world1-cursed-woods-background-v3.js?v=4`
-48. `world1-cursed-obstacle-asset-top-a.js?v=2`
-49. `world1-cursed-obstacle-asset-bottom-a.js?v=3`
-50. `world1-cursed-obstacles-v5.js?v=2`
-51. `world1-final-art-lock-v1.js?v=4`
-52. `world1-ground-obstacle-polish-v2.js?v=4`
-53. `world1-owl-dialogue-layer-fix-v3.js?v=4`
+30. `w3-world-fix-v5.js?v=4`
+31. `w3-runtime-cleanup-v1.js?v=4`
+32. `w3-environment-png-v1.js?v=1`
+33. `w3-enemy-png-v1.js?v=1`
+34. `w3-voltbat-png-v1.js?v=1`
+35. `character-roster-v1.js?v=3`
+36. `skin-routing-hardfix-v2.js?v=3`
+37. `hero-static-smooth-v2.js?v=4`
+38. `hero-blue-effects-v1.js?v=2`
+39. `character-abilities-v2.js?v=2`
+40. `character-ability-fx-v1.js?v=1`
+41. `character-ability-ui-v1.js?v=2`
+42. `fierce-falcon-v1.js?v=2`
+43. `mountain-eagle-stability-v3.js?v=1`
+44. `world1-background-scope-v1.js?v=2`
+45. `world1-cursed-woods-background-v3.js?v=3`
+46. `world1-final-art-lock-v1.js?v=3`
+47. `world1-cursed-obstacles-v5.js?v=5`
+48. `world1-ground-obstacle-polish-v2.js?v=2`
+49. `world1-crow-contrast-v1.js?v=2`
+50. `world1-phase2-owl-dialogue-v3.js?v=2`
+51. `world1-owl-dialogue-layer-fix-v3.js?v=3`
+52. `w2-emperor-png-v5.js?v=2`
+53. `w2-outro-eagle-skin-v3.js?v=2`
 
-If `ACTIVE_PATCHES` changes, this section must change in the same development cycle. CI is expected to reject active runtime tokens missing from this document.
+### `RETIRED_PATCHES`
 
-### Important retired examples
+The retired map is authoritative. A retired file may remain in the repository for history/comparison but must not return to the active loader unless the runtime map, tests, and this spec are deliberately updated together.
 
-These files may remain in the repository but are not production owners:
-
-- `boss-crowking-v1.js`
-- `world1-classic-enhanced-background-v1.js`
-- `ruins-pillars-v3.js`
-- `world1-ground-gap-polish-v1.js`
-- `w2-v7-compat-v1.js`
-- `w2-boss-combat-v5.js`
-- `w2-boss-combat-v6.js`
-- `w2-boss-tuning-v8.js`
-- `w2-boss-phase2-relief-v9.js`
-- `w3-critical-fix-v5.js`
-- `startup-menu-guard-v1.js`
-
-Never activate an old file merely because its name looks relevant.
+Important retired examples include legacy Crow King, old W1 classic background, old ground-gap renderer, W2 V2–V9 world stacks, and older W3 critical fixes.
 
 ---
 
-## 7. Post-runtime UI ownership
+## 6. Why regression risk is high
+
+The current project is behaviorally stable but historically patch-heavy. Many active files wrap the same methods such as:
+
+- `update()`
+- `draw()`
+- `gameOver()`
+- `reset()`
+- `activateBoss()`
+
+Therefore:
+
+- load order is behavior;
+- a “small” wrapper appended late can override earlier fixes;
+- replacing a function instead of chaining it can silently remove another feature;
+- adding one more patch is not automatically safer than modifying the current owner.
+
+### Development rule
+
+Before changing a lifecycle method, search every active wrapper of that method and identify the **final owner** after loader order. Prefer editing/consolidating the current owner instead of adding another wrapper.
+
+---
+
+## 7. Post-runtime UI boot
 
 `ui-runtime-boot-v1.js` waits for the approved gameplay runtime, then loads:
 
@@ -241,20 +241,22 @@ At minimum the ready menu requires:
 
 Canonical high-level flow:
 
-`PAGE LOAD → SPLASH → RUNTIME → MENU/WORLD SELECT → PLAY → STORY/LAUNCH → PLAYING → BOSS → OUTRO/VICTORY → NEXT WORLD/MENU`
+`Loading`
+→ `MENU`
+→ optional world/skin/shop/settings selection
+→ `STORY` / world intro where applicable
+→ `LAUNCH`
+→ `PLAYING`
+→ boss flow when threshold reached
+→ victory/story outro or `GAME_OVER`
+→ next world / restart / menu / revive according to state.
 
-Historical/active state names include:
+### Pause contract
 
-- `MENU`
-- `STORY`
-- `LAUNCH`
-- `PLAYING`
-- `BOSS`
-- `GAME_OVER`
-- `VICTORY`
+Pause must be a real simulation pause, not merely a visual overlay:
 
-Pause is an overlay/substate, not a separate game loop. While paused:
-
+- `game.__ffPaused === true` while Pause overlay is open;
+- the final `game.update()` chain must not execute;
 - simulation physics must stop;
 - bird Y/velocity must remain unchanged;
 - obstacle/boss progression and score must not advance;
@@ -286,9 +288,15 @@ Do not delete those compatibility hooks until the local core is fully migrated.
 
 ### Physical HUD layout
 
-Regardless of document language direction, the physical top row is:
+Regardless of document language direction, the approved compact HUD is:
 
 `coins on left | score/stage centered | Pause on right`
+
+Then the centered vertical stack is:
+
+`Fever bar | character ability / Royal Fortune`
+
+The approved visual identity is restrained royal violet/navy with thin antique-gold edging, light-blue stage text, a gold coin accent, and compact rounded forms. It must remain translucent/compact enough that gameplay stays dominant. Fever is wider than the ability chip; the ability chip must never sit above Fever or overlap the top row.
 
 Arabic affects text direction, not the physical control placement.
 
@@ -298,347 +306,235 @@ Fever remains a production gameplay mechanic and must be visible during normal g
 
 ---
 
-## 10. Persistence contract
+## 10. Save/progression compatibility
 
-Current progression/settings are local `localStorage` data. Important keys include:
+Existing local-storage keys are part of player compatibility. Do not rename/reset them casually.
+
+Known important keys include:
 
 - `fh_active_skin`
 - `fh_total_coins`
 - `fh_w1_completed`
 - `fh_w2_completed`
 - `fh_w3_completed`
-- `fh_high_score`
-- world-specific high-score/star values used by core/UI;
-- language/settings keys used by the historical core.
+- world high-score/progression keys used by the current core
+- purchased/unlocked skin state used by current roster/store patches.
 
-Do not rename, clear, or reinterpret these keys during unrelated visual/gameplay work. Any schema migration must be deliberate and regression-tested with existing save data.
-
----
-
-## 11. Character ownership
-
-Current character chain includes:
-
-- legacy/classic core rendering;
-- `hero-blue-ninja-v1.js`;
-- `hero-static-smooth-v2.js`;
-- `hero-blue-effects-v1.js`;
-- `fierce-falcon-v1.js`;
-- `skin-routing-hardfix-v2.js`;
-- `character-roster-v1.js`;
-- `character-abilities-v2.js`;
-- `mountain-eagle-stability-v3.js`;
-- `character-ability-ui-v1.js`;
-- `character-ability-fx-v1.js`.
-
-Character UI/FX must not redefine world physics or boss lifecycle.
+Any save schema migration must preserve existing players or include an explicit migration path.
 
 ---
 
-## 12. World ownership
+## 11. World ownership map
 
 ### W1 — Cursed Woods
 
-Current final owners include:
+Current final ownership is distributed, but the approved current visual/gameplay stack includes:
 
-- gameplay/story base: W1 final gameplay/story/fix patches;
-- background: `world1-cursed-woods-background-v3.js` + `world1-final-art-lock-v1.js`;
-- obstacles: asset top/bottom installers + `world1-cursed-obstacles-v5.js` + `world1-ground-obstacle-polish-v2.js`;
-- Crow King visual: `crow-king-ingame-v4.js`;
-- minions: `crow-minions-ingame-v3.js`;
-- contrast: `world1-crow-contrast-v1.js`;
-- Owl/outro: `owl-guardian-v2.js`, `world1-phase2-owl-dialogue-v3.js`, `world1-owl-dialogue-layer-fix-v3.js`;
-- final QA: `world1-qa-fix-v2.js`.
+- environment scope/background: `world1-background-scope-v1.js`, `world1-cursed-woods-background-v3.js`;
+- final W1 art lock: `world1-final-art-lock-v1.js`;
+- obstacle owner: `world1-cursed-obstacles-v5.js` plus current ground/contrast polish;
+- boss core: shared boss system + Crow King in-game owner;
+- story/dialogue: W1 final story + phase 2 owl/outro layers.
 
-The Owl dialogue must remain visually above the ground, and the approved paired fly-away/outro must survive future ground/dialogue changes.
+Do not reactivate `world1-classic-enhanced-background-v1.js` or `world1-ground-gap-polish-v1.js` to solve a visual problem; both belong to superseded approaches.
 
-### W2 — Frozen Peaks / Ice Emperor
+### W2 — Frozen Peaks
 
-Current authority includes:
+Current final ownership includes:
 
-- audio: `w2-audio-v1.js`;
-- environment/visuals: `w2-environment-assets-v1.js`, `w2-visuals-v1.js`, `w2-ice-ground-skeletons-v1.js`;
-- gameplay: `w2-gameplay-v1.js`;
-- boss art/polish/orb: `w2-emperor-art-v1.js`, `w2-boss-polish-v2.js`, `w2-boss-orb-v7.js`;
-- final boss behavior authority: `w2-boss-runtime-v10.js`.
+- W2 audio/environment/visual/gameplay layers;
+- Ice Emperor PNG final art: `w2-emperor-png-v5.js`;
+- boss behavior/runtime: `w2-boss-runtime-v10.js`;
+- current eagle reward/outro owner.
 
-Do not restore the retired V5/V6/V8/V9 compatibility combat chain.
+Do not restore old V2–V9 W2 world/runtime layers as shortcuts.
 
 ### W3 — Storm Ruins
 
-Current authority includes:
+Current final ownership includes:
 
-- `w3-foundation-v1.js`;
-- `w3-world-polish-v1.js`;
-- `w3-boss-v1.js`;
-- `w3-final-polish-v1.js`;
-- `w3-balance-visual-v2.js`;
-- `w3-challenge-audio-v3.js`;
-- `w3-final-balance-v4.js`;
-- `w3-critical-fix-v6.js`;
-- final cleanup owner: `w3-runtime-cleanup-v1.js`.
+- W3 foundation/world/boss/final-polish/balance chain;
+- `w3-runtime-cleanup-v1.js` as late cleanup owner;
+- final PNG environment/enemy/Voltbat layers.
 
-W3 asset installers referenced elsewhere in the repository remain relevant only where the active runtime actually consumes them; do not infer activation from filenames alone.
+Historical W3 critical/world fix files may still exist but active status comes only from `game.js`.
 
 ---
 
-## 13. Asset ownership
+## 12. Character/ability ownership
 
-Important production asset roots:
+Current roster/skin pipeline is controlled by the active character files in `game.js`, including:
 
-- `assets/ui/loading-hq/` — approved high-quality loading assets;
-- `assets/ui/world-thumbnails/` — current WebP world-card art;
-- `assets/ui/icons/` — pause/settings/shop/coin/stars/navigation and related vector UI icons;
-- `assets/world2/ice-emperor/` — current Ice Emperor state/source and sheet parts;
-- `assets/world3/enemies/` and `assets/world3/voltbat/` — W3 encoded character/enemy assets.
+- `character-roster-v1.js`
+- `skin-routing-hardfix-v2.js`
+- hero motion/effects files
+- `character-abilities-v2.js`
+- `character-ability-fx-v1.js`
+- `character-ability-ui-v1.js`
+- Falcon/Eagle specialization files.
 
-Do not introduce a second production art source for an existing entity without explicitly naming which owner is superseded.
-
----
-
-## 14. DOM compatibility rules
-
-`index.html` owns stable hooks required by both legacy core and modern UI. Critical examples:
-
-- `#htmlTag`
-- `#startScreen`
-- `#startStoryBtn`
-- `#worldCard`
-- `#previewBirdCanvas`
-- `#gameHud`
-- settings/store/leaderboard overlays;
-- end-screen score/coin hooks;
-- hidden `#ffCoreDomCompat` hooks.
-
-The hidden compatibility DOM is intentional. “Not visible” does not mean “unused.” Search the pinned core and active patches before removing any hook.
+When changing a skin, inspect both rendering and ability behavior. A skin is not only a sprite choice.
 
 ---
 
-## 15. CSS ownership debt
+## 13. UI ownership
 
-The page still contains overlapping CSS generations. For example, baseline `style.css`, `lab-ui.css`, V2/V3 menu CSS and specialized screens can target the same structures.
+### Loading
 
-Current rule:
+Approved loading owner:
 
-- identify the final visual owner before editing;
-- prefer editing/consolidating an existing owner;
-- do not add another global selector layer solely to win specificity;
-- post-runtime fix CSS is acceptable only for documented compatibility gaps and must remain narrow.
+- `ui-splash-approved-v3.css`
+- `ui-splash-approved-v3.js`
 
-Long-term goal: one explicit CSS owner for menu, store, HUD, end screens and settings/leaderboard.
+Loading readiness must not depend on menu **painted visibility** while the splash intentionally hides the menu. Geometry/readiness and visual reveal are separate contracts.
 
----
+### Main menu/world select
 
-## 16. Lifecycle wrapper risk
+Final visual behavior comes from the combination of:
 
-The runtime grew through method wrapping. High-risk methods include `update`, `draw`, `gameOver`, `reset`, `activateBoss`, audio lifecycle and boss activation methods.
+- base DOM in `index.html`;
+- `ui-world-select-v1.css/js`;
+- `ui-main-menu-v3.css/js`;
+- foundation styles;
+- late runtime UI fixes for proven compatibility issues.
 
-Before changing any wrapped lifecycle method:
+There is still CSS generation overlap; future cleanup should consolidate ownership only after visual regression coverage exists.
 
-1. inspect the executable active list;
-2. search every active wrapper of that method;
-3. identify the final owner in load order;
-4. make the smallest coherent change;
-5. add a regression test for the behavior being changed;
-6. avoid a new patch when an existing final owner can safely contain the change.
+### Store
 
-The preferred direction is fewer final owners, not more wrappers.
+The modern visible store is owned by `ui-store-v1.css/js` plus late compatibility styling. Purchase/save logic still depends on the gameplay/roster runtime.
 
----
+### Pause/end screens
 
-## 17. Audio contract
-
-Audio ownership is distributed across core audio plus W1/W2/W3 and boss/UX layers. Pause may suspend/resume environment audio, but a visual-only renderer must not become an audio lifecycle owner accidentally.
-
-Any future Pause consolidation must preserve both simulation freeze and correct audio resume behavior.
+Overlay presentation belongs to current end-screen/Pause UI layers; simulation freeze belongs to the final runtime pause guard. Do not merge visual visibility state with gameplay simulation state accidentally.
 
 ---
 
-## 18. Store and leaderboard
+## 14. Testing and deployment gates
 
-The store is local-game economy UI. Coin totals must use the same visual identity as the rest of Feather Fury and must remain backed by the existing persistence contract.
+### Repository safety gate
 
-The current leaderboard is local/demo behavior; there is no production global backend authority in this repository. Do not present it as globally synchronized or introduce network dependency merely to preserve current UI.
+`.github/workflows/repo-safety.yml` runs syntax/integrity checks.
 
----
+`scripts/runtime-integrity-check.js` protects critical contracts including:
 
-## 19. Version identities
-
-Several version concepts coexist:
-
-- package version around `2.2.0`;
-- historical in-game version text around `2.2.x`;
-- cache query versions such as `game.js?v=2.4.7`;
-- runtime map `approved-runtime-v1.3`.
-
-Do not assume these are the same semantic version. Future release work should define one product version and separate cache/runtime schema versions.
-
----
-
-## 20. CI and deployment safety
-
-### Repository integrity
-
-`.github/workflows/repo-safety.yml` runs `scripts/runtime-integrity-check.js` and related checks.
-
-The integrity gate must protect at minimum:
-
-- existence of every active patch;
-- no active/retired overlap;
 - direct boot versions/order;
-- required compatibility DOM;
-- post-runtime UI stack order;
-- Pause/HUD/Fever repair contracts;
-- canonical documentation references;
-- every executable active patch token represented in this specification.
+- active/retired patch map sanity;
+- required DOM hooks;
+- post-runtime UI ownership;
+- Pause visibility rules;
+- HUD/Fever/RTL repair layer;
+- documentation/source-of-truth references.
+
+The integrity gate must be updated when a deliberately approved runtime contract changes.
 
 ### Live browser verification
 
-`.github/workflows/live-runtime-verify.yml` runs Playwright at mobile viewport `390 × 844` on Chromium and WebKit.
+`.github/workflows/live-runtime-verify.yml` deploys/checks GitHub Pages and runs `scripts/live-smoke.mjs` on:
 
-Current smoke contract includes:
+- Chromium mobile;
+- WebKit/iPhone emulation.
 
-`load → runtime approved → menu ready → splash exits → menu visible → World/PLAY gap valid → store coin-balance style valid → PLAY → PLAYING → forced RTL HUD physical order → Fever visible → Pause opens → bird Y/velocity remain frozen → visible coin/score/Fever bridge reflects game state → resume`
+Current live regression coverage includes:
 
-A failure opens/updates the live deployment issue; recovery closes it.
+- loading completes;
+- main menu/world card/PLAY visible and inside viewport;
+- PLAY reaches gameplay;
+- Pause button visible;
+- top HUD physical order survives RTL;
+- Fever is visible;
+- Pause freezes bird position and velocity;
+- visible coin/score/Fever data bridge is functional;
+- menu World/PLAY spacing remains open;
+- store balance keeps its intended identity;
+- critical browser/runtime errors fail the check.
 
-### Still missing from full automated coverage
+Still missing from automated end-to-end coverage:
 
-- complete W1 run, Crow King and Owl outro;
-- complete W2 run, Ice Emperor and outro;
-- complete W3 run/boss/outro;
-- revive lifecycle;
-- real store purchase/equip persistence;
-- full language toggle lifecycle;
-- endless mode;
-- victory → next-world progression;
-- cold start with old saves;
-- offline/no-CDN boot;
-- Capacitor/Android lifecycle/back button.
+- full W1 run to boss/victory;
+- W2 boss and outro;
+- W3 boss/outro;
+- revive end-to-end;
+- real coin purchase persistence;
+- language switching through UI;
+- Endless mode;
+- next-world progression and save restore.
 
-These should be added before major runtime consolidation.
-
----
-
-## 21. Non-negotiable regression invariants
-
-Unless a deliberate product change updates both tests and this spec:
-
-1. Loading reaches 100% and exits; no 97% deadlock.
-2. Runtime and menu readiness flags become true.
-3. Logo, world card and PLAY fit the mobile viewport.
-4. World card and PLAY retain readable vertical spacing.
-5. PLAY reaches the intended story/gameplay state.
-6. Coins remain physically left, score centered, Pause physically right even in Arabic RTL.
-7. Pause freezes simulation; the bird must not fall/die while paused.
-8. Resume continues from the same simulation state.
-9. Visible run coins and score reflect live game state instead of remaining zero.
-10. Fever is visible and reflects game state.
-11. Store coin balance uses the approved game identity and layout.
-12. W1 Cursed Woods/Crow King/Owl outro ownership is preserved.
-13. W2 Runtime V10 behavior remains authoritative.
-14. W3 cleaned runtime remains authoritative.
-15. Retired patches do not silently return.
-16. Existing persistence keys are not broken by unrelated work.
-17. Chromium or WebKit critical runtime/UI errors fail deployment verification.
-18. No new public runtime code dependency is introduced.
+These are the next major regression gates to add before architectural consolidation.
 
 ---
 
-## 22. Known technical debt — priority
+## 15. Version vocabulary
 
-1. Materialize the historical transformed core locally; remove runtime CDN/XHR/eval dependency after equivalence testing.
-2. Expand world-path tests before consolidating method wrappers.
-3. Reduce wrapper depth and establish explicit final owners.
-4. Consolidate overlapping CSS generations.
-5. Unify version semantics.
-6. Add full persistence/store/revive/language tests.
-7. Complete Android/offline lifecycle verification.
-8. Keep W4 explicitly locked until it has real production implementation.
+Do not treat all visible version numbers as the same thing. Current repository contains several different version concepts:
 
----
+- package/app metadata version;
+- UI/cache query versions;
+- runtime map version;
+- individual patch versions;
+- historical core artifact version.
 
-## 23. Safe modernization roadmap
-
-### Phase A — characterize and protect
-
-Keep working behavior stable, fix visible bugs in their current owners, and add a regression test for each fixed contract.
-
-### Phase B — local core
-
-Generate a local stable core from the exact current transformed runtime, compare behavior, run browser/world tests, then remove the runtime remote code dependency.
-
-### Phase C — consolidate gameplay owners
-
-After tests exist, merge mature wrappers into explicit W1/W2/W3, character, Pause/HUD and end-screen owners.
-
-### Phase D — consolidate UI/CSS
-
-Define shared tokens in foundation and one final CSS/JS owner per surface. Retire superseded generations rather than stacking overrides forever.
-
-### Phase E — mobile/private readiness
-
-Require local production assets/code, offline cold start, persistence migration coverage, Capacitor build verification, audio lifecycle and Android back-button behavior.
+When reporting a regression, always name the **commit SHA** first. Cache versions are secondary identifiers.
 
 ---
 
-## 24. Development protocol
+## 16. Safe change procedure
 
-For every production change:
+For every non-trivial gameplay/UI change:
 
-1. Read this file and `RUNTIME_ACTIVE.md`.
-2. Inspect current `game.js` active/retired map.
-3. Identify the final owner(s) of the requested behavior.
-4. Search all wrappers of any lifecycle method being touched.
-5. Fetch the latest target file immediately before editing.
-6. Make the smallest coherent change.
-7. Separate unrelated visual/gameplay/audio/persistence changes.
-8. Do not casually change boot order or compatibility DOM.
-9. Update this spec when boot/runtime/UI ownership changes.
-10. Update `RUNTIME_ACTIVE.md` when the snapshot changes.
-11. Run repository integrity checks.
-12. Deploy.
-13. Run Chromium + WebKit live smoke.
-14. Inspect the deployed runtime, not only repository source.
+1. identify the current owner from `game.js`, `ui-runtime-boot-v1.js`, and this spec;
+2. inspect wrappers of any lifecycle method being changed;
+3. change the smallest final owner possible;
+4. do not reactivate a retired file as a shortcut;
+5. preserve required DOM/local-storage contracts;
+6. update tests for the regression being fixed;
+7. update this spec if ownership/runtime contract changed;
+8. let repo safety and live Chromium/WebKit checks pass;
+9. verify LAB preview manually for visual quality;
+10. only promote to production when explicitly approved.
 
 ---
 
-## 25. File-status taxonomy
+## 17. Architectural roadmap
 
-Use these labels in future reviews:
+Do **not** perform this as a single rewrite. Recommended sequence:
 
-- **ACTIVE CORE** — constructs the core runtime.
-- **ACTIVE PATCH** — in the executable active patch chain.
-- **ACTIVE UI** — directly or post-runtime loaded UI owner.
-- **ACTIVE ASSET** — consumed by an active owner.
-- **COMPATIBILITY** — required by historical core/bridges but not final visual owner.
-- **RETIRED** — intentionally excluded from production runtime.
-- **LAB/PREVIEW** — development-only artifact.
-- **UNKNOWN** — not proven active or retired; never activate by assumption.
+### Phase A — regression coverage
 
----
+Expand Playwright coverage through W1/W2/W3, bosses, victory, revive, purchase/save, languages, and Endless.
 
-## 26. Decision log
+### Phase B — localize the core
 
-### 2026-08-29 — Stable boot recovery
+Replace historical remote core restoration with a complete local core while preserving exact observed behavior.
 
-- Local `index.html` became the production document.
-- `game.js` became the approved runtime orchestrator.
-- UI boot was moved behind approved runtime readiness.
-- the historical remote-core transformer remains temporary debt.
+### Phase C — consolidate method ownership
 
-### 2026-08-29 — 97% splash deadlock
+Use active wrapper maps to merge repeated `update/draw/reset/gameOver/activateBoss` responsibilities into clear modules one subsystem at a time.
 
-- menu readiness changed from painted visibility to layout readiness;
-- WebKit menu prepaint was added before splash fade;
-- `htmlTag` compatibility was restored;
-- Pause was constrained inside the mobile viewport.
+### Phase D — CSS/UI consolidation
 
-### 2026-08-30 — HUD/Pause repair
+After screenshot/geometry coverage exists, retire overlapping UI generations and establish one stylesheet owner per screen/component.
 
-- `ui-runtime-fixes-v1.js/css` became the narrow post-runtime repair owner for final Pause simulation freeze, visible HUD coin/score/Fever bridging, physical RTL HUD ordering, Fever presentation, World/PLAY spacing and store coin-balance identity.
-- live browser smoke was expanded to prove these contracts on Chromium and WebKit.
+### Phase E — production/mobile hardening
+
+Validate Capacitor/offline asset loading, safe areas, performance, resume/background behavior, and private-repository deployment.
 
 ---
 
-A code change that changes runtime/boot/UI ownership without updating this document is incomplete.
+## 18. Definition of “do not regress”
+
+A future change is not accepted merely because the game opens. It must preserve, unless explicitly redesigned:
+
+- Loading → menu boot;
+- all visible menu controls;
+- W1/W2/W3 progression contracts;
+- active character rendering/abilities;
+- visible HUD data;
+- Fever;
+- real Pause simulation freeze;
+- boss behavior/art ownership;
+- save/purchase compatibility;
+- RTL and iPhone/WebKit geometry;
+- no return of retired patches.
+
+When a behavior is intentionally changed, update its automated contract and this specification in the **same development step**.
