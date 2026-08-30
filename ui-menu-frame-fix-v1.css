@@ -1,0 +1,19 @@
+/* Feather Fury — main menu frame geometry guard.
+   The start-screen-content wrapper owns only absolutely positioned children,
+   so it must explicitly cover the whole start screen or it collapses to 0×0
+   and clips the World Select / PLAY content. */
+#startScreen > .start-screen-content {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+  z-index: 1 !important;
+}
