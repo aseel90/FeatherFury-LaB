@@ -3,7 +3,7 @@
   if (window.__FF_APPROVED_RUNTIME_BOOT_V1__) return;
   window.__FF_APPROVED_RUNTIME_BOOT_V1__ = true;
 
-  const CORE_RUNTIME = 'stable-runtime-w3-clean-v1.js?v=4';
+  const CORE_RUNTIME = 'game-core-stable-v1.js?v=1';
   const ACTIVE_PATCHES = [
     // Bootstrap compatibility: exposes the legacy lexical CONFIG as window.CONFIG.
     'runtime-config-bridge-v1.js?v=1',
@@ -81,7 +81,8 @@
     'w2-boss-tuning-v8.js',
     'w2-boss-phase2-relief-v9.js',
     'w3-critical-fix-v5.js',
-    'world1-ground-gap-polish-v1.js'
+    'world1-ground-gap-polish-v1.js',
+    'stable-runtime-w3-clean-v1.js'
   ];
 
   window.__FF_RUNTIME_MAP__ = Object.freeze({

@@ -42,7 +42,7 @@ Current order:
 5. `js/world2.js?v=2.3.2`
 6. `js/world3.js?v=2.3.2`
 7. `ui-splash-approved-v3.js?v=12`
-8. `game.js?v=2.4.7`
+8. `game.js?v=2.4.9`
 9. `ui-runtime-boot-v1.js?v=8`
 
 Do not reorder these casually.
@@ -53,29 +53,26 @@ Do not reorder these casually.
 
 It performs this sequence:
 
-1. loads `stable-runtime-w3-clean-v1.js?v=4`;
+1. loads `game-core-stable-v1.js?v=1` from the local application bundle;
 2. waits for the historical game object;
 3. applies `ACTIVE_PATCHES` in exact order;
 4. records `RETIRED_PATCHES`;
 5. sets `window.__FF_RUNTIME_APPROVED_STACK__ = true`;
 6. the post-runtime UI boot then loads the UI stack.
 
-### Historical core restoration
+### Local materialized core
 
-`stable-runtime-w3-clean-v1.js` currently performs a **synchronous remote fetch** of historical `game.js` from commit:
+`game-core-stable-v1.js` is the approved game core. It is generated reproducibly from historical commit:
 
 `5b83840d68ad65939b8efae336afd76c47b7bdc1`
 
-through jsDelivr, applies W3 cleanup transforms, extracts the game class, and evaluates it.
+using the transforms preserved in `stable-runtime-w3-clean-v1.js`. The transformer is retained only as build history and is **not loaded by the game**. Runtime startup is therefore self-contained and does not depend on jsDelivr or any remote CDN.
 
-This is currently the largest architectural risk in the project because:
+Rules:
 
-- boot depends on a remote CDN;
-- true offline/Capacitor startup is not guaranteed;
-- private-repository conversion can break this path;
-- the local repository is not yet fully self-contained.
-
-**Do not remove or rewrite this mechanism without full regression coverage.** The planned migration is to localize this core while preserving observed behavior first.
+- never reintroduce a remote core fetch into startup;
+- regenerate the materialized core only through the documented materialization workflow;
+- any regenerated core must pass runtime integrity plus Chromium and WebKit live smoke before promotion.
 
 ---
 

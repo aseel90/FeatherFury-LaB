@@ -13,7 +13,7 @@ This file records the single active runtime chain used by `main` after the Augus
 - `patch-runner.js`, `patch-manifest.js`, and `startup-menu-guard-v1.js` are not part of boot.
 
 ## Active owners
-- Core runtime: `stable-runtime-w3-clean-v1.js` — **temporary recovery transformer**; it currently fetches a pinned historical `game.js` from jsDelivr at runtime, transforms it, and evaluates it. The final private/offline/Android architecture must materialize this core locally.
+- Core runtime: `game-core-stable-v1.js` — **materialized local core**. It contains the finalized historical core plus the approved World 3 cleanup transforms and requires no CDN at startup.
 - Runtime compatibility bridge: `runtime-config-bridge-v1.js` exposes the legacy lexical `CONFIG` object as `window.CONFIG` for runtime patches that require it. It owns no renderer or visual UI.
 - Gameplay pause UI: `core-gameplay-ux-v1.js`; the final simulation freeze is applied post-runtime by `ui-runtime-fixes-v1.js` so every later world/boss `update()` wrapper is frozen as well.
 - Gameplay HUD layout: `ui-hud-v1.js` / `ui-hud-v1.css`; live score, session coins and fever values are bridged by `ui-runtime-fixes-v1.js` from the real game state to the visible HUD DOM.
@@ -38,3 +38,5 @@ This file records the single active runtime chain used by `main` after the Augus
 
 ## Permanent integrity gate
 `.github/workflows/repo-safety.yml` runs `scripts/runtime-integrity-check.js` on every push/PR to `main`. The gate rejects missing active owners, active/retired overlap, historical HTML/UI bootstrap loaders, invalid pause visibility ownership, loss of the post-runtime pause/HUD repair layer, and regressions that hide the gameplay fever bar or restore the duplicate top boss HUD.
+
+- `stable-runtime-w3-clean-v1.js` — **retired transformer** kept only for reproducible regeneration of the local core; it is not loaded at runtime.
