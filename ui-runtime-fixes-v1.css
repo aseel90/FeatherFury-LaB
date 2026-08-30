@@ -318,3 +318,97 @@ html body #gameHud.ff-hud-v1 #ffAbilityHud{
   }
   #bossWarning{top:calc(max(env(safe-area-inset-top),0px) + 115px)!important}
 }
+
+/* Feather Fury runtime UI fixes v3 — quieter compact HUD. */
+html body #gameHud.ff-hud-v1 .hud-top{
+  top:calc(max(env(safe-area-inset-top),0px) + 7px)!important;
+  height:46px!important;
+  grid-template-columns:72px minmax(112px,124px) 38px!important;
+  gap:6px!important;
+}
+html body #gameHud.ff-hud-v1 .hud-coin-badge{
+  width:72px!important;min-width:72px!important;max-width:72px!important;height:36px!important;
+  padding:0 8px!important;gap:5px!important;border-width:1px!important;border-color:rgba(213,171,62,.72)!important;
+  border-radius:18px!important;background:linear-gradient(180deg,rgba(12,27,48,.94),rgba(7,16,32,.94))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 3px 9px rgba(0,0,0,.13)!important;
+  color:#f4d56b!important;font-size:.60rem!important;
+}
+html body #gameHud.ff-hud-v1 .ff-hud-coin-icon{width:20px!important;height:20px!important;flex-basis:20px!important}
+html body #gameHud.ff-hud-v1 .score-container{
+  width:124px!important;min-width:112px!important;max-width:124px!important;height:44px!important;
+  padding:4px 9px!important;gap:1px!important;border-width:1px!important;border-color:rgba(86,188,220,.48)!important;
+  border-radius:17px!important;background:linear-gradient(180deg,rgba(12,29,51,.95),rgba(7,17,34,.95))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 3px 10px rgba(0,0,0,.13)!important;
+}
+html body #gameHud.ff-hud-v1 .score-container::before{display:none!important}
+html body #gameHud.ff-hud-v1 .score-badge{font-size:.88rem!important;text-shadow:none!important}
+html body #gameHud.ff-hud-v1 .stage-badge{max-width:104px!important;color:#9fdff0!important;font-size:.62rem!important;text-shadow:none!important}
+html body #ffPauseBtn.ff-hud-pause-v1{
+  width:38px!important;height:38px!important;min-width:38px!important;max-width:38px!important;
+  border-width:1px!important;border-color:rgba(86,190,223,.56)!important;border-radius:13px!important;
+  background:linear-gradient(180deg,rgba(12,31,54,.95),rgba(7,18,35,.95))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 3px 9px rgba(0,0,0,.13)!important;
+}
+html body #ffPauseBtn.ff-hud-pause-v1 img{width:16px!important;height:16px!important;filter:brightness(1.1)!important}
+
+html body #gameHud.ff-hud-v1 .fever-bar-container{
+  top:calc(max(env(safe-area-inset-top),0px) + 61px)!important;
+  width:min(56vw,220px)!important;height:19px!important;padding:2px 7px 3px!important;gap:1px!important;
+  border-width:1px!important;border-color:rgba(213,171,62,.50)!important;border-radius:10px!important;
+  background:rgba(7,15,28,.90)!important;box-shadow:0 3px 8px rgba(0,0,0,.10)!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+}
+html body #gameHud.ff-hud-v1 .fever-bar-container::before{display:none!important}
+html body #gameHud.ff-hud-v1 .fever-label{height:7px!important;color:#d8bb5c!important;font-size:8px!important;line-height:1!important;text-shadow:none!important}
+html body #gameHud.ff-hud-v1 .fever-track{height:4px!important;border-width:0!important;background:rgba(1,5,13,.92)!important;box-shadow:none!important}
+html body #gameHud.ff-hud-v1 .fever-fill{background:linear-gradient(90deg,#42bcd8 0%,#7469cb 72%,#d5ad4f 100%)!important;box-shadow:none!important}
+html body #gameHud.ff-hud-v1 .fever-fill.max{background:linear-gradient(90deg,#67d7ed,#9d7ddb,#e2bf60)!important;box-shadow:0 0 6px rgba(124,207,231,.22)!important}
+
+html body #gameHud.ff-hud-v1 #ffAbilityHud{
+  top:calc(max(env(safe-area-inset-top),0px) + 86px)!important;
+  min-width:128px!important;max-width:min(48%,190px)!important;min-height:24px!important;
+  padding:3px 11px!important;border-width:1px!important;border-color:rgba(88,172,208,.46)!important;
+  background:rgba(9,24,45,.90)!important;box-shadow:0 3px 8px rgba(0,0,0,.10)!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;color:#e8f6ff!important;font-size:.62rem!important;
+}
+#bossWarning{top:calc(max(env(safe-area-inset-top),0px) + 116px)!important}
+
+@media(max-width:340px){
+  html body #gameHud.ff-hud-v1 .hud-top{height:43px!important;grid-template-columns:64px 106px 36px!important;gap:4px!important}
+  html body #gameHud.ff-hud-v1 .hud-coin-badge{width:64px!important;min-width:64px!important;max-width:64px!important;height:33px!important;padding-inline:6px!important;font-size:.54rem!important}
+  html body #gameHud.ff-hud-v1 .ff-hud-coin-icon{width:18px!important;height:18px!important;flex-basis:18px!important}
+  html body #gameHud.ff-hud-v1 .score-container{width:106px!important;min-width:106px!important;max-width:106px!important;height:41px!important;padding-inline:7px!important}
+  html body #gameHud.ff-hud-v1 .score-badge{font-size:.80rem!important}
+  html body #gameHud.ff-hud-v1 .stage-badge{max-width:90px!important;font-size:.56rem!important}
+  html body #ffPauseBtn.ff-hud-pause-v1{width:36px!important;height:36px!important;min-width:36px!important;max-width:36px!important}
+  html body #gameHud.ff-hud-v1 .fever-bar-container{top:calc(max(env(safe-area-inset-top),0px) + 57px)!important;width:min(60vw,200px)!important;height:18px!important}
+  html body #gameHud.ff-hud-v1 #ffAbilityHud{top:calc(max(env(safe-area-inset-top),0px) + 80px)!important;min-width:116px!important;max-width:54%!important;min-height:22px!important;font-size:.57rem!important}
+  #bossWarning{top:calc(max(env(safe-area-inset-top),0px) + 108px)!important}
+}
+@media(max-height:600px){
+  html body #gameHud.ff-hud-v1 .hud-top{top:calc(max(env(safe-area-inset-top),0px) + 5px)!important;height:42px!important}
+  html body #gameHud.ff-hud-v1 .hud-coin-badge{height:32px!important}
+  html body #gameHud.ff-hud-v1 .score-container{height:40px!important}
+  html body #ffPauseBtn.ff-hud-pause-v1{width:35px!important;height:35px!important;min-width:35px!important;max-width:35px!important}
+  html body #gameHud.ff-hud-v1 .fever-bar-container{top:calc(max(env(safe-area-inset-top),0px) + 54px)!important;width:min(52vw,190px)!important;height:17px!important}
+  html body #gameHud.ff-hud-v1 #ffAbilityHud{top:calc(max(env(safe-area-inset-top),0px) + 76px)!important;min-height:21px!important;padding:2px 9px!important}
+  #bossWarning{top:calc(max(env(safe-area-inset-top),0px) + 103px)!important}
+}
+@media(min-width:700px) and (min-height:650px){
+  html body #gameHud.ff-hud-v1 .hud-top{height:50px!important;grid-template-columns:78px 132px 40px!important}
+  html body #gameHud.ff-hud-v1 .hud-coin-badge{width:78px!important;min-width:78px!important;max-width:78px!important;height:38px!important}
+  html body #gameHud.ff-hud-v1 .score-container{width:132px!important;min-width:132px!important;max-width:132px!important;height:46px!important}
+  html body #ffPauseBtn.ff-hud-pause-v1{width:40px!important;height:40px!important;min-width:40px!important;max-width:40px!important}
+  html body #gameHud.ff-hud-v1 .fever-bar-container{top:calc(max(env(safe-area-inset-top),0px) + 65px)!important;width:230px!important;height:20px!important}
+  html body #gameHud.ff-hud-v1 #ffAbilityHud{top:calc(max(env(safe-area-inset-top),0px) + 91px)!important;min-width:134px!important}
+  #bossWarning{top:calc(max(env(safe-area-inset-top),0px) + 121px)!important}
+}
+@media(orientation:landscape) and (max-height:540px) and (min-width:600px){
+  html body #gameHud.ff-hud-v1 .hud-top{height:40px!important;grid-template-columns:64px 106px 34px!important}
+  html body #gameHud.ff-hud-v1 .hud-coin-badge{width:64px!important;min-width:64px!important;max-width:64px!important;height:30px!important}
+  html body #gameHud.ff-hud-v1 .score-container{width:106px!important;min-width:106px!important;max-width:106px!important;height:38px!important}
+  html body #ffPauseBtn.ff-hud-pause-v1{width:34px!important;height:34px!important;min-width:34px!important;max-width:34px!important}
+  html body #gameHud.ff-hud-v1 .fever-bar-container{top:calc(max(env(safe-area-inset-top),0px) + 49px)!important;width:min(38vw,180px)!important;height:16px!important}
+  html body #gameHud.ff-hud-v1 #ffAbilityHud{top:calc(max(env(safe-area-inset-top),0px) + 70px)!important;min-width:108px!important;min-height:20px!important;font-size:.55rem!important}
+  #bossWarning{top:calc(max(env(safe-area-inset-top),0px) + 95px)!important}
+}

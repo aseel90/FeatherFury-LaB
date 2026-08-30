@@ -97,11 +97,169 @@
 }
 @media (orientation:landscape) and (max-height:540px){
   #settingsScreen.ff-settings-screen{display:grid!important;grid-template-columns:minmax(250px,440px) minmax(170px,250px);grid-template-rows:auto auto;justify-content:center!important;align-content:center;column-gap:18px;row-gap:8px}
-  #settingsScreen .ff-screen-heading{grid-column:1/3}#settingsScreen .settings-panel{grid-column:1;grid-row:2;max-height:76dvh;width:100%!important}
-  #settingsScreen .version-info{display:flex!important;grid-column:2;grid-row:2;align-self:center}#settingsScreen #closeSettingsBtn{grid-column:2;grid-row:2;align-self:end;justify-self:center;margin-bottom:8px!important;width:min(190px,90%)!important}
-  #leaderboardScreen.ff-leaderboard-screen{padding-block:calc(env(safe-area-inset-top,0px) + 8px) calc(env(safe-area-inset-bottom,0px) + 8px)!important}
-  #leaderboardScreen .leaderboard-content{max-height:73dvh;width:min(72vw,620px)!important}#leaderboardScreen .shop-header{width:min(72vw,620px)!important}
+  #settingsScreen .ff-screen-heading{grid-column:2;grid-row:1}.ff-screen-heading{font-size:1.15rem!important}
+  #settingsScreen .settings-panel{grid-column:1;grid-row:1 / span 2;max-height:92dvh!important;padding:9px 13px!important}
+  #settingsScreen #closeSettingsBtn{grid-column:2;grid-row:2;align-self:start;width:min(100%,220px)!important;min-height:38px!important}
 }
-@media (min-width:700px) and (min-height:700px){
-  #settingsScreen .settings-panel{width:min(70vw,520px)!important}#leaderboardScreen .leaderboard-content,#leaderboardScreen .shop-header{width:min(70vw,560px)!important}
+
+/* Feather Fury — Settings compact polish v2 */
+#settingsScreen.ff-settings-screen{
+  justify-content:center!important;
+  gap:0!important;
+  padding:calc(env(safe-area-inset-top,0px) + 18px)
+          calc(env(safe-area-inset-right,0px) + 16px)
+          calc(env(safe-area-inset-bottom,0px) + 18px)
+          calc(env(safe-area-inset-left,0px) + 16px)!important;
+  background:linear-gradient(180deg,rgba(4,10,23,.92),rgba(5,16,31,.95))!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+#settingsScreen .settings-dialog{
+  position:relative!important;
+  width:min(90vw,390px)!important;
+  max-width:390px!important;
+  margin:0!important;
+  padding:22px 18px 16px!important;
+  box-sizing:border-box!important;
+  border:1px solid rgba(91,190,222,.34)!important;
+  border-radius:22px!important;
+  background:linear-gradient(180deg,rgba(10,25,45,.96),rgba(7,18,34,.97))!important;
+  box-shadow:0 14px 34px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.035)!important;
+  overflow:hidden!important;
+}
+#settingsScreen .dialog-title,
+#settingsScreen .ff-screen-heading{
+  min-height:42px!important;
+  margin:0 46px 14px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  color:#edf8ff!important;
+  font-size:clamp(1.28rem,5vw,1.55rem)!important;
+  font-weight:900!important;
+  line-height:1!important;
+  text-shadow:none!important;
+}
+#settingsScreen .ff-screen-heading::before{
+  width:24px!important;
+  height:24px!important;
+  filter:drop-shadow(0 0 4px rgba(83,210,235,.22))!important;
+}
+#settingsScreen #closeSettingsBtn{
+  position:absolute!important;
+  top:18px!important;
+  left:16px!important;
+  right:auto!important;
+  width:40px!important;
+  min-width:40px!important;
+  max-width:40px!important;
+  height:40px!important;
+  min-height:40px!important;
+  padding:0!important;
+  margin:0!important;
+  display:grid!important;
+  place-items:center!important;
+  border:1px solid rgba(105,203,231,.42)!important;
+  border-radius:13px!important;
+  background:rgba(13,35,57,.92)!important;
+  box-shadow:none!important;
+  color:#dff7ff!important;
+  z-index:2!important;
+}
+#settingsScreen #closeSettingsBtn .ff-btn-icon{
+  width:20px!important;
+  height:20px!important;
+  margin:0!important;
+  opacity:.92!important;
+}
+#settingsScreen #closeSettingsBtn span{display:none!important}
+html[dir="rtl"] #settingsScreen #closeSettingsBtn{left:auto!important;right:16px!important}
+
+#settingsScreen .settings-options{
+  width:100%!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:0!important;
+  margin:0!important;
+  padding:0!important;
+}
+#settingsScreen .setting-row{
+  min-height:58px!important;
+  padding:8px 2px!important;
+  gap:10px!important;
+  border-bottom:1px solid rgba(142,204,224,.10)!important;
+}
+#settingsScreen .setting-row:last-child{border-bottom:0!important;padding-bottom:4px!important}
+#settingsScreen .ff-setting-label,
+#settingsScreen .setting-row>span[data-i18n]{
+  min-width:0!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:9px!important;
+  color:#eaf5fb!important;
+  font-size:clamp(.90rem,3.7vw,1rem)!important;
+  font-weight:800!important;
+  line-height:1.15!important;
+}
+#settingsScreen .ff-setting-icon{
+  width:23px!important;
+  height:23px!important;
+  flex:0 0 23px!important;
+  filter:drop-shadow(0 0 4px rgba(82,207,234,.18))!important;
+}
+#settingsScreen .setting-action,
+#settingsScreen .secondary-btn,
+#settingsScreen #resetDataBtn,
+#settingsScreen #resetProgressBtn{
+  min-width:88px!important;
+  width:auto!important;
+  min-height:34px!important;
+  height:34px!important;
+  padding:5px 12px!important;
+  margin:0!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  border:1px solid rgba(83,192,226,.46)!important;
+  border-radius:999px!important;
+  background:rgba(11,41,64,.90)!important;
+  color:#86e8ff!important;
+  font-family:'Tajawal','Changa',sans-serif!important;
+  font-size:.88rem!important;
+  font-weight:900!important;
+  line-height:1!important;
+  box-shadow:none!important;
+  white-space:nowrap!important;
+}
+#settingsScreen #resetDataBtn,
+#settingsScreen #resetProgressBtn,
+#settingsScreen .danger-btn{
+  border-color:rgba(244,112,139,.55)!important;
+  background:rgba(66,23,40,.72)!important;
+  color:#ff95ac!important;
+}
+#settingsScreen .setting-action:active,
+#settingsScreen #resetProgressBtn:active,
+#settingsScreen #resetDataBtn:active{transform:scale(.97)!important}
+#settingsScreen .version-info{display:none!important}
+
+@media(max-width:350px){
+  #settingsScreen .settings-dialog{width:94vw!important;padding:20px 14px 13px!important;border-radius:19px!important}
+  #settingsScreen #closeSettingsBtn{top:16px!important;left:13px!important;width:38px!important;min-width:38px!important;height:38px!important;min-height:38px!important}
+  html[dir="rtl"] #settingsScreen #closeSettingsBtn{left:auto!important;right:13px!important}
+  #settingsScreen .dialog-title,#settingsScreen .ff-screen-heading{margin-inline:43px!important;margin-bottom:10px!important;font-size:1.2rem!important}
+  #settingsScreen .setting-row{min-height:53px!important;padding:6px 1px!important}
+  #settingsScreen .ff-setting-label,#settingsScreen .setting-row>span[data-i18n]{font-size:.86rem!important;gap:7px!important}
+  #settingsScreen .ff-setting-icon{width:21px!important;height:21px!important;flex-basis:21px!important}
+  #settingsScreen .setting-action,#settingsScreen .secondary-btn,#settingsScreen #resetDataBtn,#settingsScreen #resetProgressBtn{min-width:78px!important;height:32px!important;min-height:32px!important;padding:4px 9px!important;font-size:.80rem!important}
+}
+@media(max-height:620px){
+  #settingsScreen.ff-settings-screen{justify-content:flex-start!important;padding-top:calc(env(safe-area-inset-top,0px) + 10px)!important;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 10px)!important}
+  #settingsScreen .settings-dialog{padding-top:15px!important;padding-bottom:10px!important}
+  #settingsScreen #closeSettingsBtn{top:12px!important}
+  #settingsScreen .dialog-title,#settingsScreen .ff-screen-heading{min-height:36px!important;margin-bottom:7px!important;font-size:1.12rem!important}
+  #settingsScreen .setting-row{min-height:47px!important;padding:4px 2px!important}
+  #settingsScreen .setting-action,#settingsScreen .secondary-btn,#settingsScreen #resetDataBtn,#settingsScreen #resetProgressBtn{height:30px!important;min-height:30px!important}
 }
