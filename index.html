@@ -23,15 +23,24 @@
   <link rel="stylesheet" href="ui-splash-approved-v3.css?v=1" />
 </head>
 <body>
-  <svg style="display:none"><defs>
-      <g id="coin-svg"><circle cx="12" cy="12" r="10" fill="#f1c40f" stroke="#d35400" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="#f39c12"/></g>
-      <g id="star-svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor" stroke="#000" stroke-width="1" stroke-linejoin="round" /></g>
-  </defs></svg>
-  <div class="game-wrapper"><div id="app" class="game-container">
-    <canvas id="gameCanvas" width="390" height="844"></canvas>
+  <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+    <symbol id="coin-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#fbbf24" stroke="#f59e0b" stroke-width="2"/><path d="M13 5 9 12h4l-2 7 5-9h-4l1-5Z" fill="#fff3b0"/></symbol>
+    <symbol id="star-svg" viewBox="0 0 24 24"><path d="m12 2.5 2.85 5.78 6.38.93-4.62 4.5 1.09 6.35L12 17.06 6.3 20.06l1.09-6.35-4.62-4.5 6.38-.93L12 2.5Z" fill="currentColor"/></symbol>
+    <symbol id="lang-svg" viewBox="0 0 24 24"><path d="M4 5h10M9 3v2m1.5 0c-.9 4-3 6.5-6 8m2.5-4c1.4 1.8 3 3.1 5 4m3-2h5m-2.5-2 3 8m-6 0 3-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </svg>
+
+  <div class="game-wrapper"><div id="app" class="game-container" data-ff-app-shell="1">
+    <canvas id="gameCanvas" width="450" height="800" aria-label="Feather Fury Game"></canvas>
 
     <div id="startScreen" class="overlay-screen active">
-      <div class="start-topbar"><div class="coin-pill"><svg width="22" height="22" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg><span id="startTotalCoins">0</span></div><div class="topbar-actions"><button id="leaderboardBtn" class="icon-btn" aria-label="Leaderboard">🏆</button><button id="shopBtnStart" class="icon-btn" aria-label="Shop">🛒</button><button id="settingsBtn" class="icon-btn" aria-label="Settings">⚙</button></div></div>
+      <div class="top-bar start-topbar">
+        <div class="coin-pill start-balance"><svg width="22" height="22" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg><span id="startTotalCoins">0</span></div>
+        <div class="start-header-actions">
+          <button id="leaderboardBtn" class="icon-btn" aria-label="Leaderboard">🏆</button>
+          <button id="shopBtnStart" class="icon-btn" aria-label="Shop">🛒</button>
+          <button id="settingsBtn" class="icon-btn" aria-label="Settings">⚙</button>
+        </div>
+      </div>
       <div class="start-main-content">
         <div class="title-container"><div class="game-title">FEATHER<br><span>FURY</span></div></div>
         <div class="world-select-shell">
