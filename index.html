@@ -1,15 +1,14 @@
-<!doctype html>
+<!DOCTYPE html>
 <html id="htmlTag" lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
-  <meta name="theme-color" content="#0f3e5b" />
-  <title>Feather Fury — Lab</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="favicon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#07111f" />
+  <title>Feather Fury</title>
+  <link rel="icon" href="icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Changa:wght@400;600;700;800&family=Press+Start+2P&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css?v=2.3.6" />
   <link rel="stylesheet" href="lab-ui.css?v=1" />
   <link rel="stylesheet" href="ui-foundation-v1.css?v=1" />
@@ -45,42 +44,21 @@
       <div class="start-main-content">
         <div class="title-container"><div class="game-title">FEATHER<br><span>FURY</span></div></div>
         <div class="world-select-shell">
-          <button id="prevWorld" class="carousel-btn"><span>◀</span></button>
-          <div id="worldCard" class="world-card">
-            <div class="world-kicker" id="worldKicker">WORLD 1</div>
-            <div class="world-title" id="worldTitle">Cursed Woods</div>
-            <div class="preview-canvas-wrap"><canvas id="previewBirdCanvas" width="110" height="110"></canvas></div>
-            <div class="world-meta"><div class="stars" id="worldStars">☆☆☆</div><div class="world-status" id="worldStatus">Ready</div></div>
-          </div>
-          <button id="nextWorld" class="carousel-btn"><span>▶</span></button>
-          <div class="world-dots" id="worldDots"></div>
-          <div class="start-actions-group">
-            <button id="startStoryBtn" class="arcade-btn primary-btn">ابدأ</button>
-            <button id="startEndlessBtn" class="arcade-btn secondary-btn">لا نهائي</button>
-          </div>
-        </div>
-      </div>
+          <div class="worlds-carousel"><button id="prevWorldBtn" class="carousel-nav-btn" aria-label="Previous World"></button><div class="world-card" id="worldCard"><div class="world-title" id="worldTitle">الغابة الملعونة</div><div class="world-stars" id="worldStars"><span class="star empty star-small"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span><span class="star empty star-big"><svg width="1.7em" height="1.7em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span><span class="star empty star-small"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span></div><div class="bird-preview"><div class="preview-canvas-wrap"><canvas id="previewBirdCanvas" width="54" height="54"></canvas></div><span id="activeSkinName" class="skin-name-badge">العصفور الكلاسيكي</span></div><div class="world-status" id="worldStatus">جاهز للعب!</div></div><button id="nextWorldBtn" class="carousel-nav-btn" aria-label="Next World"></button></div>
+          <div class="start-actions-group"><button id='startStoryBtn' class="arcade-btn" data-i18n="playBtn">بدء المهمة</button><button id='startEndlessBtn' class='arcade-btn secondary-action-btn' data-i18n="endlessBtn">الطور اللانهائي</button></div></div></div>
     </div>
+
+    <div id="gameHud" class="hud hidden"><div class="hud-top"><div class="hud-coin-badge"><svg width="21" height="21" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg><span id="runCoins">0</span></div><div class="score-container"><div id="scoreValue" class="score-badge">0</div><div id="stageName" class="stage-badge"></div></div><button id="soundToggleBtn" class="icon-btn small-hud-btn" aria-label="Sound"></button></div><div class="fever-bar-container"><div class="fever-label"><span id="feverText"></span></div><div class="fever-track"><div id="feverFill" class="fever-fill"></div></div></div><div id="bossWarning" class="boss-warning hidden"></div><div id="gameHint" class="game-hint hidden"></div></div>
+
+    <div id="gameOverScreen" class="overlay-screen hidden"><div class="game-over-dialog"><h2 id="endGameTitle" class="game-over-title" data-i18n="gameOverTitle">انتهت اللعبة</h2><div class="run-stars-container" id="runStarsContainer"><span class="star empty star-side"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span><span class="star empty star-center"><svg width="1.9em" height="1.9em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span><span class="star empty star-side"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span></div><div class="score-card-modern"><div class="score-row-modern"><span class="label" data-i18n="scoreLabel">النقاط</span><span id="finalScore" class="value score-num">0</span></div><div class="score-row-modern best"><span class="label" data-i18n="bestScoreLabel">أعلى نتيجة</span><span id="highScore" class="value best-num">0</span></div><div class="score-row-modern coins"><span class="label" data-i18n="collectedLabel">جمعت</span><span class="value coins-num"><span id="earnedCoins">0</span> <svg width="18" height="18" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg></span></div></div><div class="game-over-buttons-group"><button id="nextWorldActionBtn" class="arcade-btn next-world-btn hidden" data-i18n="nextWorldBtn">العالم التالي</button><button id="reviveBtn" class="arcade-btn revive-btn" data-i18n="reviveBtn">استمرار (محاولة ثانية)</button><div class="secondary-btn-grid"><button id="restartBtn" class="arcade-btn action-sub-btn restart-btn" data-i18n="restartBtn">إعادة اللعب</button><button id="shopBtnGameOver" class="arcade-btn action-sub-btn shop-btn" data-i18n="shopBtn">المتجر</button><button id="mainMenuBtn" class="arcade-btn action-sub-btn menu-btn" data-i18n="mainMenuBtn">الرئيسية</button></div></div></div></div>
 
     <div id="settingsScreen" class="overlay-screen hidden"><div class="settings-dialog"><button id="closeSettingsBtn" class="close-btn">×</button><h2 class="dialog-title" data-i18n="settingsTitle">الإعدادات</h2><div class="settings-options"><div class="setting-row"><span data-i18n="langLabel">اللغة</span><button id="langToggleBtn" class="setting-action"></button></div><div class="setting-row"><span data-i18n="sfxLabel">المؤثرات الصوتية</span><button id="sfxToggleBtn" class="setting-action"></button></div><div class="setting-row"><span data-i18n="gfxLabel">الجودة</span><button id="gfxToggleBtn" class="setting-action"></button></div><div class="setting-row danger-row"><span data-i18n="resetLabel">حذف التقدم</span><button id="resetProgressBtn" class="setting-action danger-btn" data-i18n="resetBtn">حذف</button></div></div></div></div>
 
-    <div id="shopScreen" class="overlay-screen hidden"><div class="shop-header"><button id="closeShopBtn" class="close-btn">×</button><h2 data-i18n="shopTitle">المتجر</h2><div class="shop-balance"><svg width="20" height="20" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg><span id="shopTotalCoins">0</span></div></div><div id="shopItems" class="shop-grid"></div></div>
+    <div id="shopScreen" class="overlay-screen hidden"><div class="shop-dialog"><div class="shop-header"><button id="closeShopBtn" class="close-btn">×</button><h2 class="dialog-title" data-i18n="shopTitle">الطيور والمتجر</h2><div class="shop-balance"><svg width="20" height="20" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg><span id="shopTotalCoins">0</span></div></div><div id="skinsGrid" class="skins-grid"></div></div></div>
 
-    <div id="leaderboardScreen" class="overlay-screen hidden"><div class="shop-header"><button id="closeLeaderboardBtn" class="close-btn">×</button><h2 data-i18n="leaderboardTitle">Leaderboard</h2></div><div class="leaderboard-content"><ol id="leaderboardList"></ol><p data-i18n="leaderboardSubtitle">Top local scores</p></div></div>
+    <div id="leaderboardScreen" class="overlay-screen hidden"><div class="leaderboard-dialog"><button id="closeLeaderboardBtn" class="close-btn">×</button><h2 class="dialog-title" data-i18n="leaderboardTitle">أفضل النتائج</h2><div id="leaderboardList" class="leaderboard-list"></div></div></div>
 
-    <div id="gameHud" class="hud hidden"><div class="hud-top"><div class="hud-coin-badge"><svg width="22" height="22" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg><span id="runCoins">0</span></div><div class="score-container"><span class="score-badge" id="scoreValue">0</span><span class="stage-badge" id="stageName">Forest Edge</span></div></div><div class="fever-bar-container"><span class="fever-label">FEVER</span><div class="fever-track"><div id="feverFill" class="fever-fill"></div></div></div><div id="ffBossHud" class="ff-boss-hud hidden"></div><div id="bossWarning" class="boss-warning hidden"></div></div>
-
-    <div id="gameOverScreen" class="overlay-screen hidden"><div class="game-over-card"><h2 id="gameOverTitle">انتهت اللعبة</h2><div class="result-row"><span>Score</span><strong id="gameOverScore">0</strong></div><div class="result-row"><span>Coins</span><strong id="gameOverCoins">0</strong></div><div class="game-over-actions"><button id="restartBtn" class="arcade-btn primary-btn">إعادة</button><button id="reviveBtn" class="arcade-btn secondary-btn">إحياء</button><button id="shopBtnGameOver" class="arcade-btn secondary-btn">المتجر</button><button id="startEndlessBtnGameOver" class="arcade-btn secondary-btn">لا نهائي</button></div></div></div>
-
-    <div id="ffToast" class="ff-toast" aria-live="polite"></div>
-
-    <div id="ffCoreDomCompat" hidden aria-hidden="true">
-      <span id="currentScoreDisplay">0</span><span id="sessionCoinDisplay">0</span><span id="stageDisplay">Forest Edge</span><span id="feverBarFill"></span>
-      <span id="bossName">Boss</span><span id="bossHpText">100%</span><div id="bossHpFill"></div>
-      <span id="gameOverScoreDisplay">0</span><span id="gameOverCoinsDisplay">0</span><span id="bestScoreDisplay">0</span>
-      <span id="victoryScoreDisplay">0</span><span id="victoryCoinsDisplay">0</span><span id="victoryMessage"></span>
-      <button id="resetDataBtn" type="button"></button><button id="startEndlessBtnGameOverCompat" type="button"></button>
-    </div>
+    <div id="ffCoreDomCompat" hidden aria-hidden="true"><button id="resetDataBtn" type="button" tabindex="-1"></button><button id="startEndlessBtnGameOver" type="button" tabindex="-1"></button><span id="currentScoreDisplay">0</span><span id="sessionCoinDisplay">0</span><span id="stageDisplay"></span><span id="feverBarFill"></span></div><div id="gameToast" class="game-toast hidden"></div>
   </div></div>
 
   <script src="js/config.js?v=2.3.4"></script>
