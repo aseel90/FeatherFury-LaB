@@ -20,12 +20,12 @@ const canonicalSpec = read('FEATHER_FURY_GAME_SPEC.md');
 for (const doc of ['README.md','DEVELOPMENT_RULES.md','GAME_PLAN.md','RUNTIME_ACTIVE.md']) {
   if (!read(doc).includes('FEATHER_FURY_GAME_SPEC.md')) fail(`${doc} must point to FEATHER_FURY_GAME_SPEC.md as the canonical game/runtime spec`);
 }
-for (const token of ['ACTIVE_PATCHES','RETIRED_PATCHES','stable-runtime-w3-clean-v1.js','ui-runtime-boot-v1.js','scripts/live-smoke.mjs']) {
+for (const token of ['ACTIVE_PATCHES','RETIRED_PATCHES','game-core-stable-v1.js','stable-runtime-w3-clean-v1.js','ui-runtime-boot-v1.js','scripts/live-smoke.mjs']) {
   if (!canonicalSpec.includes(token)) fail(`FEATHER_FURY_GAME_SPEC.md missing canonical runtime token: ${token}`);
 }
 
 const activeMatch = game.match(/const ACTIVE_PATCHES = \[([\s\S]*?)\n\s*\];/);
-const retiredMatch = game.match(/const RETIRED_PATCHES = new Set\(\[([\s\S]*?)\n\s*\]\);/);
+const retiredMatch = game.match(/const RETIRED_PATCHES = \[([\s\S]*?)\n\s*\];/);
 if (!activeMatch) fail('ACTIVE_PATCHES block not found');
 if (!retiredMatch) fail('RETIRED_PATCHES block not found');
 
@@ -41,6 +41,12 @@ const overlap = active.filter(x => retired.includes(x));
 if (overlap.length) fail(`active/retired overlap: ${overlap.join(', ')}`);
 
 for (const file of active) if (!exists(file)) fail(`active patch missing: ${file}`);
+const coreMatch = game.match(/const\s+CORE_RUNTIME\s*=\s*['"]([^'"]+)['"]/);
+if (!coreMatch || coreMatch[1] !== 'game-core-stable-v1.js?v=1') fail('game.js must use the materialized local core');
+if (!exists('game-core-stable-v1.js')) fail('materialized local core is missing');
+if (/cdn\.jsdelivr\.net|https?:\/\//.test(read('game-core-stable-v1.js'))) fail('materialized core must not fetch remote runtime code');
+if (!retired.includes('stable-runtime-w3-clean-v1.js')) fail('runtime transformer must be retired after materialization');
+
 for (const forbidden of [
   'boss-crowking-v1.js',
   'world1-classic-enhanced-background-v1.js',
@@ -58,13 +64,14 @@ for (const forbidden of [
   if (active.includes(forbidden)) fail(`retired patch active: ${forbidden}`);
 }
 
-if (!/game\.js\?v=2\.4\.7/.test(index)) fail('index.html is not pinned to approved game.js v2.4.7');
+if (!/game\.js\?v=2\.4\.8/.test(index)) fail('index.html is not pinned to approved game.js v2.4.8');
 if (!/ui-runtime-boot-v1\.js\?v=9/.test(index)) fail('post-runtime UI boot loader is not active');
 
 if (!/<div class="game-wrapper"><div id="app" class="game-container"/.test(index)) fail('stable game wrapper/container contract is missing');
 if (!/id="startScreen" class="overlay-screen active"/.test(index)) fail('startScreen must remain an active overlay screen');
 if (!/ui-world-select-v1\.css\?v=8/.test(index)) fail('index.html is not pinned to Safari-safe world select CSS v8');
 if (!/ui-hud-v1\.css\?v=6/.test(index)) fail('index.html is not pinned to current HUD CSS release');
+if (!/ui-store-v1\.css\?v=3/.test(index)) fail('index.html is not pinned to responsive store CSS v3');
 if (!/ui-runtime-fixes-v1\.css\?v=3/.test(index)) fail('runtime UI fix stylesheet is not active');
 if (!/ui-settings-leaderboard-v1\.css\?v=2/.test(index)) fail('settings stylesheet is not pinned to compact settings v2');
 if (!/ui-splash-approved-v3\.js\?v=12/.test(index)) fail('approved loading splash script is not active');
@@ -73,7 +80,7 @@ if (!/js\/audio\.js\?v=2\.3\.2/.test(index)) fail('core audio dependency is miss
 if (!/js\/graphics\.js\?v=2\.3\.2/.test(index)) fail('core graphics dependency is missing or misordered');
 for (const w of ['world1','world2','world3']) if (!new RegExp(`js/${w}\\.js\\?v=2\\.3\\.2`).test(index)) fail(`core ${w} dependency is missing`);
 
-const depOrder = ['js/config.js?v=2.3.4','js/audio.js?v=2.3.2','js/graphics.js?v=2.3.2','js/world1.js?v=2.3.2','js/world2.js?v=2.3.2','js/world3.js?v=2.3.2','ui-splash-approved-v3.js?v=12','game.js?v=2.4.7','ui-runtime-boot-v1.js?v=9'];
+const depOrder = ['js/config.js?v=2.3.4','js/audio.js?v=2.3.2','js/graphics.js?v=2.3.2','js/world1.js?v=2.3.2','js/world2.js?v=2.3.2','js/world3.js?v=2.3.2','ui-splash-approved-v3.js?v=12','game.js?v=2.4.8','ui-runtime-boot-v1.js?v=9'];
 for (let i = 1; i < depOrder.length; i++) {
   if (index.indexOf(depOrder[i - 1]) < 0 || index.indexOf(depOrder[i]) < 0 || index.indexOf(depOrder[i - 1]) > index.indexOf(depOrder[i])) fail(`core dependency order invalid around ${depOrder[i - 1]} -> ${depOrder[i]}`);
 }
