@@ -70,17 +70,32 @@
 
   function syncStars(host) {
     if (!host) return;
-    const text = (host.textContent || '').trim();
-    const filledFromText = (text.match(/[★⭐]/g) || []).length;
-    const emptyFromText = (text.match(/☆/g) || []).length;
-    let total = filledFromText + emptyFromText;
-    let filled = filledFromText;
+
+    // The core runtime renders SVG stars as .star nodes and marks
+    // unearned stars with .empty. textContent is empty for those SVGs,
+    // so derive progress from the DOM state before converting to image assets.
+    const runtimeStars = [...host.querySelectorAll('.star')];
+    let total = runtimeStars.length;
+    let filled = runtimeStars.filter(star => !star.classList.contains('empty')).length;
 
     if (!total) {
       const oldImgs = [...host.querySelectorAll('img.ff-star-icon')];
-      if (oldImgs.length) return;
+      if (oldImgs.length) {
+        total = oldImgs.length;
+        filled = oldImgs.filter(img => (img.getAttribute('src') || '').includes('star-filled')).length;
+      } else {
+        const text = (host.textContent || '').trim();
+        const filledFromText = (text.match(/[★⭐]/g) || []).length;
+        const emptyFromText = (text.match(/☆/g) || []).length;
+        total = filledFromText + emptyFromText;
+        filled = filledFromText;
+      }
+    }
+
+    // No progress data must never be interpreted as a perfect rating.
+    if (!total) {
       total = 3;
-      filled = 3;
+      filled = 0;
     }
 
     total = Math.max(3, Math.min(5, total));
