@@ -9,7 +9,7 @@
     'ui-settings-leaderboard-v1.js?v=2',
     'ui-store-v1.js?v=1',
     'ui-world-select-v1.js?v=8',
-    'ui-main-menu-v3.js?v=5',
+    'ui-main-menu-v3.js?v=6',
     'ui-end-screens-v1.js?v=1',
     'ui-hud-v1.js?v=5',
     'ui-runtime-fixes-v1.js?v=2'
