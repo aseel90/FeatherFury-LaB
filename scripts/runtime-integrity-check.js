@@ -15,6 +15,10 @@ function fail(msg) {
 const game = read('game.js');
 const index = read('index.html');
 const runtimeDoc = read('RUNTIME_ACTIVE.md');
+const canonicalSpec = read('FEATHER_FURY_GAME_SPEC.md');
+const developmentRules = read('DEVELOPMENT_RULES.md');
+const gamePlan = read('GAME_PLAN.md');
+const readme = read('README.md');
 
 const activeMatch = game.match(/const ACTIVE_PATCHES = \[([\s\S]*?)\n\s*\];/);
 const retiredMatch = game.match(/const RETIRED_PATCHES = (?:new Set\()?\[([\s\S]*?)\n\s*\](?:\))?;/);
@@ -22,8 +26,17 @@ if (!activeMatch) fail('ACTIVE_PATCHES block not found');
 if (!retiredMatch) fail('RETIRED_PATCHES block not found');
 
 const extract = block => [...block.matchAll(/'([^']+\.js(?:\?[^']*)?)'/g)].map(m => m[1]);
-const active = activeMatch ? extract(activeMatch[1]).map(x => x.split('?')[0]) : [];
-const retired = retiredMatch ? extract(retiredMatch[1]).map(x => x.split('?')[0]) : [];
+const activeTokens = activeMatch ? extract(activeMatch[1]) : [];
+const retiredTokens = retiredMatch ? extract(retiredMatch[1]) : [];
+const active = activeTokens.map(x => x.split('?')[0]);
+const retired = retiredTokens.map(x => x.split('?')[0]);
+
+for (const token of activeTokens) {
+  if (!canonicalSpec.includes('`' + token + '`')) fail(`canonical spec missing active runtime token: ${token}`);
+}
+for (const doc of [runtimeDoc, developmentRules, gamePlan, readme]) {
+  if (!doc.includes('FEATHER_FURY_GAME_SPEC.md')) fail('project documentation must point to FEATHER_FURY_GAME_SPEC.md');
+}
 
 const dup = active.filter((x, i) => active.indexOf(x) !== i);
 if (dup.length) fail(`duplicate active patches: ${[...new Set(dup)].join(', ')}`);
