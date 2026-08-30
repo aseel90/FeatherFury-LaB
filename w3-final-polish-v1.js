@@ -132,11 +132,6 @@ src.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
 src.start(now, 0, 1.45);
 } catch (_) {}
 };
-const oldThunder = typeof sound.playThunder === 'function' ? sound.playThunder.bind(sound) : null;
-sound.playThunder = function(...args) {
-if (window.game?.activeWorld === W3) return this.playStormThunder?.(.78);
-return oldThunder?.(...args);
-};
 sound.playVoltCharge = function() {
 tone('sine', 420, 1320, .28, .07);
 noiseBurst(.22, .045, 'highpass', 900, 2600, .04);
@@ -237,6 +232,30 @@ const bossBats = this.electricBats.filter(b => b.__w3BossSwarm).slice(-3);
 this.electricBats = stageBats.slice(-2).concat(bossBats);
 }
 return result;
+};
+}
+const oldGameOver = typeof game.gameOver === 'function' ? game.gameOver.bind(game) : null;
+if (oldGameOver) {
+game.gameOver = function(isVictory = false, ...args) {
+if (this.activeWorld !== W3) return oldGameOver(isVictory, ...args);
+const savedW1HighScore = Number(this.highScore || 0);
+const savedW3HighScore = Number(this.highScoreW3 || 0);
+const runScore = Number(this.score || 0);
+this.highScore = savedW3HighScore;
+try {
+const result = oldGameOver(isVictory, ...args);
+this.highScoreW3 = Math.max(savedW3HighScore, Number(this.highScore || 0), runScore);
+try { localStorage.setItem('fh_highscore_w3', String(this.highScoreW3)); } catch (_) {}
+if (isVictory) {
+this.w3Completed = true;
+try { localStorage.setItem('fh_w3_completed', 'true'); } catch (_) {}
+}
+try { this.updateCarousel?.(); } catch (_) {}
+return result;
+} finally {
+this.highScore = savedW1HighScore;
+try { localStorage.setItem('fh_highscore', String(savedW1HighScore)); } catch (_) {}
+}
 };
 }
 const reviveBtn = document.getElementById('reviveBtn');
