@@ -9,7 +9,7 @@
     en: {title:'Heroes & Shop',characters:'Characters',shop:'Shop',choose:'Select',selected:'Selected',owned:'Owned',buy:'Buy',balance:'Balance',available:'Available Birds',allOwned:'You own every available bird',insufficient:'Not enough coins',back:'Back',characterOf:(a,b)=>`${a} of ${b}`,abilities:{classic:['Balanced','No gameplay modifier.'],pigeon:['Precision','Perfect Pass window is 20% wider.'],falcon:['Predator Fever','Fever lasts 25% longer.'],phoenix:['Ember Charge','Fever charge gains are 20% stronger.'],cyber:['Energy Shield','Blocks the first fatal hit each run.'],ghost:['Phase','Phases through the first fatal collision each run.'],king:['Royal Fortune','Better coin pull with periodic bonus coins.'],eagle:['Stability','Recovers quickly from gravity and environmental disruption.']}}
   };
 
-  let selectedOwnedIndex=0,activeTab='characters',structure=null;
+  let selectedOwnedIndex=null,activeTab='characters',structure=null;
   const lang=()=>window.game?.lang==='ar'?'ar':'en';
   const skins=()=>typeof SKINS!=='undefined'?SKINS:null;
   const icon=(name,cls='')=>{const img=document.createElement('img');img.src=ASSET(name);img.alt='';img.draggable=false;img.className=cls;img.setAttribute('aria-hidden','true');return img;};
@@ -36,7 +36,7 @@
   }
 
   function switchTab(tab){const ui=ensureStructure();if(!ui)return;activeTab=tab==='shop'?'shop':'characters';ui.charTab.classList.toggle('is-active',activeTab==='characters');ui.shopTab.classList.toggle('is-active',activeTab==='shop');ui.charPanel.classList.toggle('is-active',activeTab==='characters');ui.shopPanel.classList.toggle('is-active',activeTab==='shop');render();}
-  function syncSelectedIndex(){const g=window.game,owned=ownedKeys(g);if(!owned.length){selectedOwnedIndex=0;return owned;}const active=Math.max(0,owned.indexOf(g.activeSkin));if(selectedOwnedIndex<0||selectedOwnedIndex>=owned.length)selectedOwnedIndex=active;return owned;}
+  function syncSelectedIndex(){const g=window.game,owned=ownedKeys(g);if(!owned.length){selectedOwnedIndex=0;return owned;}const active=Math.max(0,owned.indexOf(g.activeSkin));if(!Number.isInteger(selectedOwnedIndex)||selectedOwnedIndex<0||selectedOwnedIndex>=owned.length)selectedOwnedIndex=active;return owned;}
   function moveCharacter(delta){const owned=syncSelectedIndex();if(owned.length<2)return;selectedOwnedIndex=(selectedOwnedIndex+delta+owned.length)%owned.length;renderCharacters();}
   function selectCurrentCharacter(){const g=window.game,s=skins(),owned=syncSelectedIndex();if(!g||!s||!owned.length)return;const key=owned[selectedOwnedIndex];if(!key||g.activeSkin===key)return;g.activeSkin=key;persist('fh_active_skin',key);try{g.sound?.playScore?.();}catch(_){}try{g.updatePreview?.();}catch(_){}try{g.renderShop?.();}catch(_){render();}}
   function buySkin(key){const g=window.game,s=skins(),skin=s?.[key];if(!g||!skin||g.unlockedSkins?.has?.(key))return;if(g.totalCoins<skin.price){try{g.sound?.playHit?.();}catch(_){}return;}g.totalCoins-=skin.price;g.unlockedSkins.add(key);g.activeSkin=key;persist('fh_unlocked_skins',JSON.stringify([...g.unlockedSkins]));persist('fh_active_skin',key);try{g.sound?.playCoin?.();}catch(_){}try{g.updateCoinDisplays?.();g.updatePreview?.();}catch(_){}selectedOwnedIndex=Math.max(0,ownedKeys(g).indexOf(key));switchTab('characters');try{g.renderShop?.();}catch(_){render();}}
