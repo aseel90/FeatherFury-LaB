@@ -111,6 +111,9 @@ for (const token of ['__FF_RUNTIME_APPROVED_STACK__','__FF_MENU_UI_READY__','ui-
 if (!uiBoot.includes('lab-ui.js?v=7')) fail('ui-runtime-boot-v1.js must load the gated lab helper v7');
 const labUi = read('lab-ui.js');
 if (!labUi.includes("get('fflab') === '1'") || !labUi.includes('if (labWorldUnlockEnabled)')) fail('lab-ui.js must gate world unlock behind explicit ?fflab=1');
+const w3FinalPolish = read('w3-final-polish-v1.js');
+if (!w3FinalPolish.includes('fh_highscore_w3') || !w3FinalPolish.includes('fh_w3_completed')) fail('World 3 final polish must persist W3 score and completion independently');
+if (!w3FinalPolish.includes('savedW1HighScore')) fail('World 3 progress bridge must preserve World 1 high score');
 const mainMenuJs = read('ui-main-menu-v3.js');
 if (!mainMenuJs.includes('stabilizeViewport') || !mainMenuJs.includes("window.addEventListener('pageshow', settle)") || !mainMenuJs.includes("document.addEventListener('ff:menu-ready', settle)")) fail('main menu must restore viewport/layout after splash and pageshow');
 if (!/ui-main-menu-v3\.css\?v=5/.test(index)) fail('index.html is not pinned to main menu CSS cache release v5');
