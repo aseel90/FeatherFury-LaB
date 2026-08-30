@@ -1,4 +1,4 @@
-name: Verify Playable Worlds and Bosses
+name: Verify Store Responsive Purchase Flow
 
 on:
   push:
@@ -11,11 +11,11 @@ permissions:
   issues: write
 
 concurrency:
-  group: feather-fury-worlds-live-qa
+  group: feather-fury-store-live-qa
   cancel-in-progress: true
 
 jobs:
-  worlds-qa:
+  store-qa:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
@@ -68,7 +68,7 @@ jobs:
         if: steps.deploy.outputs.result == 'success'
         run: npx playwright install --with-deps chromium webkit
 
-      - name: Verify all playable worlds
+      - name: Verify responsive store purchase flow
         if: steps.deploy.outputs.result == 'success'
         id: qa
         shell: bash
@@ -78,10 +78,10 @@ jobs:
           set +e
           mkdir -p artifacts
           failed=0
-          : > artifacts/worlds-qa.log
+          : > artifacts/store-qa.log
           for browser in chromium webkit; do
-            echo "=== ${browser} ===" | tee -a artifacts/worlds-qa.log
-            FF_BROWSER="$browser" FF_ARTIFACT_DIR="artifacts/worlds-${browser}" node scripts/live-worlds-qa.mjs 2>&1 | tee -a artifacts/worlds-qa.log
+            echo "=== ${browser} ===" | tee -a artifacts/store-qa.log
+            FF_BROWSER="$browser" FF_ARTIFACT_DIR="artifacts/store-${browser}" node scripts/live-store-qa.mjs 2>&1 | tee -a artifacts/store-qa.log
             code=${PIPESTATUS[0]}
             if [ "$code" -ne 0 ]; then failed=1; fi
           done
@@ -96,7 +96,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: FeatherFury-Worlds-Live-QA
+          name: FeatherFury-Store-Live-QA
           path: artifacts
           if-no-files-found: ignore
 
@@ -112,10 +112,10 @@ jobs:
           SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
-          title='[WORLD QA] Playable Worlds Status'
+          title='[STORE QA] Responsive Purchase Status'
           if [ "$DEPLOY_RESULT" != 'success' ]; then RESULT='failure'; fi
           if [ "$QA_OUTCOME" = 'skipped' ] && [ "$DEPLOY_RESULT" = 'success' ]; then RESULT='failure'; fi
-          num=$(gh issue list --state all --limit 100 --json number,title --jq '.[] | select(.title == "[WORLD QA] Playable Worlds Status") | .number' | head -1)
+          num=$(gh issue list --state all --limit 100 --json number,title --jq '.[] | select(.title == "[STORE QA] Responsive Purchase Status") | .number' | head -1)
           if [ "$RESULT" = 'success' ]; then
             cat > /tmp/body.md <<BODY
           Status: **SUCCESS**
@@ -127,11 +127,13 @@ jobs:
           - Chromium mobile
           - WebKit iPhone
 
-          Verified through the deployed build:
-          - World 1 launches and Crow boss activates
-          - World 2 launches and Ice Emperor boss activates
-          - World 3 launches and Lord Voltbat/Thunderbird boss activates
-          - PLAY HUD + pause control are present in every playable world
+          Verified live at 360x800, 390x844 and 412x915:
+          - every purchase button remains inside its character card
+          - purchase buttons retain a mobile touch target of at least 40px
+          - shop list remains scrollable without escaping the viewport
+          - buying a bird deducts and persists coins
+          - purchased/unlocked skin and active skin persist after reload
+          - switching to another owned bird persists after a second reload
           BODY
             if [ -n "$num" ]; then
               gh issue edit "$num" --body-file /tmp/body.md >/dev/null
@@ -152,12 +154,12 @@ jobs:
                 echo "Preflight: $DEPLOY_DETAIL"
               elif [ "$QA_OUTCOME" = 'skipped' ]; then
                 echo 'QA step was skipped after deployment preflight; inspect the linked run for setup/install failure.'
-              elif [ -f artifacts/worlds-qa.log ]; then
+              elif [ -f artifacts/store-qa.log ]; then
                 echo '```text'
-                tail -n 260 artifacts/worlds-qa.log
+                tail -n 260 artifacts/store-qa.log
                 echo '```'
               else
-                echo 'QA failed without a worlds-qa.log; inspect the linked run.'
+                echo 'QA failed without a store-qa.log; inspect the linked run.'
               fi
             } > /tmp/body.md
             if [ -n "$num" ]; then
