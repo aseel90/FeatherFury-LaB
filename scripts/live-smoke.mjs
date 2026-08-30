@@ -1,124 +1,116 @@
-import { chromium, webkit } from 'playwright';
 import fs from 'node:fs';
 import path from 'node:path';
+import { chromium, webkit } from 'playwright';
 
 const BASE = process.env.FF_URL || 'https://aseel90.github.io/FeatherFury-LaB/';
 const ENGINE = (process.env.FF_BROWSER || 'chromium').toLowerCase();
-const OUT = process.env.FF_ARTIFACT_DIR || `artifacts/live-smoke-${ENGINE}`;
-fs.mkdirSync(OUT, { recursive:true });
+const OUT = path.resolve(process.env.FF_ARTIFACT_DIR || 'artifacts/live-smoke');
+fs.mkdirSync(OUT, { recursive: true });
 
-const type = ENGINE === 'webkit' ? webkit : chromium;
-const browser = await type.launch({ headless:true });
+const browserType = ENGINE === 'webkit' ? webkit : chromium;
+const browser = await browserType.launch({ headless: true });
 const context = await browser.newContext({
   viewport: { width: 390, height: 844 },
-  deviceScaleFactor: 2,
+  deviceScaleFactor: 1,
   isMobile: true,
-  hasTouch: true
+  hasTouch: true,
+  userAgent: ENGINE === 'webkit'
+    ? 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'
+    : undefined
 });
 const page = await context.newPage();
 const events = [];
-const origin = new URL(BASE).origin;
-
 page.on('console', msg => {
-  if (msg.type() === 'error' || msg.type() === 'warning') events.push({ type: `console:${msg.type()}`, text: msg.text() });
+  const type = msg.type();
+  if (['error','warning'].includes(type)) events.push({ type:`console:${type}`, text:msg.text() });
 });
-page.on('pageerror', err => events.push({ type: 'pageerror', text: err?.stack || String(err) }));
-page.on('requestfailed', req => {
-  if (req.url().startsWith(origin)) events.push({ type: 'requestfailed', text: `${req.url()} :: ${req.failure()?.errorText || 'unknown'}` });
-});
+page.on('pageerror', err => events.push({ type:'pageerror', text:String(err) }));
+page.on('requestfailed', req => events.push({ type:'requestfailed', text:`${req.url()} :: ${req.failure()?.errorText || 'failed'}` }));
+
+const visible = el => {
+  if (!el) return false;
+  const s = getComputedStyle(el), r = el.getBoundingClientRect();
+  return !el.classList.contains('hidden') && s.display !== 'none' && s.visibility !== 'hidden' && Number(s.opacity || 1) > .01 && r.width > 1 && r.height > 1;
+};
 
 const readState = () => page.evaluate(() => {
-  const visible = el => {
-    if (!el || el.classList.contains('hidden')) return false;
-    const style = getComputedStyle(el);
-    if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity || 1) <= 0.01) return false;
-    const r = el.getBoundingClientRect();
-    const vv = window.visualViewport;
-    const left = vv?.offsetLeft || 0;
-    const top = vv?.offsetTop || 0;
-    const right = left + (vv?.width || innerWidth);
-    const bottom = top + (vv?.height || innerHeight);
-    return r.width > 2 && r.height > 2 && r.left >= left - 2 && r.top >= top - 2 && r.right <= right + 2 && r.bottom <= bottom + 2;
+  const vis = el => {
+    if (!el) return false;
+    const s=getComputedStyle(el), r=el.getBoundingClientRect();
+    return !el.classList.contains('hidden') && s.display!=='none' && s.visibility!=='hidden' && Number(s.opacity||1)>.01 && r.width>1 && r.height>1;
   };
   const rect = el => {
     if (!el) return null;
-    const r = el.getBoundingClientRect();
+    const r=el.getBoundingClientRect();
     return { left:r.left, top:r.top, right:r.right, bottom:r.bottom, width:r.width, height:r.height };
   };
-  const preview = document.getElementById('previewBirdCanvas');
-  let previewInk = false;
-  try {
-    const ctx = preview?.getContext('2d', { willReadFrequently: true });
-    const data = ctx?.getImageData(0, 0, preview.width, preview.height)?.data || [];
-    for (let i = 3; i < data.length; i += 4) { if (data[i] > 8) { previewInk = true; break; } }
-  } catch (_) { previewInk = !!preview; }
+  const start = document.getElementById('startScreen');
+  const logo = document.querySelector('#startScreen .ff-main-logo');
+  const card = document.getElementById('worldCard');
+  const play = document.getElementById('startStoryBtn');
   const thumb = document.querySelector('#worldCard .ff-world-thumb');
+  const preview = document.getElementById('previewBirdCanvas');
+  const worldStars = document.getElementById('worldStars');
+  const starIcons = [...(worldStars?.querySelectorAll('.ff-star-icon') || [])];
+  let previewInk = false;
+  if (preview?.width && preview?.height) {
+    try {
+      const ctx = preview.getContext('2d', { willReadFrequently:true });
+      const data = ctx.getImageData(0,0,preview.width,preview.height).data;
+      for(let i=3;i<data.length;i+=4){ if(data[i]>8){ previewInk=true; break; } }
+    } catch (_) { previewInk=true; }
+  }
+  const runtime = window.__FF_RUNTIME_MAP__;
+  const coin = document.querySelector('#gameHud .hud-coin-badge');
+  const score = document.querySelector('#gameHud .score-container');
+  const pause = document.getElementById('ffPauseBtn');
+  const ability = document.getElementById('ffAbilityHud');
+  const fever = document.querySelector('#gameHud .fever-bar-container');
+  const storeBalance = document.querySelector('#shopScreen .ff-store-balance, #shopScreen .shop-balance');
   return {
-    engine: navigator.userAgent,
-    viewport: { innerWidth, innerHeight, visualWidth:visualViewport?.width, visualHeight:visualViewport?.height },
-    runtimeReady: window.__FF_RUNTIME_APPROVED_STACK__ === true,
-    menuReady: window.__FF_MENU_UI_READY__ === true,
-    runtimeBooting: window.__FF_PATCH_BOOTING__,
-    runtimeMap: window.__FF_RUNTIME_MAP__?.version || null,
-    menuError: window.__FF_MENU_UI_ERROR__ || null,
-    startVisible: visible(document.getElementById('startScreen')),
-    startActive: document.getElementById('startScreen')?.classList.contains('active') || false,
-    logoVisible: visible(document.querySelector('#startScreen .ff-main-logo')),
-    worldCardVisible: visible(document.getElementById('worldCard')),
-    playVisible: visible(document.getElementById('startStoryBtn')),
-    menuRects: {
-      logo: rect(document.querySelector('#startScreen .ff-main-logo')),
-      card: rect(document.getElementById('worldCard')),
-      play: rect(document.getElementById('startStoryBtn'))
+    engine:navigator.userAgent,
+    viewport:{ innerWidth, innerHeight, visualWidth:visualViewport?.width || null, visualHeight:visualViewport?.height || null },
+    runtimeReady:window.__FF_RUNTIME_APPROVED_STACK__ === true,
+    menuReady:window.__FF_MENU_UI_READY__ === true,
+    runtimeBooting:!!window.__FF_RUNTIME_BOOTING__,
+    runtimeMap:runtime?.version || runtime || null,
+    menuError:window.__FF_MENU_UI_ERROR__ || null,
+    storedHighScore: localStorage.getItem('fh_highscore'),
+    storedW1Completed: localStorage.getItem('fh_w1_completed'),
+    storedW2Completed: localStorage.getItem('fh_w2_completed'),
+    storedW3Completed: localStorage.getItem('fh_w3_completed'),
+    startVisible:vis(start),
+    startActive:!!start?.classList.contains('active'),
+    logoVisible:vis(logo),
+    worldCardVisible:vis(card),
+    playVisible:vis(play),
+    menuRects:{logo:rect(logo),card:rect(card),play:rect(play)},
+    playDisabled:!!play?.disabled,
+    worldThumb:thumb ? getComputedStyle(thumb).backgroundImage : null,
+    worldKicker:document.querySelector('#worldCard .ff-world-kicker')?.textContent?.trim() || null,
+    worldStars:{
+      total:starIcons.length,
+      filled:starIcons.filter(img => /star-filled\.svg(?:\?|$)/.test(img.getAttribute('src') || '')).length,
+      empty:starIcons.filter(img => /star-empty\.svg(?:\?|$)/.test(img.getAttribute('src') || '')).length
     },
-    playDisabled: !!document.getElementById('startStoryBtn')?.disabled,
-    worldThumb: thumb ? getComputedStyle(thumb).backgroundImage : null,
-    worldKicker: document.querySelector('#worldCard .ff-world-kicker')?.textContent?.trim() || null,
-    worldStars: (() => {
-      const imgs = [...document.querySelectorAll('#worldStars img.ff-star-icon')];
-      return {
-        total: imgs.length,
-        filled: imgs.filter(img => (img.getAttribute('src') || '').includes('star-filled')).length,
-        empty: imgs.filter(img => (img.getAttribute('src') || '').includes('star-empty')).length
-      };
-    })(),
-    coinIcon: !!document.querySelector('#startScreen .ff-coin-icon'),
-    birdButton: !!document.querySelector('#startScreen .ff-bird-avatar-btn'),
+    coinIcon:!!document.querySelector('#startScreen .ff-coin-icon'),
+    birdButton:!!document.querySelector('#startScreen .ff-bird-avatar-btn'),
     previewInk,
-    pauseVisible: document.getElementById('ffPauseOverlay')?.classList.contains('show') || false,
-    pauseButtonVisible: visible(document.getElementById('ffPauseBtn')),
-    hudLayout: (() => {
-      const rect = idOrEl => {
-        const el = typeof idOrEl === 'string' ? document.querySelector(idOrEl) : idOrEl;
-        if (!el) return null;
-        const style = getComputedStyle(el);
-        const r = el.getBoundingClientRect();
-        if (style.display === 'none' || style.visibility === 'hidden' || r.width <= 0 || r.height <= 0) return null;
-        return { left:r.left, right:r.right, top:r.top, bottom:r.bottom, width:r.width, height:r.height };
-      };
-      return {
-        coin: rect('#gameHud .hud-coin-badge'),
-        score: rect('#gameHud .score-container'),
-        pause: rect('#ffPauseBtn'),
-        ability: rect('#ffAbilityHud'),
-        fever: rect('#gameHud .fever-bar-container')
-      };
-    })(),
-    hudValues: {
-      coins: document.getElementById('runCoins')?.textContent?.trim() || null,
-      score: document.getElementById('scoreValue')?.textContent?.trim() || null,
-      stage: document.getElementById('stageName')?.textContent?.trim() || null,
-      feverWidth: document.getElementById('feverFill')?.getBoundingClientRect()?.width || 0,
-      feverVisible: visible(document.querySelector('#gameHud .fever-bar-container'))
+    pauseVisible:!!document.getElementById('ffPauseOverlay')?.classList.contains('show'),
+    pauseButtonVisible:vis(pause),
+    hudLayout:{ coin:rect(coin), score:rect(score), pause:rect(pause), ability:rect(ability), fever:rect(fever) },
+    hudValues:{
+      coins:document.getElementById('runCoins')?.textContent?.trim() || '0',
+      score:document.getElementById('scoreValue')?.textContent?.trim() || '0',
+      stage:document.getElementById('stageName')?.textContent?.trim() || null,
+      feverWidth:document.getElementById('feverFill')?.getBoundingClientRect()?.width || 0,
+      feverVisible:vis(fever)
     },
-    storeBalanceStyle: (() => {
-      const el = document.querySelector('#shopScreen .shop-balance'); if(!el)return null;
-      const s=getComputedStyle(el); return {display:s.display,fontFamily:s.fontFamily,borderRadius:s.borderRadius};
-    })(),
-    gameState: window.game?.state || null,
-    currentWorld: window.game?.activeWorld ?? null,
-    splashPresent: !!document.getElementById('ffApprovedBootSplash'),
-    toast: document.getElementById('gameToast')?.textContent?.trim() || ''
+    storeBalanceStyle:storeBalance ? (()=>{ const s=getComputedStyle(storeBalance); return {display:s.display,fontFamily:s.fontFamily,borderRadius:s.borderRadius}; })() : null,
+    gameState:window.game?.state || null,
+    currentWorld:window.game?.activeWorld ?? null,
+    splashPresent:!!document.getElementById('ffApprovedBootSplash'),
+    toast:document.getElementById('gameToast')?.textContent?.trim() || ''
   };
 });
 
@@ -296,6 +288,59 @@ try {
     return out;
   });
   if (JSON.stringify(nextWorldMap) !== JSON.stringify([1,2,3])) throw new Error(`Next World map failed: ${JSON.stringify(nextWorldMap)}`);
+
+  // World 3 progress must be isolated from World 1 and persist its own best score/completion.
+  const w3Progress = await page.evaluate(() => {
+    const g = window.game;
+    if (!g?.__w3FinalPolishV1Installed || typeof g.gameOver !== 'function') return { installed:false };
+    const keys = ['fh_highscore','fh_highscore_w3','fh_w3_completed','fh_unlocked_skins'];
+    const stored = Object.fromEntries(keys.map(k => [k, localStorage.getItem(k)]));
+    const snapshot = {
+      activeWorld:g.activeWorld, currentWorldIndex:g.currentWorldIndex, state:g.state, score:g.score, sessionCoins:g.sessionCoins,
+      highScore:g.highScore, highScoreW3:g.highScoreW3, w3Completed:g.w3Completed, totalCoins:g.totalCoins,
+      unlockedSkins:[...(g.unlockedSkins || [])]
+    };
+    const restoreStorage = () => {
+      for (const [key, value] of Object.entries(stored)) {
+        if (value === null) localStorage.removeItem(key); else localStorage.setItem(key, value);
+      }
+    };
+    try {
+      g.activeWorld = 2; g.currentWorldIndex = 2; g.highScore = 11; g.highScoreW3 = 0; g.w3Completed = false;
+      g.score = 22; g.sessionCoins = 0; g.state = 'PLAYING';
+      localStorage.setItem('fh_highscore', '11');
+      localStorage.setItem('fh_highscore_w3', '0');
+      localStorage.setItem('fh_w3_completed', 'false');
+      g.gameOver(false);
+      const defeat = {
+        w1:Number(g.highScore), w3:Number(g.highScoreW3), complete:!!g.w3Completed,
+        storedW1:localStorage.getItem('fh_highscore'), storedW3:localStorage.getItem('fh_highscore_w3'), storedComplete:localStorage.getItem('fh_w3_completed')
+      };
+
+      g.activeWorld = 2; g.currentWorldIndex = 2; g.score = 44; g.sessionCoins = 0; g.state = 'PLAYING';
+      g.gameOver(true);
+      const victory = {
+        w1:Number(g.highScore), w3:Number(g.highScoreW3), complete:!!g.w3Completed,
+        storedW1:localStorage.getItem('fh_highscore'), storedW3:localStorage.getItem('fh_highscore_w3'), storedComplete:localStorage.getItem('fh_w3_completed')
+      };
+      return { installed:true, defeat, victory };
+    } finally {
+      Object.assign(g, {
+        activeWorld:snapshot.activeWorld, currentWorldIndex:snapshot.currentWorldIndex, state:snapshot.state, score:snapshot.score,
+        sessionCoins:snapshot.sessionCoins, highScore:snapshot.highScore, highScoreW3:snapshot.highScoreW3,
+        w3Completed:snapshot.w3Completed, totalCoins:snapshot.totalCoins
+      });
+      g.unlockedSkins = new Set(snapshot.unlockedSkins);
+      restoreStorage();
+    }
+  });
+  if (!w3Progress.installed) throw new Error(`World 3 progress bridge is not installed: ${JSON.stringify(w3Progress)}`);
+  if (w3Progress.defeat.w1 !== 11 || w3Progress.defeat.w3 !== 22 || w3Progress.defeat.complete || w3Progress.defeat.storedW1 !== '11' || w3Progress.defeat.storedW3 !== '22' || w3Progress.defeat.storedComplete !== 'false') {
+    throw new Error(`World 3 defeat progress isolation failed: ${JSON.stringify(w3Progress.defeat)}`);
+  }
+  if (w3Progress.victory.w1 !== 11 || w3Progress.victory.w3 !== 44 || !w3Progress.victory.complete || w3Progress.victory.storedW1 !== '11' || w3Progress.victory.storedW3 !== '44' || w3Progress.victory.storedComplete !== 'true') {
+    throw new Error(`World 3 victory progress persistence failed: ${JSON.stringify(w3Progress.victory)}`);
+  }
 
   const criticalEvents = events.filter(e => e.type === 'pageerror' || e.type === 'requestfailed' || /approved runtime boot failed|clean stable runtime failed|post-runtime UI boot failed/i.test(e.text));
   if (criticalEvents.length) throw new Error(`Critical browser events: ${JSON.stringify(criticalEvents.slice(-20))}`);
