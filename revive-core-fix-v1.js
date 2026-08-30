@@ -7,9 +7,21 @@
     if (!game || !btn) return false;
     if (game.__reviveCoreFixV1Installed) return true;
 
-    const COST = 1;
+    const ECONOMY = window.FFEconomy;
+    const FALLBACK_COSTS = [8, 18];
+    const costs = Array.isArray(ECONOMY?.revive?.coinCosts) ? ECONOMY.revive.coinCosts : FALLBACK_COSTS;
+    const maxPerRun = Number(ECONOMY?.revive?.maxPerRun || costs.length || 2);
+    const reviveCount = () => Math.max(0, Number(game.__ffReviveCount || 0));
+    const currentCost = () => {
+      const count = reviveCount();
+      if (count >= maxPerRun) return null;
+      const cost = Number(costs[count]);
+      return Number.isFinite(cost) ? cost : null;
+    };
     const applyCost = () => {
-      try { if (window.CONFIG) window.CONFIG.REVIVE_COST = COST; } catch (_) {}
+      const cost = currentCost();
+      try { if (window.CONFIG && Number.isFinite(cost)) window.CONFIG.REVIVE_COST = cost; } catch (_) {}
+      return cost;
     };
     const hideGameOver = () => {
       const screen = document.getElementById('gameOverScreen');
@@ -23,21 +35,30 @@
     };
     const showHud = () => document.getElementById('gameHud')?.classList.remove('hidden');
 
+    const oldReset = typeof game.reset === 'function' ? game.reset.bind(game) : null;
+    if (oldReset) {
+      game.reset = function(...args) {
+        const r = oldReset(...args);
+        this.__ffReviveCount = 0;
+        return r;
+      };
+    }
+
     const oldUpdateCoins = typeof game.updateCoinDisplays === 'function' ? game.updateCoinDisplays.bind(game) : null;
     if (oldUpdateCoins) {
       game.updateCoinDisplays = function() {
-        applyCost();
+        const cost = applyCost();
         const r = oldUpdateCoins();
         const revive = document.getElementById('reviveBtn');
         if (revive) {
-          const can = Number(this.totalCoins || 0) >= COST;
+          const can = Number.isFinite(cost) && Number(this.totalCoins || 0) >= cost;
           revive.disabled = !can;
           revive.style.opacity = can ? '1' : '.45';
           revive.style.cursor = can ? 'pointer' : 'not-allowed';
           const price = revive.querySelector('.revive-price');
           if (price) {
             const svg = price.querySelector('svg')?.outerHTML || '<svg width="14" height="14" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg>';
-            price.innerHTML = `${svg} ${COST}`;
+            price.innerHTML = Number.isFinite(cost) ? `${svg} ${cost}` : `${svg} MAX`;
           }
         }
         return r;
@@ -61,16 +82,17 @@
       e?.preventDefault?.();
       e?.stopPropagation?.();
       if (game.__ffReviveInProgress || game.state !== 'GAMEOVER') return;
-      applyCost();
+      const cost = applyCost();
       const coins = Number(game.totalCoins || 0);
-      if (coins < COST) {
+      if (!Number.isFinite(cost) || coins < cost) {
         game.sound?.playHit?.();
         game.updateCoinDisplays?.();
         return;
       }
 
       game.__ffReviveInProgress = true;
-      game.totalCoins = Math.max(0, coins - COST);
+      game.totalCoins = Math.max(0, coins - cost);
+      game.__ffReviveCount = reviveCount() + 1;
       game.sound?.playCoin?.();
       game.__ffPaused = false;
       document.getElementById('ffPauseOverlay')?.classList.remove('show');

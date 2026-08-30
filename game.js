@@ -25,7 +25,7 @@
     'w2-visuals-v1.js?v=6',
     'w2-ice-ground-skeletons-v1.js?v=4',
     'w2-gameplay-v1.js?v=2',
-    'revive-core-fix-v1.js?v=3',
+    'revive-core-fix-v1.js?v=4',
     'w2-emperor-art-v1.js?v=4',
     'w2-boss-polish-v2.js?v=2',
     'w2-boss-orb-v7.js?v=2',
