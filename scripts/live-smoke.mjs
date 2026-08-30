@@ -93,8 +93,22 @@ const readState = () => page.evaluate(() => {
         coin: rect('#gameHud .hud-coin-badge'),
         score: rect('#gameHud .score-container'),
         pause: rect('#ffPauseBtn'),
-        ability: rect('#ffAbilityHud')
+        ability: rect('#ffAbilityHud'),
+        fever: rect('#gameHud .fever-bar-container')
       };
+    })(),
+    hudValues: {
+      coins: document.getElementById('runCoins')?.textContent?.trim() || '',
+      score: document.getElementById('scoreValue')?.textContent?.trim() || '',
+      stage: document.getElementById('stageName')?.textContent?.trim() || '',
+      feverWidth: document.getElementById('feverFill')?.getBoundingClientRect()?.width || 0,
+      feverVisible: visible(document.querySelector('#gameHud .fever-bar-container'))
+    },
+    storeBalanceStyle: (() => {
+      const el = document.querySelector('#shopScreen .ff-store-balance');
+      if (!el) return null;
+      const st = getComputedStyle(el);
+      return { display: st.display, fontFamily: st.fontFamily, borderRadius: st.borderRadius };
     })(),
     gameState: window.game?.state || null,
     currentWorld: window.game?.currentWorldIndex ?? null,
@@ -112,6 +126,11 @@ try {
   const badMenu = !menu.startVisible || !menu.startActive || !menu.logoVisible || !menu.worldCardVisible || !menu.playVisible || menu.playDisabled ||
     !menu.worldThumb?.includes('world-1.webp') || !menu.worldKicker || !menu.coinIcon || !menu.birdButton || !menu.previewInk || menu.pauseVisible;
   if (badMenu) throw new Error(`Main menu contract failed: ${JSON.stringify(menu)}`);
+  const worldPlayGap = (menu.menuRects?.play?.top ?? 0) - (menu.menuRects?.card?.bottom ?? 0);
+  if (worldPlayGap < 10) throw new Error(`World/PLAY spacing collapsed (${worldPlayGap}px): ${JSON.stringify(menu.menuRects)}`);
+  if (menu.storeBalanceStyle?.display !== 'flex' || !/Press Start 2P/i.test(menu.storeBalanceStyle?.fontFamily || '')) {
+    throw new Error(`Store coin balance identity is incomplete: ${JSON.stringify(menu.storeBalanceStyle)}`);
+  }
 
   await page.locator('#startStoryBtn').click({ timeout: 5_000 });
   await page.waitForFunction(() => ['STORY','LAUNCH','PLAYING'].includes(window.game?.state), null, { timeout: 10_000 });
@@ -130,11 +149,14 @@ try {
     return !!btn && !!hud && !hud.classList.contains('hidden') && btn.classList.contains('show') && getComputedStyle(btn).display !== 'none';
   }, null, { timeout: 8_000 });
 
+  await page.evaluate(() => { document.documentElement.dir = 'rtl'; });
+  await page.waitForTimeout(120);
   const afterPlay = await readState();
   if (afterPlay.startActive || afterPlay.gameState === 'MENU') throw new Error(`PLAY did not leave menu: ${JSON.stringify(afterPlay)}`);
   if (!afterPlay.pauseButtonVisible) throw new Error(`Pause button is missing after PLAY: ${JSON.stringify(afterPlay)}`);
+  if (!afterPlay.hudValues?.feverVisible) throw new Error(`Fever bar is missing during gameplay: ${JSON.stringify(afterPlay.hudValues)}`);
 
-  const { coin, score, pause, ability } = afterPlay.hudLayout || {};
+  const { coin, score, pause, ability, fever } = afterPlay.hudLayout || {};
   if (!coin || !score || !pause) throw new Error(`HUD row is incomplete: ${JSON.stringify(afterPlay.hudLayout)}`);
   const topDelta = Math.max(coin.top, score.top, pause.top) - Math.min(coin.top, score.top, pause.top);
   if (!(coin.right < score.left && score.right < pause.left) || topDelta > 16) {
@@ -143,11 +165,55 @@ try {
   if (ability && ability.top < Math.max(coin.bottom, score.bottom, pause.bottom) - 2) {
     throw new Error(`Ability chip overlaps top HUD: ${JSON.stringify(afterPlay.hudLayout)}`);
   }
+  if (!fever || fever.top < Math.max(coin.bottom, score.bottom, pause.bottom) + 12) {
+    throw new Error(`Fever bar overlaps or is missing below top HUD: ${JSON.stringify(afterPlay.hudLayout)}`);
+  }
 
   await page.locator('#ffPauseBtn').click({ timeout: 5_000 });
   await page.waitForFunction(() => document.getElementById('ffPauseOverlay')?.classList.contains('show'), null, { timeout: 5_000 });
   const paused = await readState();
   if (!paused.pauseVisible) throw new Error(`Pause overlay did not open: ${JSON.stringify(paused)}`);
+
+  const frozenBefore = await page.evaluate(() => ({
+    y: Number(window.game?.bird?.y ?? NaN),
+    velocity: Number(window.game?.bird?.velocity ?? NaN),
+    score: Number(window.game?.score ?? NaN),
+    frame: Number(window.game?.frame ?? NaN)
+  }));
+  await page.waitForTimeout(650);
+  const frozenAfter = await page.evaluate(() => ({
+    y: Number(window.game?.bird?.y ?? NaN),
+    velocity: Number(window.game?.bird?.velocity ?? NaN),
+    score: Number(window.game?.score ?? NaN),
+    frame: Number(window.game?.frame ?? NaN)
+  }));
+  const finiteMotion = Number.isFinite(frozenBefore.y) && Number.isFinite(frozenAfter.y) && Number.isFinite(frozenBefore.velocity) && Number.isFinite(frozenAfter.velocity);
+  if (!finiteMotion || Math.abs(frozenAfter.y - frozenBefore.y) > 0.01 || Math.abs(frozenAfter.velocity - frozenBefore.velocity) > 0.01 || frozenAfter.score !== frozenBefore.score) {
+    throw new Error(`Pause did not freeze simulation: ${JSON.stringify({ frozenBefore, frozenAfter })}`);
+  }
+
+  const savedHudState = await page.evaluate(() => ({
+    score: window.game?.score, sessionCoins: window.game?.sessionCoins, fever: window.game?.fever, feverActive: window.game?.feverActive, feverTimer: window.game?.feverTimer
+  }));
+  await page.evaluate(() => {
+    window.game.score = 7;
+    window.game.sessionCoins = 3;
+    window.game.feverActive = false;
+    window.game.feverTimer = 0;
+    window.game.fever = 50;
+  });
+  await page.waitForFunction(() => {
+    const coins = document.getElementById('runCoins')?.textContent?.trim();
+    const score = document.getElementById('scoreValue')?.textContent?.trim();
+    const fever = document.getElementById('feverFill')?.getBoundingClientRect()?.width || 0;
+    return coins === '3' && score === '7' && fever > 2;
+  }, null, { timeout: 3_000 });
+  const bridged = await readState();
+  if (bridged.hudValues?.coins !== '3' || bridged.hudValues?.score !== '7' || !bridged.hudValues?.feverVisible || bridged.hudValues?.feverWidth <= 2) {
+    throw new Error(`Visible HUD data bridge failed: ${JSON.stringify(bridged.hudValues)}`);
+  }
+  await page.evaluate(saved => Object.assign(window.game, saved), savedHudState);
+
   const resume = page.locator('#ffPauseOverlay [data-action="resume"]');
   if (await resume.count()) {
     await resume.click({ timeout: 5_000 });
