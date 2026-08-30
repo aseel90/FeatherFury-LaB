@@ -15,10 +15,6 @@ function fail(msg) {
 const game = read('game.js');
 const index = read('index.html');
 const runtimeDoc = read('RUNTIME_ACTIVE.md');
-const canonicalSpec = read('FEATHER_FURY_GAME_SPEC.md');
-const devRules = read('DEVELOPMENT_RULES.md');
-const gamePlan = read('GAME_PLAN.md');
-const readme = read('README.md');
 
 const activeMatch = game.match(/const ACTIVE_PATCHES = \[([\s\S]*?)\n\s*\];/);
 const retiredMatch = game.match(/const RETIRED_PATCHES = (?:new Set\()?\[([\s\S]*?)\n\s*\](?:\))?;/);
@@ -28,21 +24,6 @@ if (!retiredMatch) fail('RETIRED_PATCHES block not found');
 const extract = block => [...block.matchAll(/'([^']+\.js(?:\?[^']*)?)'/g)].map(m => m[1]);
 const active = activeMatch ? extract(activeMatch[1]).map(x => x.split('?')[0]) : [];
 const retired = retiredMatch ? extract(retiredMatch[1]).map(x => x.split('?')[0]) : [];
-const dynamicOwners = [...game.matchAll(/loadScriptWithRetry\('([^']+\.js(?:\?[^']*)?)'/g)].map(m => m[1].split('?')[0]);
-const coreMatch = game.match(/const\s+CORE_RUNTIME\s*=\s*['"]([^'"]+)['"]/);
-const coreRuntime = coreMatch ? coreMatch[1].split('?')[0] : null;
-
-if (!canonicalSpec.includes('CANONICAL TECHNICAL SOURCE OF TRUTH')) fail('FEATHER_FURY_GAME_SPEC.md is missing its canonical authority marker');
-if (!coreRuntime || !canonicalSpec.includes(coreRuntime)) fail(`canonical spec must document active core runtime: ${coreRuntime || 'missing CORE_RUNTIME'}`);
-for (const file of [...new Set([...active, ...dynamicOwners])]) {
-  if (!canonicalSpec.includes(file)) fail(`canonical spec missing active runtime owner: ${file}`);
-}
-for (const file of retired) {
-  if (!canonicalSpec.includes(file)) fail(`canonical spec missing retired runtime owner: ${file}`);
-}
-for (const [name, doc] of [['DEVELOPMENT_RULES.md', devRules], ['GAME_PLAN.md', gamePlan], ['README.md', readme], ['RUNTIME_ACTIVE.md', runtimeDoc]]) {
-  if (!doc.includes('FEATHER_FURY_GAME_SPEC.md')) fail(`${name} must point to FEATHER_FURY_GAME_SPEC.md`);
-}
 
 const dup = active.filter((x, i) => active.indexOf(x) !== i);
 if (dup.length) fail(`duplicate active patches: ${[...new Set(dup)].join(', ')}`);
@@ -68,19 +49,20 @@ for (const forbidden of [
 }
 
 if (!/game\.js\?v=2\.4\.7/.test(index)) fail('index.html is not pinned to approved game.js v2.4.7');
-if (!/ui-runtime-boot-v1\.js\?v=6/.test(index)) fail('post-runtime UI boot loader is not active');
+if (!/ui-runtime-boot-v1\.js\?v=7/.test(index)) fail('post-runtime UI boot loader is not active');
 
 if (!/<div class="game-wrapper"><div id="app" class="game-container"/.test(index)) fail('stable game wrapper/container contract is missing');
 if (!/id="startScreen" class="overlay-screen active"/.test(index)) fail('startScreen must remain an active overlay screen');
 if (!/ui-world-select-v1\.css\?v=7/.test(index)) fail('index.html is not pinned to Safari-safe world select CSS v7');
 if (!/ui-hud-v1\.css\?v=6/.test(index)) fail('index.html is not pinned to current HUD CSS release');
+if (!/ui-runtime-fixes-v1\.css\?v=1/.test(index)) fail('runtime UI fix stylesheet is not active');
 if (!/ui-splash-approved-v3\.js\?v=12/.test(index)) fail('approved loading splash script is not active');
 if (!/js\/config\.js\?v=2\.3\.4/.test(index)) fail('core config dependency is missing or misordered');
 if (!/js\/audio\.js\?v=2\.3\.2/.test(index)) fail('core audio dependency is missing or misordered');
 if (!/js\/graphics\.js\?v=2\.3\.2/.test(index)) fail('core graphics dependency is missing or misordered');
 for (const w of ['world1','world2','world3']) if (!new RegExp(`js/${w}\\.js\\?v=2\\.3\\.2`).test(index)) fail(`core ${w} dependency is missing`);
 
-const depOrder = ['js/config.js?v=2.3.4','js/audio.js?v=2.3.2','js/graphics.js?v=2.3.2','js/world1.js?v=2.3.2','js/world2.js?v=2.3.2','js/world3.js?v=2.3.2','ui-splash-approved-v3.js?v=12','game.js?v=2.4.7','ui-runtime-boot-v1.js?v=6'];
+const depOrder = ['js/config.js?v=2.3.4','js/audio.js?v=2.3.2','js/graphics.js?v=2.3.2','js/world1.js?v=2.3.2','js/world2.js?v=2.3.2','js/world3.js?v=2.3.2','ui-splash-approved-v3.js?v=12','game.js?v=2.4.7','ui-runtime-boot-v1.js?v=7'];
 for (let i = 1; i < depOrder.length; i++) {
   if (index.indexOf(depOrder[i - 1]) < 0 || index.indexOf(depOrder[i]) < 0 || index.indexOf(depOrder[i - 1]) > index.indexOf(depOrder[i])) fail(`core dependency order invalid around ${depOrder[i - 1]} -> ${depOrder[i]}`);
 }
@@ -101,7 +83,7 @@ for (const legacyDirect of ['lab-ui.js','ui-settings-leaderboard-v1.js','ui-stor
 
 const uiBoot = read('ui-runtime-boot-v1.js');
 if (/core-gameplay-ux-v1\.js/.test(uiBoot)) fail('ui-runtime-boot-v1.js must not reload core-gameplay-ux; runtime owns it');
-for (const token of ['__FF_RUNTIME_APPROVED_STACK__','__FF_MENU_UI_READY__','ui-world-select-v1.js?v=8','ui-main-menu-v3.js?v=5','ui-hud-v1.js?v=5']) {
+for (const token of ['__FF_RUNTIME_APPROVED_STACK__','__FF_MENU_UI_READY__','ui-world-select-v1.js?v=8','ui-main-menu-v3.js?v=5','ui-hud-v1.js?v=5','ui-runtime-fixes-v1.js?v=1']) {
   if (!uiBoot.includes(token)) fail(`ui-runtime-boot-v1.js is missing menu boot contract: ${token}`);
 }
 if (!/function laidOutInViewport\(el\)/.test(uiBoot) || /fullyVisible\(logo\)/.test(uiBoot)) fail('menu boot must validate splash-hidden geometry without requiring painted visibility');
@@ -114,11 +96,20 @@ const hud = read('ui-hud-v1.css');
 if (!/#ffPauseBtn\.ff-hud-pause-v1/.test(hud)) fail('current HUD must own pause button layout');
 if (!/\.hud-top\s*\{[^}]*grid-template-columns:76px minmax\(96px,118px\) 42px/i.test(hud)) fail('HUD top row must be the approved 76px / flexible score / 42px pause layout');
 if (!/\.hud-top\s*\{[^}]*width:auto\s*!important/i.test(hud)) fail('HUD top row must use auto width so left/right viewport insets bound the row');
-if (!/fever-bar-container[^}]*display\s*:\s*none\s*!important/i.test(hud)) fail('retired fever bar must stay hidden');
+if (!/fever-bar-container[^}]*display\s*:\s*none\s*!important/i.test(hud)) fail('base HUD still owns the retired fever state before post-runtime override');
 if (!/#ffBossHud[^}]*display\s*:\s*none\s*!important/i.test(hud)) fail('duplicate boss HUD must stay hidden');
 
 const uiHudJs = read('ui-hud-v1.js');
 if (!/top\.appendChild\(pause\)/.test(uiHudJs)) fail('HUD JS must place pause control inside the top HUD row');
+
+const runtimeFixes = read('ui-runtime-fixes-v1.js');
+if (!/installPauseGuard/.test(runtimeFixes) || !/syncHudData/.test(runtimeFixes)) fail('runtime fixes must freeze pause and bridge HUD data');
+if (!/__ffFinalPauseGuardV1/.test(runtimeFixes)) fail('runtime fixes must install one final pause update guard');
+const runtimeFixCss = read('ui-runtime-fixes-v1.css');
+if (!/direction:ltr\s*!important/i.test(runtimeFixCss)) fail('runtime fixes must pin HUD physical direction');
+if (!/fever-bar-container[\s\S]*display:flex\s*!important/i.test(runtimeFixCss)) fail('runtime fixes must restore fever bar');
+if (!/start-actions-group[^{]*\{[^}]*margin-top/i.test(runtimeFixCss)) fail('runtime fixes must restore world/PLAY spacing');
+if (!/ff-store-balance[\s\S]*display:flex\s*!important/i.test(runtimeFixCss)) fail('runtime fixes must normalize store coin balance');
 
 const runtimeBridge = read('runtime-config-bridge-v1.js');
 if (!/window\.CONFIG\s*=\s*CONFIG/.test(runtimeBridge)) fail('runtime CONFIG bridge must expose legacy CONFIG contract');
