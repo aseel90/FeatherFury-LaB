@@ -1,0 +1,116 @@
+name: Verify Playable Worlds and Bosses
+
+on:
+  workflow_run:
+    workflows: ["Deploy Feather Fury Pages"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: feather-fury-worlds-live-qa
+  cancel-in-progress: true
+
+jobs:
+  worlds-qa:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout deployed source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install browsers
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Verify all playable worlds
+        id: qa
+        shell: bash
+        env:
+          FF_VERIFY_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+        run: |
+          set +e
+          mkdir -p artifacts
+          failed=0
+          : > artifacts/worlds-qa.log
+          for browser in chromium webkit; do
+            echo "=== ${browser} ===" | tee -a artifacts/worlds-qa.log
+            FF_BROWSER="$browser" FF_ARTIFACT_DIR="artifacts/worlds-${browser}" node scripts/live-worlds-qa.mjs 2>&1 | tee -a artifacts/worlds-qa.log
+            code=${PIPESTATUS[0]}
+            if [ "$code" -ne 0 ]; then failed=1; fi
+          done
+          if [ "$failed" -eq 0 ]; then
+            echo "result=success" >> "$GITHUB_OUTPUT"
+          else
+            echo "result=failure" >> "$GITHUB_OUTPUT"
+          fi
+          exit 0
+
+      - name: Upload QA diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: FeatherFury-Worlds-Live-QA
+          path: artifacts
+          if-no-files-found: ignore
+
+      - name: Report QA status
+        if: always()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RESULT: ${{ steps.qa.outputs.result }}
+          SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+        run: |
+          set -euo pipefail
+          title='[WORLD QA] Playable Worlds Status'
+          num=$(gh issue list --state all --limit 100 --json number,title --jq '.[] | select(.title == "[WORLD QA] Playable Worlds Status") | .number' | head -1)
+          if [ "$RESULT" = 'success' ]; then
+            cat > /tmp/body.md <<BODY
+          Status: **SUCCESS**
+
+          Deployed commit: \`$SHA\`
+          Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          Browsers:
+          - Chromium mobile
+          - WebKit iPhone
+
+          Verified through the deployed build:
+          - World 1 launches and Crow boss activates
+          - World 2 launches and Ice Emperor boss activates
+          - World 3 launches and Lord Voltbat/Thunderbird boss activates
+          - PLAY HUD + pause control are present in every playable world
+          BODY
+            if [ -n "$num" ]; then gh issue edit "$num" --body-file /tmp/body.md --state closed >/dev/null; else num=$(gh issue create --title "$title" --body-file /tmp/body.md | sed 's#.*/##'); gh issue close "$num" >/dev/null; fi
+          else
+            tail -n 260 artifacts/worlds-qa.log > /tmp/tail.txt
+            {
+              echo 'Status: **FAILURE**'
+              echo
+              echo "Deployed commit: \`$SHA\`"
+              echo "Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+              echo
+              echo '```text'
+              cat /tmp/tail.txt
+              echo '```'
+            } > /tmp/body.md
+            if [ -n "$num" ]; then gh issue edit "$num" --body-file /tmp/body.md --state open >/dev/null; else gh issue create --title "$title" --body-file /tmp/body.md >/dev/null; fi
+          fi
+
+      - name: Fail if QA failed
+        if: steps.qa.outputs.result != 'success'
+        run: exit 1
