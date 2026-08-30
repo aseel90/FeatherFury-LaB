@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 
@@ -26,6 +27,20 @@ jobs:
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
+
+      - name: Add verified Android test APK
+        uses: actions/download-artifact@v4
+        with:
+          name: FeatherFury-Android-RC
+          path: downloads
+          github-token: ${{ github.token }}
+          repository: aseel90/FeatherFury-LaB
+          run-id: 33325859450
+
+      - name: Keep only the shareable APK
+        run: |
+          test -s downloads/FeatherFury-RC-debug.apk
+          rm -f downloads/FeatherFury-RC-unsigned.aab downloads/FeatherFury-GooglePlay-512.png
 
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
