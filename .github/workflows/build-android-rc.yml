@@ -27,7 +27,7 @@ on:
       - .github/workflows/build-android-rc.yml
 
 permissions:
-  contents: read
+  contents: write
   issues: write
 
 concurrency:
@@ -155,6 +155,22 @@ jobs:
             FeatherFury-RC-debug.apk
             FeatherFury-RC-unsigned.aab
             FeatherFury-GooglePlay-512.png
+
+      - name: Publish shareable test APK
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=android-rc-share
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" FeatherFury-RC-debug.apk --clobber
+          else
+            gh release create "$TAG" FeatherFury-RC-debug.apk \
+              --title "Feather Fury Android Test APK" \
+              --notes "Shareable Android test build generated from the latest successful Feather Fury RC pipeline." \
+              --prerelease \
+              --target "$GITHUB_SHA"
+          fi
 
       - name: Report Android RC build status
         if: always()
