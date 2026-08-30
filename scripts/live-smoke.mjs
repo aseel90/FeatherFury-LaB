@@ -149,7 +149,9 @@ try {
     throw new Error(`Store coin balance identity is incomplete: ${JSON.stringify(menu.storeBalanceStyle)}`);
   }
 
-  await page.locator('#startStoryBtn').click({ timeout: 5_000 });
+  // Menu geometry/enabled state was already verified above. Use a DOM click here to avoid
+  // Playwright scrolling the fixed mobile menu under the top bar before dispatch.
+  await page.evaluate(() => document.getElementById('startStoryBtn')?.click());
   await page.waitForFunction(() => ['STORY','LAUNCH','PLAYING'].includes(window.game?.state), null, { timeout: 10_000 });
 
   if (await page.evaluate(() => window.game?.state === 'STORY')) {
