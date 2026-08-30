@@ -148,6 +148,11 @@ try {
 
       await page.evaluate(() => window.FFStoreUI.open('characters'));
       await page.waitForFunction(() => document.querySelector('.ff-characters-panel')?.classList.contains('is-active'), null, { timeout:6_000 });
+      const activeCard = await page.evaluate(() => ({
+        actionDisabled: !!document.querySelector('.ff-character-action')?.disabled,
+        selectedBadge: document.querySelector('.ff-character-selected-badge')?.classList.contains('is-visible') || false
+      }));
+      if (!activeCard.actionDisabled || !activeCard.selectedBadge) throw new Error(`Character carousel did not reopen on active skin at ${vp.name}: ${JSON.stringify(activeCard)}`);
       await page.locator('.ff-character-prev').click({ timeout:5_000 });
       const selectReady = await page.evaluate(() => ({ disabled:!!document.querySelector('.ff-character-action')?.disabled, label:document.querySelector('.ff-character-action')?.textContent?.trim() || '' }));
       if (selectReady.disabled) throw new Error(`Cannot select alternate owned character at ${vp.name}: ${JSON.stringify(selectReady)}`);
