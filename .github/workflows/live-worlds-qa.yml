@@ -58,15 +58,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
 
-      - name: Install dependencies
+      - name: Install Playwright
         if: steps.deploy.outputs.result == 'success'
-        run: npm ci
-
-      - name: Install browsers
-        if: steps.deploy.outputs.result == 'success'
-        run: npx playwright install --with-deps chromium webkit
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium webkit
 
       - name: Verify all playable worlds
         if: steps.deploy.outputs.result == 'success'
