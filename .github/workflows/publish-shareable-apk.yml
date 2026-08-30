@@ -1,0 +1,46 @@
+name: Publish Shareable APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/publish-shareable-apk.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download verified Android RC artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: FeatherFury-Android-RC
+          path: share
+          github-token: ${{ github.token }}
+          repository: aseel90/FeatherFury-LaB
+          run-id: 33325859450
+
+      - name: Verify APK
+        run: |
+          test -s share/FeatherFury-RC-debug.apk
+          ls -lh share/FeatherFury-RC-debug.apk
+
+      - name: Publish public test APK release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=android-rc-share
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" share/FeatherFury-RC-debug.apk --clobber
+          else
+            gh release create "$TAG" share/FeatherFury-RC-debug.apk \
+              --title "Feather Fury Android Test APK" \
+              --notes "Public test APK from the verified Android RC build 00928e54." \
+              --prerelease \
+              --target "00928e54daa8b062b79b6c5b3ebc433c5eff78b5"
+          fi
