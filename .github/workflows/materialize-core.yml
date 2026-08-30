@@ -75,24 +75,29 @@ jobs:
         id: commit
         shell: bash
         run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add \
-            game-core-stable-v1.js \
-            game.js \
-            index.html \
-            RUNTIME_ACTIVE.md \
-            FEATHER_FURY_GAME_SPEC.md \
-            scripts/materialize-core.js \
-            scripts/runtime-integrity-check.js
-          git diff --cached --check
-          if git diff --cached --quiet; then
-            echo "No materialization changes required"
-            exit 0
-          fi
-          git commit -m "Materialize stable game core locally"
-          git push origin HEAD:main
+          set +e
+          {
+            set -euo pipefail
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add \
+              game-core-stable-v1.js \
+              game.js \
+              index.html \
+              RUNTIME_ACTIVE.md \
+              FEATHER_FURY_GAME_SPEC.md \
+              scripts/materialize-core.js \
+              scripts/runtime-integrity-check.js
+            git diff --cached --check
+            if git diff --cached --quiet; then
+              echo "No materialization changes required"
+              exit 0
+            fi
+            git commit -m "Materialize stable game core locally"
+            git push origin HEAD:main
+          } 2>&1 | tee core-commit.log
+          code=${PIPESTATUS[0]}
+          exit $code
 
       - name: Report core materialization status
         if: always()
@@ -104,8 +109,12 @@ jobs:
             const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
             const fs = require('fs');
             let validationTail = '';
+            let commitTail = '';
             if (fs.existsSync('core-validate.log')) {
               validationTail = fs.readFileSync('core-validate.log', 'utf8').split('\n').slice(-30).join('\n').trim();
+            }
+            if (fs.existsSync('core-commit.log')) {
+              commitTail = fs.readFileSync('core-commit.log', 'utf8').split('\n').slice(-30).join('\n').trim();
             }
             const body = [
               `Status: **${status.toUpperCase()}**`,
@@ -122,7 +131,8 @@ jobs:
               status === 'success'
                 ? 'The local materialized core passed integrity checks and was committed atomically to `main`.'
                 : 'No core promotion should be trusted until this issue returns to SUCCESS.',
-              ...(status !== 'success' && validationTail ? ['', 'Validation tail:', '```', validationTail, '```'] : [])
+              ...(status !== 'success' && validationTail ? ['', 'Validation tail:', '```', validationTail, '```'] : []),
+              ...(status !== 'success' && commitTail ? ['', 'Commit tail:', '```', commitTail, '```'] : [])
             ].join('\n');
             const { data: issues } = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
