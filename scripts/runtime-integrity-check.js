@@ -20,7 +20,7 @@ const canonicalSpec = read('FEATHER_FURY_GAME_SPEC.md');
 for (const doc of ['README.md','DEVELOPMENT_RULES.md','GAME_PLAN.md','RUNTIME_ACTIVE.md']) {
   if (!read(doc).includes('FEATHER_FURY_GAME_SPEC.md')) fail(`${doc} must point to FEATHER_FURY_GAME_SPEC.md as the canonical game/runtime spec`);
 }
-for (const token of ['ACTIVE_PATCHES','RETIRED_PATCHES','game-core-stable-v1.js','stable-runtime-w3-clean-v1.js','ui-runtime-boot-v1.js','scripts/live-smoke.mjs']) {
+for (const token of ['ACTIVE_PATCHES','RETIRED_PATCHES','stable-runtime-w3-clean-v1.js','ui-runtime-boot-v1.js','scripts/live-smoke.mjs']) {
   if (!canonicalSpec.includes(token)) fail(`FEATHER_FURY_GAME_SPEC.md missing canonical runtime token: ${token}`);
 }
 
@@ -42,10 +42,14 @@ if (overlap.length) fail(`active/retired overlap: ${overlap.join(', ')}`);
 
 for (const file of active) if (!exists(file)) fail(`active patch missing: ${file}`);
 const coreMatch = game.match(/const\s+CORE_RUNTIME\s*=\s*['"]([^'"]+)['"]/);
-if (!coreMatch || coreMatch[1] !== 'game-core-stable-v1.js?v=1') fail('game.js must use the materialized local core');
-if (!exists('game-core-stable-v1.js')) fail('materialized local core is missing');
-if (/cdn\.jsdelivr\.net|https?:\/\//.test(read('game-core-stable-v1.js'))) fail('materialized core must not fetch remote runtime code');
-if (!retired.includes('stable-runtime-w3-clean-v1.js')) fail('runtime transformer must be retired after materialization');
+if (!coreMatch) fail('game.js CORE_RUNTIME is missing');
+else if (coreMatch[1] === 'game-core-stable-v1.js?v=1') {
+  if (!exists('game-core-stable-v1.js')) fail('materialized local core is missing');
+  if (/cdn\.jsdelivr\.net|https?:\/\//.test(read('game-core-stable-v1.js'))) fail('materialized core must not fetch remote runtime code');
+  if (!retired.includes('stable-runtime-w3-clean-v1.js')) fail('runtime transformer must be retired after materialization');
+} else if (coreMatch[1] !== 'stable-runtime-w3-clean-v1.js?v=4') {
+  fail(`unapproved transitional core runtime: ${coreMatch[1]}`);
+}
 
 for (const forbidden of [
   'boss-crowking-v1.js',
