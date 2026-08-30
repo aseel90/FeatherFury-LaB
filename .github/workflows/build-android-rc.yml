@@ -30,6 +30,10 @@ permissions:
   contents: read
   issues: write
 
+concurrency:
+  group: feather-fury-android-rc
+  cancel-in-progress: true
+
 jobs:
   android-rc:
     runs-on: ubuntu-latest
