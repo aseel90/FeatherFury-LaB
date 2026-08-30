@@ -69,7 +69,7 @@ for (const forbidden of [
 }
 
 if (!/game\.js\?v=2\.4\.9/.test(index)) fail('index.html is not pinned to approved game.js v2.4.9');
-if (!/ui-runtime-boot-v1\.js\?v=9/.test(index)) fail('post-runtime UI boot loader is not active');
+if (!/ui-runtime-boot-v1\.js\?v=12/.test(index)) fail('post-runtime UI boot loader is not pinned to v12');
 
 if (!/<div class="game-wrapper"><div id="app" class="game-container"/.test(index)) fail('stable game wrapper/container contract is missing');
 if (!/id="startScreen" class="overlay-screen active"/.test(index)) fail('startScreen must remain an active overlay screen');
@@ -84,7 +84,7 @@ if (!/js\/audio\.js\?v=2\.3\.2/.test(index)) fail('core audio dependency is miss
 if (!/js\/graphics\.js\?v=2\.3\.2/.test(index)) fail('core graphics dependency is missing or misordered');
 for (const w of ['world1','world2','world3']) if (!new RegExp(`js/${w}\\.js\\?v=2\\.3\\.2`).test(index)) fail(`core ${w} dependency is missing`);
 
-const depOrder = ['js/config.js?v=2.3.4','js/audio.js?v=2.3.2','js/graphics.js?v=2.3.2','js/world1.js?v=2.3.2','js/world2.js?v=2.3.2','js/world3.js?v=2.3.2','ui-splash-approved-v3.js?v=12','game.js?v=2.4.9','ui-runtime-boot-v1.js?v=9'];
+const depOrder = ['js/config.js?v=2.3.4','js/audio.js?v=2.3.2','js/graphics.js?v=2.3.2','js/world1.js?v=2.3.2','js/world2.js?v=2.3.2','js/world3.js?v=2.3.2','ui-splash-approved-v3.js?v=12','game.js?v=2.4.9','ui-runtime-boot-v1.js?v=12'];
 for (let i = 1; i < depOrder.length; i++) {
   if (index.indexOf(depOrder[i - 1]) < 0 || index.indexOf(depOrder[i]) < 0 || index.indexOf(depOrder[i - 1]) > index.indexOf(depOrder[i])) fail(`core dependency order invalid around ${depOrder[i - 1]} -> ${depOrder[i]}`);
 }
@@ -105,9 +105,12 @@ for (const legacyDirect of ['lab-ui.js','ui-settings-leaderboard-v1.js','ui-stor
 
 const uiBoot = read('ui-runtime-boot-v1.js');
 if (/core-gameplay-ux-v1\.js/.test(uiBoot)) fail('ui-runtime-boot-v1.js must not reload core-gameplay-ux; runtime owns it');
-for (const token of ['__FF_RUNTIME_APPROVED_STACK__','__FF_MENU_UI_READY__','ui-world-select-v1.js?v=8','ui-main-menu-v3.js?v=6','ui-hud-v1.js?v=5','ui-runtime-fixes-v1.js?v=2']) {
+for (const token of ['__FF_RUNTIME_APPROVED_STACK__','__FF_MENU_UI_READY__','ui-world-select-v1.js?v=10','ui-main-menu-v3.js?v=6','ui-hud-v1.js?v=5','ui-runtime-fixes-v1.js?v=2']) {
   if (!uiBoot.includes(token)) fail(`ui-runtime-boot-v1.js is missing menu boot contract: ${token}`);
 }
+if (!uiBoot.includes('lab-ui.js?v=7')) fail('ui-runtime-boot-v1.js must load the gated lab helper v7');
+const labUi = read('lab-ui.js');
+if (!labUi.includes("get('fflab') === '1'") || !labUi.includes('if (labWorldUnlockEnabled)')) fail('lab-ui.js must gate world unlock behind explicit ?fflab=1');
 const mainMenuJs = read('ui-main-menu-v3.js');
 if (!mainMenuJs.includes('stabilizeViewport') || !mainMenuJs.includes("window.addEventListener('pageshow', settle)") || !mainMenuJs.includes("document.addEventListener('ff:menu-ready', settle)")) fail('main menu must restore viewport/layout after splash and pageshow');
 if (!/ui-main-menu-v3\.css\?v=5/.test(index)) fail('index.html is not pinned to main menu CSS cache release v5');
