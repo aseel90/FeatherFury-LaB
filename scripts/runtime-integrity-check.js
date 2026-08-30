@@ -68,7 +68,7 @@ for (const forbidden of [
   if (active.includes(forbidden)) fail(`retired patch active: ${forbidden}`);
 }
 
-if (!/game\.js\?v=2\.4\.8/.test(index)) fail('index.html is not pinned to approved game.js v2.4.8');
+if (!/game\.js\?v=2\.4\.9/.test(index)) fail('index.html is not pinned to approved game.js v2.4.9');
 if (!/ui-runtime-boot-v1\.js\?v=9/.test(index)) fail('post-runtime UI boot loader is not active');
 
 if (!/<div class="game-wrapper"><div id="app" class="game-container"/.test(index)) fail('stable game wrapper/container contract is missing');
@@ -84,7 +84,7 @@ if (!/js\/audio\.js\?v=2\.3\.2/.test(index)) fail('core audio dependency is miss
 if (!/js\/graphics\.js\?v=2\.3\.2/.test(index)) fail('core graphics dependency is missing or misordered');
 for (const w of ['world1','world2','world3']) if (!new RegExp(`js/${w}\\.js\\?v=2\\.3\\.2`).test(index)) fail(`core ${w} dependency is missing`);
 
-const depOrder = ['js/config.js?v=2.3.4','js/audio.js?v=2.3.2','js/graphics.js?v=2.3.2','js/world1.js?v=2.3.2','js/world2.js?v=2.3.2','js/world3.js?v=2.3.2','ui-splash-approved-v3.js?v=12','game.js?v=2.4.8','ui-runtime-boot-v1.js?v=9'];
+const depOrder = ['js/config.js?v=2.3.4','js/audio.js?v=2.3.2','js/graphics.js?v=2.3.2','js/world1.js?v=2.3.2','js/world2.js?v=2.3.2','js/world3.js?v=2.3.2','ui-splash-approved-v3.js?v=12','game.js?v=2.4.9','ui-runtime-boot-v1.js?v=9'];
 for (let i = 1; i < depOrder.length; i++) {
   if (index.indexOf(depOrder[i - 1]) < 0 || index.indexOf(depOrder[i]) < 0 || index.indexOf(depOrder[i - 1]) > index.indexOf(depOrder[i])) fail(`core dependency order invalid around ${depOrder[i - 1]} -> ${depOrder[i]}`);
 }
