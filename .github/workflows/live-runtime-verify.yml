@@ -69,7 +69,7 @@ jobs:
             artifacts/live-smoke/**
 
       - name: Bridge live failure to issue
-        if: failure()
+        if: steps.smoke.outcome == 'failure'
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -115,10 +115,23 @@ jobs:
             const title = '[LIVE VERIFY] Runtime Status';
             const sha = '${{ steps.meta.outputs.sha }}';
             const outcome = '${{ steps.smoke.outcome }}';
+            const label = outcome === 'success'
+              ? 'SUCCESS'
+              : outcome === 'failure'
+                ? 'FAILURE'
+                : outcome === 'cancelled'
+                  ? 'CANCELLED'
+                  : 'INCOMPLETE';
             const ok = outcome === 'success';
+            const failed = outcome === 'failure';
             const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const detail = ok
+              ? 'Loading → complete World Select → PLAY and the canonical navigation smoke checks passed on the deployed GitHub Pages build.'
+              : failed
+                ? 'The deployed build did not pass the complete live browser smoke contract. See the run diagnostics and the open deployment failure issue.'
+                : 'Verification did not finish. This status does not imply a runtime failure; use the next completed live run as the release verdict.';
             const body = [
-              `Status: **${ok ? 'SUCCESS' : 'FAILURE'}**`,
+              `Status: **${label}**`,
               '',
               `Deployed commit: \`${sha}\``,
               `Run: ${runUrl}`,
@@ -127,9 +140,7 @@ jobs:
               '- Chromium mobile',
               '- WebKit iPhone',
               '',
-              ok
-                ? 'Loading → complete World Select → PLAY and the canonical navigation smoke checks passed on the deployed GitHub Pages build.'
-                : 'The deployed build did not pass the complete live browser smoke contract. See the run diagnostics and the open deployment failure issue.'
+              detail
             ].join('\n');
             const { data: issues } = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
@@ -138,6 +149,7 @@ jobs:
               per_page: 100
             });
             const existing = issues.find(i => !i.pull_request && i.title === title);
+            const state = ok ? 'closed' : 'open';
             if (existing) {
               await github.rest.issues.update({
                 owner: context.repo.owner,
@@ -145,7 +157,7 @@ jobs:
                 issue_number: existing.number,
                 title,
                 body,
-                state: ok ? 'closed' : 'open'
+                state
               });
             } else {
               const created = await github.rest.issues.create({
