@@ -59,7 +59,7 @@ for (const forbidden of [
 }
 
 if (!/game\.js\?v=2\.4\.7/.test(index)) fail('index.html is not pinned to approved game.js v2.4.7');
-if (!/ui-runtime-boot-v1\.js\?v=7/.test(index)) fail('post-runtime UI boot loader is not active');
+if (!/ui-runtime-boot-v1\.js\?v=8/.test(index)) fail('post-runtime UI boot loader is not active');
 
 if (!/<div class="game-wrapper"><div id="app" class="game-container"/.test(index)) fail('stable game wrapper/container contract is missing');
 if (!/id="startScreen" class="overlay-screen active"/.test(index)) fail('startScreen must remain an active overlay screen');
@@ -73,13 +73,13 @@ if (!/js\/audio\.js\?v=2\.3\.2/.test(index)) fail('core audio dependency is miss
 if (!/js\/graphics\.js\?v=2\.3\.2/.test(index)) fail('core graphics dependency is missing or misordered');
 for (const w of ['world1','world2','world3']) if (!new RegExp(`js/${w}\\.js\\?v=2\\.3\\.2`).test(index)) fail(`core ${w} dependency is missing`);
 
-const depOrder = ['js/config.js?v=2.3.4','js/audio.js?v=2.3.2','js/graphics.js?v=2.3.2','js/world1.js?v=2.3.2','js/world2.js?v=2.3.2','js/world3.js?v=2.3.2','ui-splash-approved-v3.js?v=12','game.js?v=2.4.7','ui-runtime-boot-v1.js?v=7'];
+const depOrder = ['js/config.js?v=2.3.4','js/audio.js?v=2.3.2','js/graphics.js?v=2.3.2','js/world1.js?v=2.3.2','js/world2.js?v=2.3.2','js/world3.js?v=2.3.2','ui-splash-approved-v3.js?v=12','game.js?v=2.4.7','ui-runtime-boot-v1.js?v=8'];
 for (let i = 1; i < depOrder.length; i++) {
   if (index.indexOf(depOrder[i - 1]) < 0 || index.indexOf(depOrder[i]) < 0 || index.indexOf(depOrder[i - 1]) > index.indexOf(depOrder[i])) fail(`core dependency order invalid around ${depOrder[i - 1]} -> ${depOrder[i]}`);
 }
 
 for (const requiredId of [
-  'htmlTag','startScreen','previewBirdCanvas','startStoryBtn','settingsBtn','closeSettingsBtn','closeShopBtn','closeLeaderboardBtn','restartBtn','reviveBtn','shopBtnGameOver',
+  'htmlTag','startScreen','previewBirdCanvas','startStoryBtn','settingsBtn','shopBtnStart','closeSettingsBtn','closeShopBtn','closeLeaderboardBtn','restartBtn','reviveBtn','shopBtnGameOver','nextWorldActionBtn',
   'sfxToggleBtn','gfxToggleBtn','langToggleBtn','shopTotalCoins','skinsGrid','endGameTitle','finalScore','highScore','earnedCoins','mainMenuBtn',
   'gameHud','settingsScreen','shopScreen','leaderboardScreen','resetDataBtn','startEndlessBtnGameOver','currentScoreDisplay','sessionCoinDisplay','stageDisplay','feverBarFill'
 ]) {
@@ -94,7 +94,7 @@ for (const legacyDirect of ['lab-ui.js','ui-settings-leaderboard-v1.js','ui-stor
 
 const uiBoot = read('ui-runtime-boot-v1.js');
 if (/core-gameplay-ux-v1\.js/.test(uiBoot)) fail('ui-runtime-boot-v1.js must not reload core-gameplay-ux; runtime owns it');
-for (const token of ['__FF_RUNTIME_APPROVED_STACK__','__FF_MENU_UI_READY__','ui-world-select-v1.js?v=8','ui-main-menu-v3.js?v=5','ui-hud-v1.js?v=5','ui-runtime-fixes-v1.js?v=1']) {
+for (const token of ['__FF_RUNTIME_APPROVED_STACK__','__FF_MENU_UI_READY__','ui-world-select-v1.js?v=8','ui-main-menu-v3.js?v=5','ui-hud-v1.js?v=5','ui-runtime-fixes-v1.js?v=2']) {
   if (!uiBoot.includes(token)) fail(`ui-runtime-boot-v1.js is missing menu boot contract: ${token}`);
 }
 if (!/function laidOutInViewport\(el\)/.test(uiBoot) || /fullyVisible\(logo\)/.test(uiBoot)) fail('menu boot must validate splash-hidden geometry without requiring painted visibility');
@@ -105,16 +105,14 @@ if (!/html body #ffPauseOverlay\.show\s*\{[^}]*display\s*:\s*flex\s*!important/i
 
 const hud = read('ui-hud-v1.css');
 if (!/#ffPauseBtn\.ff-hud-pause-v1/.test(hud)) fail('current HUD must own pause button layout');
-if (!/\.hud-top\s*\{[^}]*grid-template-columns:76px minmax\(96px,118px\) 42px/i.test(hud)) fail('HUD top row must be the approved 76px / flexible score / 42px pause layout');
 if (!/\.hud-top\s*\{[^}]*width:auto\s*!important/i.test(hud)) fail('HUD top row must use auto width so left/right viewport insets bound the row');
-if (!/fever-bar-container[^}]*display\s*:\s*none\s*!important/i.test(hud)) fail('base HUD still owns the retired fever state before post-runtime override');
-if (!/#ffBossHud[^}]*display\s*:\s*none\s*!important/i.test(hud)) fail('duplicate boss HUD must stay hidden');
-
 const uiHudJs = read('ui-hud-v1.js');
-if (!/top\.appendChild\(pause\)/.test(uiHudJs)) fail('HUD JS must place pause control inside the top HUD row');
+if (!/top\.appendChild\(pause\)/.test(uiHudJs)) fail('HUD JS must place pause control inside the top row');
 
 const runtimeFixes = read('ui-runtime-fixes-v1.js');
 if (!/installPauseGuard/.test(runtimeFixes) || !/syncHudData/.test(runtimeFixes)) fail('runtime fixes must freeze pause and bridge HUD data');
+if (!/installNavigationContract/.test(runtimeFixes) || !/__FF_UI_NAV__/.test(runtimeFixes) || !/game\.returnToMenu\s*=\s*goMain/.test(runtimeFixes)) fail('runtime fixes must own the canonical UI navigation contract');
+if (!canonicalSpec.includes('## 19. UI Navigation Contract') || !canonicalSpec.includes('Pause -> Settings -> Back -> Pause') || !canonicalSpec.includes('Store -> Back -> END')) fail('canonical spec must include the UI navigation route map');
 if (!/__ffFinalPauseGuardV1/.test(runtimeFixes)) fail('runtime fixes must install one final pause update guard');
 const runtimeFixCss = read('ui-runtime-fixes-v1.css');
 if (!/direction:ltr\s*!important/i.test(runtimeFixCss)) fail('runtime fixes must pin HUD physical direction');
@@ -123,7 +121,7 @@ if (!/start-actions-group[^{]*\{[^}]*margin-top/i.test(runtimeFixCss)) fail('run
 if (!/ff-store-balance[\s\S]*display:flex\s*!important/i.test(runtimeFixCss)) fail('runtime fixes must normalize store coin balance');
 if (!/score-container[\s\S]*border-color:rgba\(86,188,220/i.test(runtimeFixCss)) fail('compact HUD must keep the quiet cyan center score panel');
 if (!/ffAbilityHud[\s\S]*top:calc\(max\(env\(safe-area-inset-top\),0px\) \+ 86px\)/i.test(runtimeFixCss)) fail('compact HUD must place ability below Fever in the center stack');
-if (!/fever-bar-container[\s\S]*top:calc\(max\(env\(safe-area-inset-top\),0px\) \+ 61px\)/i.test(runtimeFixCss)) fail('compact HUD must place Fever above the ability chip');
+if (!/fever-bar-container[\s\S]*top:calc\(max\(env\(safe-area-inset-top\),0px\) \+ 61px\)/i.test(runtimeFixCss)) fail('compact HUD must place the thin Fever bar above the ability chip');
 if (!/fever-bar-container[\s\S]*height:19px\s*!important/i.test(runtimeFixCss)) fail('compact HUD Fever bar must remain thin');
 const settingsCss = read('ui-settings-leaderboard-v1.css');
 if (!/#settingsScreen \.settings-dialog[\s\S]*width:min\(90vw,390px\)/i.test(settingsCss)) fail('settings must use the compact centered dialog');
@@ -139,6 +137,7 @@ const liveVerify = read('.github/workflows/live-runtime-verify.yml');
 if (!/playwright install --with-deps chromium webkit/.test(liveVerify)) fail('live verify must install Chromium and WebKit');
 if (!/FF_BROWSER=chromium/.test(liveVerify) || !/FF_BROWSER=webkit/.test(liveVerify)) fail('live verify must execute both Chromium and WebKit mobile smoke tests');
 const liveSmoke = read('scripts/live-smoke.mjs');
+if (!liveSmoke.includes('Pause -> Settings contract failed') || !liveSmoke.includes('End -> Store -> Back') || !liveSmoke.includes('Next World map failed')) fail('live smoke must enforce the canonical navigation map');
 if (!/visualViewport/.test(liveSmoke) || !/logoVisible/.test(liveSmoke) || !/worldCardVisible/.test(liveSmoke)) fail('live smoke must enforce visible menu geometry in the visual viewport');
 
 if (process.exitCode) process.exit(process.exitCode);

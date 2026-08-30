@@ -2,18 +2,13 @@ import { chromium, webkit } from 'playwright';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const BASE = process.env.FF_LIVE_URL || 'https://aseel90.github.io/FeatherFury-LaB/';
-const SHA = process.env.FF_VERIFY_SHA || 'manual';
+const BASE = process.env.FF_URL || 'https://aseel90.github.io/FeatherFury-LaB/';
 const ENGINE = (process.env.FF_BROWSER || 'chromium').toLowerCase();
-const OUT = process.env.FF_SMOKE_OUT || `artifacts/live-smoke/${ENGINE}`;
-fs.mkdirSync(OUT, { recursive: true });
+const OUT = process.env.FF_ARTIFACT_DIR || `artifacts/live-smoke-${ENGINE}`;
+fs.mkdirSync(OUT, { recursive:true });
 
-const url = new URL(BASE);
-url.searchParams.set('ui', 'world-v1');
-url.searchParams.set('ffverify', `${SHA}-${Date.now()}`);
-
-const browserType = ENGINE === 'webkit' ? webkit : chromium;
-const browser = await browserType.launch(ENGINE === 'chromium' ? { headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage'] } : { headless: true });
+const type = ENGINE === 'webkit' ? webkit : chromium;
+const browser = await type.launch({ headless:true });
 const context = await browser.newContext({
   viewport: { width: 390, height: 844 },
   deviceScaleFactor: 2,
@@ -43,12 +38,12 @@ const readState = () => page.evaluate(() => {
     const top = vv?.offsetTop || 0;
     const right = left + (vv?.width || innerWidth);
     const bottom = top + (vv?.height || innerHeight);
-    return r.width > 1 && r.height > 1 && r.left >= left - 2 && r.top >= top - 2 && r.right <= right + 2 && r.bottom <= bottom + 2;
+    return r.width > 2 && r.height > 2 && r.left >= left - 2 && r.top >= top - 2 && r.right <= right + 2 && r.bottom <= bottom + 2;
   };
   const rect = el => {
     if (!el) return null;
     const r = el.getBoundingClientRect();
-    return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height};
+    return { left:r.left, top:r.top, right:r.right, bottom:r.bottom, width:r.width, height:r.height };
   };
   const preview = document.getElementById('previewBirdCanvas');
   let previewInk = false;
@@ -60,7 +55,7 @@ const readState = () => page.evaluate(() => {
   const thumb = document.querySelector('#worldCard .ff-world-thumb');
   return {
     engine: navigator.userAgent,
-    viewport: {innerWidth, innerHeight, visualWidth: visualViewport?.width || null, visualHeight: visualViewport?.height || null},
+    viewport: { innerWidth, innerHeight, visualWidth:visualViewport?.width, visualHeight:visualViewport?.height },
     runtimeReady: window.__FF_RUNTIME_APPROVED_STACK__ === true,
     menuReady: window.__FF_MENU_UI_READY__ === true,
     runtimeBooting: window.__FF_PATCH_BOOTING__,
@@ -71,10 +66,14 @@ const readState = () => page.evaluate(() => {
     logoVisible: visible(document.querySelector('#startScreen .ff-main-logo')),
     worldCardVisible: visible(document.getElementById('worldCard')),
     playVisible: visible(document.getElementById('startStoryBtn')),
-    menuRects: {logo: rect(document.querySelector('#startScreen .ff-main-logo')), card: rect(document.getElementById('worldCard')), play: rect(document.getElementById('startStoryBtn'))},
-    playDisabled: document.getElementById('startStoryBtn')?.disabled ?? null,
+    menuRects: {
+      logo: rect(document.querySelector('#startScreen .ff-main-logo')),
+      card: rect(document.getElementById('worldCard')),
+      play: rect(document.getElementById('startStoryBtn'))
+    },
+    playDisabled: !!document.getElementById('startStoryBtn')?.disabled,
     worldThumb: thumb ? getComputedStyle(thumb).backgroundImage : null,
-    worldKicker: document.querySelector('#worldCard .ff-world-kicker')?.textContent || null,
+    worldKicker: document.querySelector('#worldCard .ff-world-kicker')?.textContent?.trim() || null,
     coinIcon: !!document.querySelector('#startScreen .ff-coin-icon'),
     birdButton: !!document.querySelector('#startScreen .ff-bird-avatar-btn'),
     previewInk,
@@ -98,24 +97,26 @@ const readState = () => page.evaluate(() => {
       };
     })(),
     hudValues: {
-      coins: document.getElementById('runCoins')?.textContent?.trim() || '',
-      score: document.getElementById('scoreValue')?.textContent?.trim() || '',
-      stage: document.getElementById('stageName')?.textContent?.trim() || '',
+      coins: document.getElementById('runCoins')?.textContent?.trim() || null,
+      score: document.getElementById('scoreValue')?.textContent?.trim() || null,
+      stage: document.getElementById('stageName')?.textContent?.trim() || null,
       feverWidth: document.getElementById('feverFill')?.getBoundingClientRect()?.width || 0,
       feverVisible: visible(document.querySelector('#gameHud .fever-bar-container'))
     },
     storeBalanceStyle: (() => {
-      const el = document.querySelector('#shopScreen .ff-store-balance');
-      if (!el) return null;
-      const st = getComputedStyle(el);
-      return { display: st.display, fontFamily: st.fontFamily, borderRadius: st.borderRadius };
+      const el = document.querySelector('#shopScreen .shop-balance'); if(!el)return null;
+      const s=getComputedStyle(el); return {display:s.display,fontFamily:s.fontFamily,borderRadius:s.borderRadius};
     })(),
     gameState: window.game?.state || null,
-    currentWorld: window.game?.currentWorldIndex ?? null,
+    currentWorld: window.game?.activeWorld ?? null,
     splashPresent: !!document.getElementById('ffApprovedBootSplash'),
-    toast: document.getElementById('gameToast')?.textContent || ''
+    toast: document.getElementById('gameToast')?.textContent?.trim() || ''
   };
 });
+
+const url = new URL(BASE);
+url.searchParams.set('ui','world-v1');
+url.searchParams.set('ffverify', `${process.env.GITHUB_SHA || 'local'}-${Date.now()}`);
 
 try {
   await page.goto(url.href, { waitUntil: 'domcontentloaded', timeout: 30_000 });
@@ -208,6 +209,20 @@ try {
     throw new Error(`Pause did not freeze simulation: ${JSON.stringify({ frozenBefore, frozenAfter })}`);
   }
 
+  // Navigation contract: Pause -> Settings -> Back must return to Pause without resuming simulation.
+  await page.locator('#ffPauseOverlay [data-action="settings"]').click({ timeout: 5_000 });
+  await page.waitForFunction(() => {
+    const settings = document.getElementById('settingsScreen');
+    return settings?.classList.contains('active') && !settings.classList.contains('hidden') && window.game?.__ffPaused === true;
+  }, null, { timeout: 5_000 });
+  const settingsState = await page.evaluate(() => ({ state:window.game?.state, paused:window.game?.__ffPaused, pauseVisible:document.getElementById('ffPauseOverlay')?.classList.contains('show') }));
+  if (!settingsState.paused || settingsState.pauseVisible) throw new Error(`Pause -> Settings contract failed: ${JSON.stringify(settingsState)}`);
+
+  await page.locator('#closeSettingsBtn').click({ timeout: 5_000 });
+  await page.waitForFunction(() => document.getElementById('ffPauseOverlay')?.classList.contains('show') && window.game?.__ffPaused === true, null, { timeout: 5_000 });
+  const backToPause = await page.evaluate(() => ({ state:window.game?.state, paused:window.game?.__ffPaused, settingsActive:document.getElementById('settingsScreen')?.classList.contains('active') }));
+  if (!backToPause.paused || backToPause.settingsActive || backToPause.state !== settingsState.state) throw new Error(`Settings -> Pause return contract failed: ${JSON.stringify({settingsState,backToPause})}`);
+
   const savedHudState = await page.evaluate(() => ({
     score: window.game?.score, sessionCoins: window.game?.sessionCoins, fever: window.game?.fever, feverActive: window.game?.feverActive, feverTimer: window.game?.feverTimer
   }));
@@ -233,8 +248,41 @@ try {
   const resume = page.locator('#ffPauseOverlay [data-action="resume"]');
   if (await resume.count()) {
     await resume.click({ timeout: 5_000 });
-    await page.waitForFunction(() => !document.getElementById('ffPauseOverlay')?.classList.contains('show'), null, { timeout: 5_000 });
+    await page.waitForFunction(() => !document.getElementById('ffPauseOverlay')?.classList.contains('show') && window.game?.__ffPaused === false, null, { timeout: 5_000 });
   }
+
+  // Pause -> Main Menu must synchronize engine state and visible route.
+  await page.locator('#ffPauseBtn').click({ timeout: 5_000 });
+  await page.waitForFunction(() => document.getElementById('ffPauseOverlay')?.classList.contains('show'), null, { timeout: 5_000 });
+  await page.locator('#ffPauseOverlay [data-action="menu"]').click({ timeout: 5_000 });
+  await page.waitForFunction(() => {
+    const start = document.getElementById('startScreen');
+    return window.game?.state === 'MENU' && window.game?.__ffPaused === false && start?.classList.contains('active') && !start.classList.contains('hidden');
+  }, null, { timeout: 5_000 });
+
+  // End -> Store -> Back must preserve GAMEOVER/end-screen context.
+  await page.evaluate(() => {
+    const start=document.getElementById('startScreen'), end=document.getElementById('gameOverScreen');
+    start?.classList.remove('active'); start?.classList.add('hidden');
+    end?.classList.remove('hidden'); end?.classList.add('active','ff-defeat');
+    window.game.state='GAMEOVER'; window.game.__ffPaused=false;
+  });
+  await page.locator('#shopBtnGameOver').click({ timeout: 5_000 });
+  await page.waitForFunction(() => document.getElementById('shopScreen')?.classList.contains('active') && !document.getElementById('gameOverScreen')?.classList.contains('active'), null, { timeout: 5_000 });
+  await page.locator('#closeShopBtn').click({ timeout: 5_000 });
+  await page.waitForFunction(() => document.getElementById('gameOverScreen')?.classList.contains('active') && window.game?.state === 'GAMEOVER', null, { timeout: 5_000 });
+
+  // Next World must advance relative to the completed world, never hard-code W2.
+  const nextWorldMap = await page.evaluate(() => {
+    const nav=window.__FF_UI_NAV__, out=[];
+    for (const world of [0,1,2]) {
+      window.game.activeWorld=world; window.game.state='GAMEOVER';
+      nav.nextWorld();
+      out.push(window.game.currentWorldIndex);
+    }
+    return out;
+  });
+  if (JSON.stringify(nextWorldMap) !== JSON.stringify([1,2,3])) throw new Error(`Next World map failed: ${JSON.stringify(nextWorldMap)}`);
 
   const criticalEvents = events.filter(e => e.type === 'pageerror' || e.type === 'requestfailed' || /approved runtime boot failed|clean stable runtime failed|post-runtime UI boot failed/i.test(e.text));
   if (criticalEvents.length) throw new Error(`Critical browser events: ${JSON.stringify(criticalEvents.slice(-20))}`);

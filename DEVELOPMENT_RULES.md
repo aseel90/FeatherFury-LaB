@@ -1,143 +1,133 @@
-# FeatherFury LAB — Mandatory Development Rules
+# Feather Fury — Development Rules
 
-This file is the first reference for any future change in `FeatherFury-LaB`.
+> Canonical game/runtime architecture: `FEATHER_FURY_GAME_SPEC.md`. If this file and the runtime differ, stop and reconcile them before changing gameplay/UI ownership.
 
-> **Canonical technical architecture:** read `FEATHER_FURY_GAME_SPEC.md` before changing runtime ownership, boot order, worlds, bosses, characters, persistence, UI ownership, or patch order. `GAME_PLAN.md` remains the design/approval history; when old file ownership in `GAME_PLAN.md` conflicts with the current loader/spec, the current loader and `FEATHER_FURY_GAME_SPEC.md` win for technical runtime facts.
+## 1. Golden rule
 
-## 1. Repository roles
+Do not fix a visible issue by reactivating an older patch, old world renderer, old boss implementation, or old splash generation.
 
-- `FeatherFury` = stable/production source. Do not modify unless explicitly approved.
-- `FeatherFury-LaB` = all experiments, UI work, testing and risky changes.
-- Never copy experimental LAB changes back to production without user approval.
+File presence in the repository is not proof that a file is active.
 
-## 2. Protected core files
+Before editing behavior, check `game.js` and `FEATHER_FURY_GAME_SPEC.md`.
 
-Treat these as protected files:
+## 2. Branch/repository rule
 
-- `game.js`
-- `index.html`
-- `style.css`
-- `js/config.js`
-- `js/world1.js`
-- `js/world2.js`
-- `js/world3.js`
-- `js/graphics.js`
-- `js/audio.js`
+Development and verification happen in `aseel90/FeatherFury-LaB`.
 
-Rules:
+Do not promote LAB changes into the production repository unless explicitly approved.
 
-1. Never replace a protected file from a stale local copy.
-2. Always read the latest GitHub version immediately before editing.
-3. Prefer isolated LAB files (`lab-ui.css`, `lab-ui.js`) for UI-only changes.
-4. If a protected file must change, make the smallest possible edit.
-5. Do not minify, reformat, or rewrite the whole protected file unless explicitly required.
-6. After editing a protected file, verify its size and diff before considering the change complete.
-7. If file size unexpectedly drops substantially, stop and restore before doing anything else.
+## 3. Active runtime rule
 
-## 3. Branch / rollback policy
+`game.js` owns the approved runtime order.
 
-For changes that touch gameplay, core files, Android build files, or multiple major systems:
+Never:
 
-1. Create a dedicated branch from the current stable LAB `main`.
-2. Make changes there.
-3. Review changed-file list and diff.
-4. Run syntax checks where applicable.
-5. Merge only after verification.
+- reorder `ACTIVE_PATCHES` casually;
+- add a retired file to `ACTIVE_PATCHES` to restore an old behavior;
+- remove a patch without identifying what later wrappers depend on it;
+- change the historical core pin without full live regression testing.
 
-Small isolated CSS/UI changes may go directly to LAB `main` only when they do not modify protected core files.
+## 4. Core rule
 
-## 4. Pre-change checklist
+The current core is restored by `stable-runtime-w3-clean-v1.js` from a pinned historical commit.
 
-Before every change:
+This is a known architectural debt. Until the localization migration is complete, preserve the pin and transformation contract.
 
-- Confirm repository is `FeatherFury-LaB`.
-- Read this file.
-- Read the latest versions of every target file from GitHub.
-- Identify whether the task is UI-only or changes gameplay logic.
-- Preserve the current working state and commit SHA.
+Do not assume the game can run offline merely because all visible assets are local.
 
-## 5. Post-change verification
+## 5. Wrapped-method rule
 
-After every change:
+Many runtime layers wrap shared methods such as `update`, `draw`, `reset`, `gameOver`, and `activateBoss`.
 
-- Confirm `index.html` still has the expected full size/content.
-- Confirm `game.js` is not truncated.
-- Run JavaScript syntax checks for changed JS.
-- Verify only intended files changed.
-- Confirm no screen is accidentally active/visible on top of the start screen.
-- Verify mobile responsiveness.
-- Verify keyboard/remote focus behavior when UI controls are changed.
-- Do not claim visual browser testing succeeded if it was not actually performed.
+Before modifying one of these methods:
 
-## 6. UI rules
+1. find every active wrapper;
+2. identify the final owner;
+3. prefer editing the final owner;
+4. keep delegation to previous implementation unless replacement is deliberate;
+5. add regression coverage for the behavior being changed.
 
-- Mobile-first responsive design.
-- Must scale to phones, tablets and Smart TV / Android TV.
-- Use `clamp()`, relative units and max-width constraints where useful.
-- Avoid fixed layouts that only fit one phone size.
-- No emoji icons in production UI. Use clean SVG/vector artwork or text instead.
-- World-specific backgrounds must not cover or overlay UI controls.
-- Avoid negative z-index / pseudo-element background tricks that can expose gameplay canvas or other screens.
-- Keep primary and secondary actions visually distinct.
+Do not add another wrapper just to avoid understanding the current chain.
 
-## 7. Android / Google Play direction
+## 6. UI/DOM rule
 
-The final product is intended for Android / Google Play.
+The historical core requires compatibility IDs at constructor time.
 
-- Web preview is only a development/testing method.
-- Do not make architectural decisions solely to suit GitHub Pages.
-- Preserve compatibility with a future Android packaging approach chosen after performance testing.
-- Final Android build should consider AAB, signing, target SDK, fullscreen, safe areas, back button, lifecycle/audio behavior and Android TV where appropriate.
+Do not remove DOM elements such as `skinsGrid`, score/coin compatibility fields, or settings/shop/end-screen IDs just because modern UI visually replaces them.
 
-## 8. Source/privacy rules
+If a modern screen needs different markup, preserve the core hook or create an explicit adapter.
 
-- Production and LAB should normally remain private.
-- LAB may be made public temporarily only for web preview/testing when necessary.
-- Do not rely on public GitHub-hosted source files as a permanent runtime dependency.
-- Before returning LAB to private, all runtime code/assets must exist inside the repository/build itself.
+## 7. Loading rule
 
-## 9. Current recovery note
+Loading and menu readiness are separate contracts.
 
-A previous accidental overwrite truncated `game.js`. The LAB runtime was temporarily changed to load a pinned stable build from an earlier commit. This is a temporary recovery mechanism, not the desired final architecture.
+The approved splash intentionally hides the menu while runtime/UI initialize. Menu readiness must validate structure/geometry, not painted `visibility`, or it can recreate the 97% deadlock.
 
-Before declaring the LAB ready for private/offline/Android use:
+Do not change splash/menu readiness without running both Chromium and WebKit live checks.
 
-- restore the complete stable `game.js` into the repository itself;
-- remove any temporary external/pinned runtime loader;
-- verify the game works with no dependency on a public historical GitHub raw file.
+## 8. HUD/Pause rule
 
-## 10. Golden rule
+Pause means simulation freeze.
 
-If a requested change is only visual, do not touch gameplay/core files.
-If a core-file edit is required, protect the working version first and verify the diff before merging.
+A visible pause overlay is not sufficient. `game.__ffPaused` must stop the final wrapped `update()` chain.
 
-## 11. Regression-prevention workflow (mandatory from 2026-08-24)
+Visible HUD data must reflect real game values, not only legacy hidden DOM values.
 
-1. **No direct UI changes on `main`.** Every UI or behavior fix must start on a dedicated branch created from the latest `main`.
-2. **One problem per branch.** Do not combine unrelated fixes (for example Shop + Leaderboard + world navigation) in the same change set.
-3. **Protected surfaces:** `index.html`, `game.js`, `lab-ui.js`, and `lab-ui.css` must be fetched fresh from GitHub before modification.
-4. **Never upload a partial local copy.** If a modified file is unexpectedly smaller than the fetched source, stop immediately and restore before any further work.
-5. **Pre-merge verification checklist:** compare file sizes before/after; inspect the diff for only intended selectors/functions; verify Main, Settings, Leaderboard, Shop, and world navigation still render/function; preserve existing approved fixes unless the branch explicitly targets them.
-6. **No merge until validation.** Keep the change isolated until the target behavior is verified; if browser preview limitations require merge for testing, the branch must contain only one isolated change and the pre-change commit SHA must be retained as the immediate rollback point.
-7. **Rollback point first.** Record the source commit SHA used to create the branch so the exact previous state can be restored.
-8. **Do not fix forward across multiple screens.** If a new regression appears, stop the current change, restore the last good state for the affected file/screen, then address the regression in its own branch.
+Fever is active gameplay and must not be retired as visual clutter.
 
-## 12. Approved-system lock / no re-experimenting
+## 9. World ownership
 
-`GAME_PLAN.md` is the design/approval source of truth for systems that have already been approved. Current technical/runtime ownership is governed by `FEATHER_FURY_GAME_SPEC.md` and the actual loader/gates.
+Use technical IDs W1/W2/W3/W4 when discussing runtime logic.
 
-When a visual/gameplay system is marked **APPROVED / LOCKED**:
+Display names can evolve; technical IDs should remain stable.
 
-1. Keep the same implementation approach for future refinement of that system.
-2. Do not replace it with a new rendering technique, library, asset pipeline, physics model, or experimental architecture merely to try another approach.
-3. Improve the approved system incrementally: proportions, art quality, tuning, layering, animation polish, performance and bug fixes are allowed inside the same approach.
-4. A technique change requires explicit user approval before implementation.
-5. Never reopen a solved system while completing an unrelated item. Preserve approved obstacles, collisions, character behavior and UI unless the task explicitly targets them.
-6. Reference artwork/code supplied for visual direction is a design reference: adapt its visual language into the approved FeatherFury system rather than copy-pasting it as a parallel runtime.
+Do not reintroduce old W1 “Ruins” visual implementations over Cursed Woods ownership.
 
-### World 1 current lock
+Do not reintroduce retired W2 V5/V6/V8/V9 boss layers over V10.
 
-- **Cursed Woods obstacles: APPROVED / LOCKED.** Keep `world1-cursed-obstacles-v5.js` and its image-based trimmed-asset + stable collision/movement approach. Do not redesign or replace it while polishing the background.
-- **Cursed Woods background renderer: APPROVED TECHNIQUE.** Continue using the active Canvas 2D `drawRuinsBackground` ownership in `world1-cursed-woods-background-v3.js` + `world1-final-art-lock-v1.js`; no WebGL, DOM/CSS background layer, new engine, or parallel renderer for this task. `cursed-woods-v1.js` is legacy/not active in the current loader.
-- **Current final task for World 1:** background visual polish only. Gameplay geometry, obstacles, collisions, bird behavior, HUD and boss systems are out of scope.
-- After the background is visually approved and regression-checked, mark **World 1 complete** and stop feature experimentation on it unless a specific bug is reported.
+Do not reintroduce W3 critical V5 over V6/current cleanup.
+
+## 10. Save compatibility
+
+Local-storage keys are part of the player contract.
+
+Do not rename or repurpose `fh_*` keys without migration logic.
+
+Changes to character ownership, selected skin, world completion, or coin storage must be tested with pre-existing saves.
+
+## 11. Cache/version rule
+
+Cache query versions are not product versions.
+
+When changing a browser-loaded JS/CSS file, bump its cache query only when required and update integrity tests in the same commit.
+
+When reporting an issue, use the commit SHA as the primary identifier.
+
+## 12. Testing rule
+
+A change is not complete because it works in one browser.
+
+For runtime/UI changes:
+
+- repo-safety checks must pass;
+- Chromium live smoke must pass;
+- WebKit/iPhone live smoke must pass;
+- the exact path changed should have a regression assertion whenever practical.
+
+## 13. Documentation rule
+
+Update `FEATHER_FURY_GAME_SPEC.md` in the same change whenever you change:
+
+- runtime ownership;
+- active/retired patch boundaries;
+- boot order;
+- DOM compatibility contract;
+- save keys;
+- major world/boss ownership;
+- browser regression expectations.
+
+## UI navigation ownership
+
+The canonical navigation map is in `FEATHER_FURY_GAME_SPEC.md` under **UI Navigation Contract**. After UI boot, `window.__FF_UI_NAV__` / `ui-runtime-fixes-v1.js` is the final owner of cross-screen navigation.
+
+Do not add new screen buttons that directly mix `classList.add/remove('active'/'hidden')` with `game.state` changes. Route multi-origin screens through the navigation contract so Back preserves origin (for example Pause -> Settings -> Back -> Pause and End -> Store -> Back -> End). Any intentional navigation change must update the canonical map and live regression test in the same change.

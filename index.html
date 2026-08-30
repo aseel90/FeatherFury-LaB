@@ -23,29 +23,15 @@
   <link rel="stylesheet" href="ui-splash-approved-v3.css?v=1" />
 </head>
 <body>
-  <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
-    <symbol id="coin-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#fbbf24" stroke="#f59e0b" stroke-width="2"/><path d="M13 5 9 12h4l-2 7 5-9h-4l1-5Z" fill="#fff3b0"/></symbol>
-    <symbol id="star-svg" viewBox="0 0 24 24"><path d="m12 2.5 2.85 5.78 6.38.93-4.62 4.5 1.09 6.35L12 17.06 6.3 20.06l1.09-6.35-4.62-4.5 6.38-.93L12 2.5Z" fill="currentColor"/></symbol>
-    <symbol id="lang-svg" viewBox="0 0 24 24"><path d="M4 5h10M9 3v2m1.5 0c-.9 4-3 6.5-6 8m2.5-4c1.4 1.8 3 3.1 5 4m3-2h5m-2.5-2 3 8m-6 0 3-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  </svg>
-
-  <div class="game-wrapper"><div id="app" class="game-container" data-ff-app-shell="1">
-    <canvas id="gameCanvas" width="450" height="800" aria-label="Feather Fury Game"></canvas>
+  <svg width="0" height="0" style="position:absolute"><defs><symbol id="coin-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#FFD700" stroke="#8B6914" stroke-width="2"/><circle cx="12" cy="12" r="5" fill="none" stroke="#FFF1A8" stroke-width="1.2"/><path d="M9 12h6M12 9v6" stroke="#8B6914" stroke-width="1.4" stroke-linecap="round"/></symbol><symbol id="star-svg" viewBox="0 0 24 24"><path d="M12 2.6l2.85 5.78 6.38.93-4.62 4.5 1.09 6.35L12 17.15 6.3 20.16l1.09-6.35-4.62-4.5 6.38-.93L12 2.6z" fill="currentColor"/></symbol></defs></svg>
+  <div class="game-wrapper"><div id="app" class="game-container">
+    <canvas id="gameCanvas" width="390" height="844"></canvas>
 
     <div id="startScreen" class="overlay-screen active">
-      <div class="top-bar start-topbar">
-        <div class="coin-pill start-balance"><svg width="22" height="22" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg><span id="startTotalCoins">0</span></div>
-        <div class="start-header-actions">
-          <button id="leaderboardBtn" class="icon-btn" aria-label="Leaderboard">🏆</button>
-          <button id="shopBtnStart" class="icon-btn" aria-label="Shop">🛒</button>
-          <button id="settingsBtn" class="icon-btn" aria-label="Settings">⚙</button>
-        </div>
+      <div class="start-screen-content">
+        <div class="top-bar"><button id="settingsBtn" class="icon-btn" aria-label="Settings">⚙️</button><div class="coin-pill"><svg width="21" height="21" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg><span id="startTotalCoins">0</span></div><button id="leaderboardBtn" class="icon-btn" aria-label="Leaderboard">🏆</button><button id="shopBtnStart" class="icon-btn" aria-label="Shop">🛒</button></div>
+        <div class="start-main-content"><div class="title-container"><div class="game-title">FEATHER<br><span>FURY</span></div></div><div class="world-select-shell"><div class="worlds-carousel"><button id="prevWorldBtn" class="carousel-nav-btn" aria-label="Previous World"></button><div class="world-card" id="worldCard"><div class="world-title" id="worldTitle">الغابة الملعونة</div><div class="world-stars" id="worldStars"><span class="star empty star-small"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span><span class="star empty star-big"><svg width="1.7em" height="1.7em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span><span class="star empty star-small"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span></div><div class="bird-preview"><div class="preview-canvas-wrap"><canvas id="previewBirdCanvas" width="54" height="54"></canvas></div><span id="activeSkinName" class="skin-name-badge">العصفور الكلاسيكي</span></div><div class="world-status" id="worldStatus">جاهز للعب!</div></div><button id="nextWorldBtn" class="carousel-nav-btn" aria-label="Next World"></button></div><div class="start-actions-group"><button id='startStoryBtn' class="arcade-btn" data-i18n="playBtn">بدء المهمة</button><button id='startEndlessBtn' class='arcade-btn secondary-action-btn' data-i18n="endlessBtn">الطور اللانهائي</button></div></div></div>
       </div>
-      <div class="start-main-content">
-        <div class="title-container"><div class="game-title">FEATHER<br><span>FURY</span></div></div>
-        <div class="world-select-shell">
-          <div class="worlds-carousel"><button id="prevWorldBtn" class="carousel-nav-btn" aria-label="Previous World"></button><div class="world-card" id="worldCard"><div class="world-title" id="worldTitle">الغابة الملعونة</div><div class="world-stars" id="worldStars"><span class="star empty star-small"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span><span class="star empty star-big"><svg width="1.7em" height="1.7em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span><span class="star empty star-small"><svg width="1.4em" height="1.4em" viewBox="0 0 24 24"><use href="#star-svg"></use></svg></span></div><div class="bird-preview"><div class="preview-canvas-wrap"><canvas id="previewBirdCanvas" width="54" height="54"></canvas></div><span id="activeSkinName" class="skin-name-badge">العصفور الكلاسيكي</span></div><div class="world-status" id="worldStatus">جاهز للعب!</div></div><button id="nextWorldBtn" class="carousel-nav-btn" aria-label="Next World"></button></div>
-          <div class="start-actions-group"><button id='startStoryBtn' class="arcade-btn" data-i18n="playBtn">بدء المهمة</button><button id='startEndlessBtn' class='arcade-btn secondary-action-btn' data-i18n="endlessBtn">الطور اللانهائي</button></div></div></div>
     </div>
 
     <div id="gameHud" class="hud hidden"><div class="hud-top"><div class="hud-coin-badge"><svg width="21" height="21" viewBox="0 0 24 24"><use href="#coin-svg"></use></svg><span id="runCoins">0</span></div><div class="score-container"><div id="scoreValue" class="score-badge">0</div><div id="stageName" class="stage-badge"></div></div><button id="soundToggleBtn" class="icon-btn small-hud-btn" aria-label="Sound"></button></div><div class="fever-bar-container"><div class="fever-label"><span id="feverText"></span></div><div class="fever-track"><div id="feverFill" class="fever-fill"></div></div></div><div id="bossWarning" class="boss-warning hidden"></div><div id="gameHint" class="game-hint hidden"></div></div>
@@ -69,6 +55,6 @@
   <script src="js/world3.js?v=2.3.2"></script>
   <script src="ui-splash-approved-v3.js?v=12"></script>
   <script src="game.js?v=2.4.7"></script>
-  <script src="ui-runtime-boot-v1.js?v=7"></script>
+  <script src="ui-runtime-boot-v1.js?v=8"></script>
 </body>
 </html>
