@@ -1,13 +1,13 @@
 name: Verify Playable Worlds and Bosses
 
 on:
-  workflow_run:
-    workflows: ["Deploy LAB Preview"]
-    types: [completed]
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
+  actions: read
   issues: write
 
 concurrency:
@@ -16,13 +16,36 @@ concurrency:
 
 jobs:
   worlds-qa:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout deployed source
+      - name: Checkout source
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          ref: ${{ github.sha }}
+
+      - name: Wait for matching LAB deployment
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 36); do
+            row=$(gh run list --workflow deploy-pages.yml --commit "$SHA" --limit 1 --json databaseId,status,conclusion --jq '.[0] // empty')
+            if [ -n "$row" ]; then
+              status=$(printf '%s' "$row" | jq -r '.status')
+              conclusion=$(printf '%s' "$row" | jq -r '.conclusion // ""')
+              echo "Deploy status: $status ${conclusion:-}"
+              if [ "$status" = 'completed' ]; then
+                if [ "$conclusion" = 'success' ]; then exit 0; fi
+                echo "Matching Pages deployment concluded: $conclusion" >&2
+                exit 1
+              fi
+            fi
+            sleep 10
+          done
+          echo "Timed out waiting for matching Pages deployment" >&2
+          exit 1
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -40,7 +63,7 @@ jobs:
         id: qa
         shell: bash
         env:
-          FF_VERIFY_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+          FF_VERIFY_SHA: ${{ github.sha }}
         run: |
           set +e
           mkdir -p artifacts
@@ -68,12 +91,12 @@ jobs:
           if-no-files-found: ignore
 
       - name: Report QA status
-        if: always()
+        if: always() && steps.qa.outcome != 'skipped'
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
           RESULT: ${{ steps.qa.outputs.result }}
-          SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+          SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
           title='[WORLD QA] Playable Worlds Status'
