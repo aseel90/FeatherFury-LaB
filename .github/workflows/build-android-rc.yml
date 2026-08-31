@@ -12,6 +12,7 @@ on:
       - '*.css'
       - js/**
       - assets/**
+      - android-assets/google-services.json
       - manifest.json
       - icon.png
       - favicon.png
@@ -114,6 +115,7 @@ jobs:
         id: capacitor
         run: |
           npx cap add android
+          install -m 600 android-assets/google-services.json android/app/google-services.json
           npx cap sync android
 
       - name: Install approved Feather Fury launcher icons
@@ -126,6 +128,9 @@ jobs:
           grep -R "compileSdkVersion = 36\|compileSdk 36\|compileSdk = 36" android/variables.gradle android/app/build.gradle android/build.gradle
           grep -R "targetSdkVersion = 36\|targetSdk 36\|targetSdk = 36" android/variables.gradle android/app/build.gradle android/build.gradle
           grep -R "capacitor-app" android/app/capacitor.build.gradle android/capacitor.settings.gradle
+          test -s android/app/google-services.json
+          grep -q '"package_name": "com.aseel.featherfury"' android/app/google-services.json
+          grep -R "capacitor-firebase-analytics" android/app/capacitor.build.gradle android/capacitor.settings.gradle
           grep -q 'android:icon="@mipmap/ic_launcher"' android/app/src/main/AndroidManifest.xml
           grep -q 'android:roundIcon="@mipmap/ic_launcher_round"' android/app/src/main/AndroidManifest.xml
           grep -q '<monochrome android:drawable="@mipmap/ic_launcher_monochrome"' android/app/src/main/res/mipmap-anydpi-v33/ic_launcher.xml

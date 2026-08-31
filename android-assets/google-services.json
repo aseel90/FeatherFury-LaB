@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "629830033662",
+    "project_id": "featherfury",
+    "storage_bucket": "featherfury.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:629830033662:android:272360180409fa14eb05af",
+        "android_client_info": {
+          "package_name": "com.aseel.featherfury"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAj9L3Ni6cX_TmvFmA1BEcj91nayO4CKFY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

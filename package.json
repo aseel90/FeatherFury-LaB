@@ -4,9 +4,11 @@
   "description": "Feather Fury",
   "private": true,
   "dependencies": {
+    "@capacitor-firebase/analytics": "8.3.0",
     "@capacitor/android": "8.5.0",
     "@capacitor/app": "8.0.0",
-    "@capacitor/core": "8.5.0"
+    "@capacitor/core": "8.5.0",
+    "firebase": "12.6.0"
   },
   "devDependencies": {
     "@capacitor/cli": "8.5.0"
