@@ -1,0 +1,66 @@
+name: Web QA Report Sync
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/15 * * * *'
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: featherfury-web-qa-report-sync
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      QA_ENDPOINT: https://featherfury-web-qa-reports.salahaseel82.workers.dev/v1/reports/recent?limit=50
+      QA_ISSUE: '115'
+    steps:
+      - name: Fetch sanitized Cloudflare QA reports
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --retry 3 --retry-delay 2 "$QA_ENDPOINT" -o reports.json
+
+      - name: Build GitHub issue report
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const payload = JSON.parse(fs.readFileSync('reports.json', 'utf8'));
+          if (!payload || payload.ok !== true || !Array.isArray(payload.reports)) {
+            throw new Error('Unexpected Feather Fury QA endpoint response');
+          }
+          const reports = payload.reports;
+          const esc = (v) => String(v ?? '').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ');
+          const yes = (v) => Number(v) ? 'yes' : 'no';
+          const lines = [];
+          lines.push(reports.length ? 'Status: **ACTIVE**' : 'Status: **WAITING FOR FIRST `?ffqa=1` BROWSER SESSION**');
+          lines.push('');
+          lines.push(`Last sync: \`${new Date().toISOString()}\``);
+          lines.push('');
+          lines.push('Source: isolated Cloudflare Worker + D1 (`featherfury-web-qa-reports`).');
+          lines.push('The browser reporter is disabled unless the game URL contains `ffqa=1`.');
+          lines.push('');
+          lines.push(`Recent reports: **${reports.length}**`);
+          lines.push('');
+          if (reports.length) {
+            lines.push('| ID | Received | Kind | Session | World | Hero | Score | Coins | Revives | Boss reached | Boss done | JS errors |');
+            lines.push('|---:|---|---|---|---:|---|---:|---:|---:|---|---|---:|');
+            for (const r of reports) {
+              lines.push(`| ${esc(r.id)} | ${esc(r.received_at)} | ${esc(r.kind)} | ${esc(r.session_id).slice(0, 22)} | ${esc(r.world)} | ${esc(r.hero)} | ${esc(r.score)} | ${esc(r.coins_earned)} | ${esc(r.revives)} | ${yes(r.boss_reached)} | ${yes(r.boss_completed)} | ${esc(r.js_errors)} |`);
+            }
+          }
+          lines.push('');
+          lines.push('This issue intentionally contains only sanitized QA/gameplay fields; the pipeline does not need a GitHub token inside the game or Cloudflare Worker.');
+          fs.writeFileSync('qa-issue.md', lines.join('\n') + '\n');
+          NODE
+
+      - name: Update Web QA issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh issue edit "$QA_ISSUE" --repo "$GH_REPO" --body-file qa-issue.md
