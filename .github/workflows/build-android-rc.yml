@@ -80,7 +80,9 @@ jobs:
           node --check game-core-stable-v1.js
           node --check game.js
           node --check android-native-v1.js
+          node --check telemetry-v1.js
           node scripts/runtime-integrity-check.js
+          node scripts/telemetry-integrity-check.js
 
       - name: Prepare clean native web bundle
         id: webbundle
@@ -109,6 +111,8 @@ jobs:
             --exclude='capacitor.config.json'
           test -s www/game-core-stable-v1.js
           test -f www/android-native-v1.js
+          test -s www/telemetry-v1.js
+          grep -q 'telemetry-v1.js?v=1' www/index.html
           ! grep -Eq 'cdn\.jsdelivr\.net|https?://' www/game-core-stable-v1.js
 
       - name: Create Android project and sync plugins
