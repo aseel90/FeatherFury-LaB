@@ -141,6 +141,12 @@ jobs:
           test "$(identify -format '%wx%h' FeatherFury-GooglePlay-512.png)" = "512x512"
           test "$(stat -c%s FeatherFury-GooglePlay-512.png)" -le 1048576
 
+      - name: Restore stable QA debug signing key
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: feather-fury-qa-debug-keystore-v1
+
       - name: Build debug APK and unsigned release AAB
         id: gradle
         run: |
