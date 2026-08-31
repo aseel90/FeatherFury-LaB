@@ -237,6 +237,14 @@
   }
 
   state.sessionId = getSessionId();
+  state.sessionStartSent = true;
+  send({
+    kind: 'session_start',
+    world: worldNumber(window.game?.activeWorld != null ? `world_${Number(window.game.activeWorld) + 1}` : ''),
+    hero: text(window.game?.activeSkin, 48),
+    score: num(window.game?.score),
+    events: [{ name: 'qa_session_start', at: new Date().toISOString() }]
+  });
   window.addEventListener('ff:telemetry', onTelemetry);
   window.addEventListener('error', (event) => {
     const where = event?.filename ? ` @ ${String(event.filename).split('/').pop()}:${event.lineno || 0}` : '';
