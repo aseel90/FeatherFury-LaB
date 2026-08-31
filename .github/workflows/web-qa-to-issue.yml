@@ -2,6 +2,11 @@ name: Web QA Report Sync
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/web-qa-to-issue.yml'
+      - 'web-qa-reporter-v1.js'
   schedule:
     - cron: '*/15 * * * *'
 
