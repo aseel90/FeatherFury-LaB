@@ -1,7 +1,7 @@
 {
-  "versionCode": 7,
-  "versionName": "0.2.6-library-ui",
+  "versionCode": 8,
+  "versionName": "0.2.7-tv-polish",
   "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-  "sha256": "5f278edc154bf31ba2c53da663d443320deb7a445622d144973e6dd9d678f701",
-  "notes": "Movie and series categories, improved responsive TV layout, and updated settings UI."
+  "sha256": "8ee1e9c48ec6d900bc2b94ed234407dea930a81be53c9e87c8da780b6f71fd03",
+  "notes": "Arabic RTL, multi-server profiles, grid mode, buffering indicator, exit confirmation, app branding, and TV UI polish."
 }
