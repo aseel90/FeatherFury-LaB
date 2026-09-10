@@ -1,0 +1,43 @@
+name: Import Selyro updater APK
+
+on:
+  push:
+    paths:
+      - '.github/workflows/import-selyro-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Selyro TV 0.2.5
+        run: |
+          mkdir -p selyro-updates
+          curl --fail --location --retry 3 \
+            -o selyro-updates/Selyro-TV-latest.apk \
+            https://raw.githubusercontent.com/aseel90/iptv/078ec6210b892c5b58efe4f4ff09def44cbe04c0/ci-artifacts/Selyro-TV-v0.2.5-updater.apk
+          echo 'a59f321575dc020eb0c372a6124a0e29ae5f9cc27940a090546c58a49def6f95  selyro-updates/Selyro-TV-latest.apk' | sha256sum -c -
+
+      - name: Publish updater files
+        run: |
+          printf '%s  %s\n' 'a59f321575dc020eb0c372a6124a0e29ae5f9cc27940a090546c58a49def6f95' 'Selyro-TV-latest.apk' > selyro-updates/Selyro-TV-latest.sha256
+          cat > selyro-updates/latest.json <<'JSON'
+          {
+            "versionCode": 6,
+            "versionName": "0.2.5-updater",
+            "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
+            "sha256": "a59f321575dc020eb0c372a6124a0e29ae5f9cc27940a090546c58a49def6f95",
+            "notes": "Built-in one-click updates enabled."
+          }
+          JSON
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add selyro-updates/Selyro-TV-latest.apk selyro-updates/Selyro-TV-latest.sha256 selyro-updates/latest.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Publish Selyro TV v0.2.5 updater APK'
+          git push
