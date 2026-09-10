@@ -1,7 +1,7 @@
 {
-  "versionCode": 9,
-  "versionName": "0.2.8-series-hotfix",
-  "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-  "sha256": "c8c1060d6b043d60b3eac48b9a3ce47304d05109a73a5527f4cb25e0592b7e9a",
-  "notes": "Urgent series hotfix: opening a series now shows its details and episodes correctly in both grid and list modes."
+  "versionCode": 10,
+  "versionName": "0.3.0-ui-refresh",
+  "apkUrl": "https://raw.githubusercontent.com/aseel90/iptv/bf02753edfb3a7a72780b151c5b8e19b727939a9/ci-artifacts/Selyro-TV-v0.3.0-ui-refresh.apk",
+  "sha256": "7834c5e65e2a518310d39bb6d1ee1c187ca68aee1d48538f5aa8ab309760e5bf",
+  "notes": "Major UI/UX refresh: new Selyro identity and Android TV launcher artwork, modern focus states and browsing surfaces, clearer playback progress and buffering feedback, and improved D-pad seeking while preserving series, RTL, display modes, multi-server support and updater compatibility."
 }
