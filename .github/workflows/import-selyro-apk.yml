@@ -15,29 +15,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download Selyro TV 0.2.6
+      - name: Download Selyro TV 0.2.7
         run: |
           mkdir -p selyro-updates
           curl --fail --location --retry 3 \
             -o selyro-updates/Selyro-TV-latest.apk \
-            https://raw.githubusercontent.com/aseel90/iptv/d222069fef4e1fbed297e924f5d0a06c1c4bac1a/ci-artifacts/Selyro-TV-v0.2.6-library-ui.apk
-          echo '5f278edc154bf31ba2c53da663d443320deb7a445622d144973e6dd9d678f701  selyro-updates/Selyro-TV-latest.apk' | sha256sum -c -
+            https://raw.githubusercontent.com/aseel90/iptv/cff23bc6d0c32e19c341f54f4e0fd755db6b5e69/ci-artifacts/Selyro-TV-v0.2.7-tv-polish.apk
+          echo '8ee1e9c48ec6d900bc2b94ed234407dea930a81be53c9e87c8da780b6f71fd03  selyro-updates/Selyro-TV-latest.apk' | sha256sum -c -
 
       - name: Publish updater files
         run: |
-          printf '%s  %s\n' '5f278edc154bf31ba2c53da663d443320deb7a445622d144973e6dd9d678f701' 'Selyro-TV-latest.apk' > selyro-updates/Selyro-TV-latest.sha256
+          printf '%s  %s\n' '8ee1e9c48ec6d900bc2b94ed234407dea930a81be53c9e87c8da780b6f71fd03' 'Selyro-TV-latest.apk' > selyro-updates/Selyro-TV-latest.sha256
           cat > selyro-updates/latest.json <<'JSON'
           {
-            "versionCode": 7,
-            "versionName": "0.2.6-library-ui",
+            "versionCode": 8,
+            "versionName": "0.2.7-tv-polish",
             "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-            "sha256": "5f278edc154bf31ba2c53da663d443320deb7a445622d144973e6dd9d678f701",
-            "notes": "Movie and series categories, improved responsive TV layout, and updated settings UI."
+            "sha256": "8ee1e9c48ec6d900bc2b94ed234407dea930a81be53c9e87c8da780b6f71fd03",
+            "notes": "Arabic RTL, multi-server profiles, grid mode, buffering indicator, exit confirmation, app branding, and TV UI polish."
           }
           JSON
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add selyro-updates/Selyro-TV-latest.apk selyro-updates/Selyro-TV-latest.sha256 selyro-updates/latest.json
           git diff --cached --quiet && exit 0
-          git commit -m 'Publish Selyro TV v0.2.6 library UI'
+          git commit -m 'Publish Selyro TV v0.2.7 TV polish'
           git push
