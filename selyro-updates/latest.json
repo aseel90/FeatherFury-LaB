@@ -1,7 +1,7 @@
 {
-  "versionCode": 6,
-  "versionName": "0.2.5-updater",
+  "versionCode": 7,
+  "versionName": "0.2.6-library-ui",
   "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-  "sha256": "a59f321575dc020eb0c372a6124a0e29ae5f9cc27940a090546c58a49def6f95",
-  "notes": "Built-in one-click updates enabled."
+  "sha256": "5f278edc154bf31ba2c53da663d443320deb7a445622d144973e6dd9d678f701",
+  "notes": "Movie and series categories, improved responsive TV layout, and updated settings UI."
 }
