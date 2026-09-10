@@ -1,7 +1,7 @@
 {
-  "versionCode": 8,
-  "versionName": "0.2.7-tv-polish",
+  "versionCode": 9,
+  "versionName": "0.2.8-series-hotfix",
   "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-  "sha256": "8ee1e9c48ec6d900bc2b94ed234407dea930a81be53c9e87c8da780b6f71fd03",
-  "notes": "Arabic RTL, multi-server profiles, grid mode, buffering indicator, exit confirmation, app branding, and TV UI polish."
+  "sha256": "c8c1060d6b043d60b3eac48b9a3ce47304d05109a73a5527f4cb25e0592b7e9a",
+  "notes": "Urgent series hotfix: opening a series now shows its details and episodes correctly in both grid and list modes."
 }
