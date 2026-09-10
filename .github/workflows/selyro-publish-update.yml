@@ -1,0 +1,42 @@
+name: Publish Selyro TV Update
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'selyro-updates/incoming/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reconstruct and verify APK
+        shell: bash
+        run: |
+          set -euxo pipefail
+          test -f selyro-updates/incoming/manifest.env
+          source selyro-updates/incoming/manifest.env
+          cat selyro-updates/incoming/apk.b64.part-* > /tmp/selyro-apk.b64
+          base64 -d /tmp/selyro-apk.b64 > selyro-updates/Selyro-TV-latest.apk
+          echo "$SHA256  selyro-updates/Selyro-TV-latest.apk" | sha256sum -c -
+          cat > selyro-updates/latest.json <<EOF
+          {
+            "versionCode": $VERSION_CODE,
+            "versionName": "$VERSION_NAME",
+            "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
+            "sha256": "$SHA256",
+            "notes": "$NOTES"
+          }
+          EOF
+      - name: Commit public update
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add selyro-updates/Selyro-TV-latest.apk selyro-updates/latest.json
+          git commit -m "Publish Selyro TV $VERSION_NAME" || exit 0
+          git push

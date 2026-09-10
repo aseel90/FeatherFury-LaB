@@ -1,0 +1,7 @@
+{
+  "versionCode": 6,
+  "versionName": "0.2.5-updater",
+  "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
+  "sha256": "not-published-yet",
+  "notes": "Updater base installed. Future Selyro TV updates will appear automatically."
+}
