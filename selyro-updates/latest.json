@@ -1,7 +1,7 @@
 {
-  "versionCode": 10,
-  "versionName": "0.3.0-ui-refresh",
-  "apkUrl": "https://raw.githubusercontent.com/aseel90/iptv/bf02753edfb3a7a72780b151c5b8e19b727939a9/ci-artifacts/Selyro-TV-v0.3.0-ui-refresh.apk",
-  "sha256": "7834c5e65e2a518310d39bb6d1ee1c187ca68aee1d48538f5aa8ab309760e5bf",
-  "notes": "Major UI/UX refresh: new Selyro identity and Android TV launcher artwork, modern focus states and browsing surfaces, clearer playback progress and buffering feedback, and improved D-pad seeking while preserving series, RTL, display modes, multi-server support and updater compatibility."
+  "versionCode": 11,
+  "versionName": "0.3.1-polish",
+  "apkUrl": "https://raw.githubusercontent.com/aseel90/iptv/64529356dfa460bf6541c1f0c321be511222d3a5/ci-artifacts/Selyro-TV-v0.3.1-polish.apk",
+  "sha256": "16d746a380d53650c3ea88a24c0f01a9017baaee9902c05b99e6687824dca0ef",
+  "notes": "Polish update: localized player controls with RTL/LTR support, cleaner TV remote layout, resume playback and visible progress, audio/subtitle track selection, stronger reconnect behavior, while preserving the new Selyro identity, launcher icon and TV banner."
 }
