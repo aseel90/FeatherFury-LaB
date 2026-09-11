@@ -1,7 +1,7 @@
 {
-  "versionCode": 12,
-  "versionName": "0.3.2-icon-hotfix",
+  "versionCode": 13,
+  "versionName": "0.3.3-banner-hotfix",
   "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-  "sha256": "7be356d88211a60c721d599edae1dfb56d52962bee5e960b0ab7552fdbfd0f49",
-  "notes": "Android TV launcher icon hotfix: replaces the TV launch point with density-specific raster artwork for Xiaomi/Google TV launchers while preserving the Selyro identity, TV banner, and all 0.3.1 playback polish."
+  "sha256": "ca001f44490a9b6cba6a80e51941379ad204e97b95d3769dcd0f8f59173ac1f3",
+  "notes": "Android TV launcher banner hotfix: replaces the corrupted 320x180 banner with a verified valid Selyro TV banner and applies it to both the application and MainActivity for Xiaomi/Google TV launcher compatibility."
 }
