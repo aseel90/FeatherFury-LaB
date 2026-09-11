@@ -1,7 +1,7 @@
 {
   "versionCode": 11,
   "versionName": "0.3.1-polish",
-  "apkUrl": "https://raw.githubusercontent.com/aseel90/iptv/64529356dfa460bf6541c1f0c321be511222d3a5/ci-artifacts/Selyro-TV-v0.3.1-polish.apk",
+  "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-v0.3.1-polish.apk",
   "sha256": "16d746a380d53650c3ea88a24c0f01a9017baaee9902c05b99e6687824dca0ef",
   "notes": "Polish update: localized player controls with RTL/LTR support, cleaner TV remote layout, resume playback and visible progress, audio/subtitle track selection, stronger reconnect behavior, while preserving the new Selyro identity, launcher icon and TV banner."
 }
