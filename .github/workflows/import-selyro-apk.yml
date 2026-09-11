@@ -14,28 +14,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download Selyro TV 0.2.8
+      - name: Download Selyro TV 0.3.1
         run: |
           mkdir -p selyro-updates
           curl --fail --location --retry 3 \
             -o selyro-updates/Selyro-TV-latest.apk \
-            https://raw.githubusercontent.com/aseel90/iptv/05655e8fb47909ab66f2989ce9f8ff77edc9e628/ci-artifacts/Selyro-TV-v0.2.8-series-hotfix.apk
-          echo 'c8c1060d6b043d60b3eac48b9a3ce47304d05109a73a5527f4cb25e0592b7e9a  selyro-updates/Selyro-TV-latest.apk' | sha256sum -c -
+            https://raw.githubusercontent.com/aseel90/iptv/64529356dfa460bf6541c1f0c321be511222d3a5/ci-artifacts/Selyro-TV-v0.3.1-polish.apk
+          echo '16d746a380d53650c3ea88a24c0f01a9017baaee9902c05b99e6687824dca0ef  selyro-updates/Selyro-TV-latest.apk' | sha256sum -c -
       - name: Publish updater files
         run: |
-          printf '%s  %s\n' 'c8c1060d6b043d60b3eac48b9a3ce47304d05109a73a5527f4cb25e0592b7e9a' 'Selyro-TV-latest.apk' > selyro-updates/Selyro-TV-latest.sha256
+          printf '%s  %s\n' '16d746a380d53650c3ea88a24c0f01a9017baaee9902c05b99e6687824dca0ef' 'Selyro-TV-latest.apk' > selyro-updates/Selyro-TV-latest.sha256
           cat > selyro-updates/latest.json <<'JSON'
           {
-            "versionCode": 9,
-            "versionName": "0.2.8-series-hotfix",
+            "versionCode": 11,
+            "versionName": "0.3.1-polish",
             "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-            "sha256": "c8c1060d6b043d60b3eac48b9a3ce47304d05109a73a5527f4cb25e0592b7e9a",
-            "notes": "Urgent series hotfix: opening a series now shows its details and episodes correctly in both grid and list modes."
+            "sha256": "16d746a380d53650c3ea88a24c0f01a9017baaee9902c05b99e6687824dca0ef",
+            "notes": "Polish update: localized player controls with RTL/LTR support, cleaner TV remote layout, resume playback and visible progress, audio/subtitle track selection, stronger reconnect behavior, while preserving the new Selyro identity, launcher icon and TV banner."
           }
           JSON
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add selyro-updates/Selyro-TV-latest.apk selyro-updates/Selyro-TV-latest.sha256 selyro-updates/latest.json
           git diff --cached --quiet && exit 0
-          git commit -m 'Publish Selyro TV v0.2.8 series hotfix'
+          git commit -m 'Publish Selyro TV v0.3.1 polish'
           git push
