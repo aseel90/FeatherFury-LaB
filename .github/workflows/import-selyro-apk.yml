@@ -14,28 +14,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download Selyro TV 0.3.3
+      - name: Download Selyro TV 0.3.4
         run: |
           mkdir -p selyro-updates
           curl --fail --location --retry 3 \
             -o selyro-updates/Selyro-TV-latest.apk \
-            https://raw.githubusercontent.com/aseel90/iptv/c454114e0e2723e30153a199b70ca3766996bd4b/ci-artifacts/Selyro-TV-v0.3.3-banner-hotfix.apk
-          echo 'ca001f44490a9b6cba6a80e51941379ad204e97b95d3769dcd0f8f59173ac1f3  selyro-updates/Selyro-TV-latest.apk' | sha256sum -c -
+            https://raw.githubusercontent.com/aseel90/iptv/9aa74fd4a6904f271d4a7d1f40de43d1f17326c0/ci-artifacts/Selyro-TV-v0.3.4-live-tv-ux.apk
+          echo 'daf5e7bdc61d082ffd28eae49dd0216e54cf6b1478d8e7901ffdc7abf9dfef51  selyro-updates/Selyro-TV-latest.apk' | sha256sum -c -
       - name: Publish updater files
         run: |
-          printf '%s  %s\n' 'ca001f44490a9b6cba6a80e51941379ad204e97b95d3769dcd0f8f59173ac1f3' 'Selyro-TV-latest.apk' > selyro-updates/Selyro-TV-latest.sha256
+          printf '%s  %s\n' 'daf5e7bdc61d082ffd28eae49dd0216e54cf6b1478d8e7901ffdc7abf9dfef51' 'Selyro-TV-latest.apk' > selyro-updates/Selyro-TV-latest.sha256
           cat > selyro-updates/latest.json <<'JSON'
           {
-            "versionCode": 13,
-            "versionName": "0.3.3-banner-hotfix",
+            "versionCode": 14,
+            "versionName": "0.3.4-live-tv-ux",
             "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-            "sha256": "ca001f44490a9b6cba6a80e51941379ad204e97b95d3769dcd0f8f59173ac1f3",
-            "notes": "Android TV launcher banner hotfix: replaces the corrupted 320x180 banner with a verified valid Selyro TV banner and applies it to both the application and MainActivity for Xiaomi/Google TV launcher compatibility."
+            "sha256": "daf5e7bdc61d082ffd28eae49dd0216e54cf6b1478d8e7901ffdc7abf9dfef51",
+            "notes": "Live TV UX upgrade: smart Up/Down quick channel switching, in-player channel drawer, EPG/info panel, OK control hub with audio and subtitles, context-aware Back to the Live TV list, smoother player reuse while switching, and Selyro fallback artwork for missing or failed channel logos."
           }
           JSON
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add selyro-updates/Selyro-TV-latest.apk selyro-updates/Selyro-TV-latest.sha256 selyro-updates/latest.json
           git diff --cached --quiet && exit 0
-          git commit -m 'Publish Selyro TV v0.3.3 banner hotfix'
+          git commit -m 'Publish Selyro TV v0.3.4 Live TV UX'
           git push
