@@ -14,28 +14,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download Selyro TV 0.3.2
+      - name: Download Selyro TV 0.3.3
         run: |
           mkdir -p selyro-updates
           curl --fail --location --retry 3 \
             -o selyro-updates/Selyro-TV-latest.apk \
-            https://raw.githubusercontent.com/aseel90/iptv/4eb9e05a4b3d343e5068fe982ec82a625b24dbde/ci-artifacts/Selyro-TV-v0.3.2-icon-hotfix.apk
-          echo '7be356d88211a60c721d599edae1dfb56d52962bee5e960b0ab7552fdbfd0f49  selyro-updates/Selyro-TV-latest.apk' | sha256sum -c -
+            https://raw.githubusercontent.com/aseel90/iptv/c454114e0e2723e30153a199b70ca3766996bd4b/ci-artifacts/Selyro-TV-v0.3.3-banner-hotfix.apk
+          echo 'ca001f44490a9b6cba6a80e51941379ad204e97b95d3769dcd0f8f59173ac1f3  selyro-updates/Selyro-TV-latest.apk' | sha256sum -c -
       - name: Publish updater files
         run: |
-          printf '%s  %s\n' '7be356d88211a60c721d599edae1dfb56d52962bee5e960b0ab7552fdbfd0f49' 'Selyro-TV-latest.apk' > selyro-updates/Selyro-TV-latest.sha256
+          printf '%s  %s\n' 'ca001f44490a9b6cba6a80e51941379ad204e97b95d3769dcd0f8f59173ac1f3' 'Selyro-TV-latest.apk' > selyro-updates/Selyro-TV-latest.sha256
           cat > selyro-updates/latest.json <<'JSON'
           {
-            "versionCode": 12,
-            "versionName": "0.3.2-icon-hotfix",
+            "versionCode": 13,
+            "versionName": "0.3.3-banner-hotfix",
             "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-            "sha256": "7be356d88211a60c721d599edae1dfb56d52962bee5e960b0ab7552fdbfd0f49",
-            "notes": "Android TV launcher icon hotfix: replaces the TV launch point with density-specific raster artwork for Xiaomi/Google TV launchers while preserving the Selyro identity, TV banner, and all 0.3.1 playback polish."
+            "sha256": "ca001f44490a9b6cba6a80e51941379ad204e97b95d3769dcd0f8f59173ac1f3",
+            "notes": "Android TV launcher banner hotfix: replaces the corrupted 320x180 banner with a verified valid Selyro TV banner and applies it to both the application and MainActivity for Xiaomi/Google TV launcher compatibility."
           }
           JSON
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add selyro-updates/Selyro-TV-latest.apk selyro-updates/Selyro-TV-latest.sha256 selyro-updates/latest.json
           git diff --cached --quiet && exit 0
-          git commit -m 'Publish Selyro TV v0.3.2 icon hotfix'
+          git commit -m 'Publish Selyro TV v0.3.3 banner hotfix'
           git push
