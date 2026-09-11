@@ -1,7 +1,7 @@
 {
-  "versionCode": 14,
-  "versionName": "0.3.4-live-tv-ux",
+  "versionCode": 15,
+  "versionName": "0.3.5-lifecycle-hotfix",
   "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-  "sha256": "daf5e7bdc61d082ffd28eae49dd0216e54cf6b1478d8e7901ffdc7abf9dfef51",
-  "notes": "Live TV UX upgrade: smart Up/Down quick channel switching, in-player channel drawer, EPG/info panel, OK control hub with audio and subtitles, context-aware Back to the Live TV list, smoother player reuse while switching, and Selyro fallback artwork for missing or failed channel logos."
+  "sha256": "38dce1ffa4e0a70b917912818c490628b2bf623ff876b3ba881a39d6e7b4e4d7",
+  "notes": "Lifecycle/task hotfix: prevents duplicate Selyro activity instances, stops active playback when the app leaves the screen, removes the app task on final exit, and enables Android 12+ protection against third-party application overlays while preserving the 0.3.4 Live TV UX and Selyro identity."
 }
