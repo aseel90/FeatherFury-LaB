@@ -14,28 +14,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download Selyro TV 0.3.5
+      - name: Download Selyro TV 0.3.6
         run: |
           mkdir -p selyro-updates
           curl --fail --location --retry 3 \
             -o selyro-updates/Selyro-TV-latest.apk \
-            https://raw.githubusercontent.com/aseel90/iptv/ac396bb6950e10f1afd2f4233aaa167eca057790/ci-artifacts/Selyro-TV-v0.3.5-lifecycle-hotfix.apk
-          echo '38dce1ffa4e0a70b917912818c490628b2bf623ff876b3ba881a39d6e7b4e4d7  selyro-updates/Selyro-TV-latest.apk' | sha256sum -c -
+            https://raw.githubusercontent.com/aseel90/iptv/98d6dadcd90b55977f0ff09d870d3ce9f6127860/ci-artifacts/Selyro-TV-v0.3.6-performance-ux.apk
+          echo 'd469089aff8d3849fdee7b07528596f80a43af24b655a840ac8077248e9d9a7c  selyro-updates/Selyro-TV-latest.apk' | sha256sum -c -
       - name: Publish updater files
         run: |
-          printf '%s  %s\n' '38dce1ffa4e0a70b917912818c490628b2bf623ff876b3ba881a39d6e7b4e4d7' 'Selyro-TV-latest.apk' > selyro-updates/Selyro-TV-latest.sha256
+          printf '%s  %s\n' 'd469089aff8d3849fdee7b07528596f80a43af24b655a840ac8077248e9d9a7c' 'Selyro-TV-latest.apk' > selyro-updates/Selyro-TV-latest.sha256
           cat > selyro-updates/latest.json <<'JSON'
           {
-            "versionCode": 15,
-            "versionName": "0.3.5-lifecycle-hotfix",
+            "versionCode": 16,
+            "versionName": "0.3.6-performance-ux",
             "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-            "sha256": "38dce1ffa4e0a70b917912818c490628b2bf623ff876b3ba881a39d6e7b4e4d7",
-            "notes": "Lifecycle/task hotfix: prevents duplicate Selyro activity instances, stops active playback when the app leaves the screen, removes the app task on final exit, and enables Android 12+ protection against third-party application overlays while preserving the 0.3.4 Live TV UX and Selyro identity."
+            "sha256": "d469089aff8d3849fdee7b07528596f80a43af24b655a840ac8077248e9d9a7c",
+            "notes": "Performance and UX upgrade: guarded Live TV startup retries and timeout feedback, remembered last Live channel/category, unified Live/Movies/Series search with history, richer Now/Next EPG with local-time progress, Continue Watching and resume, Next Episode support, while preserving the validated lifecycle protections and remote-first Live UX."
           }
           JSON
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add selyro-updates/Selyro-TV-latest.apk selyro-updates/Selyro-TV-latest.sha256 selyro-updates/latest.json
           git diff --cached --quiet && exit 0
-          git commit -m 'Publish Selyro TV v0.3.5 lifecycle hotfix'
+          git commit -m 'Publish Selyro TV v0.3.6 performance UX'
           git push
