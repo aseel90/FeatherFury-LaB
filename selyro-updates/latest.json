@@ -1,7 +1,7 @@
 {
-  "versionCode": 16,
-  "versionName": "0.3.6-performance-ux",
+  "versionCode": 17,
+  "versionName": "0.3.7-management-favorites-quality",
   "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-  "sha256": "d469089aff8d3849fdee7b07528596f80a43af24b655a840ac8077248e9d9a7c",
-  "notes": "Performance and UX upgrade: guarded Live TV startup retries and timeout feedback, remembered last Live channel/category, unified Live/Movies/Series search with history, richer Now/Next EPG with local-time progress, Continue Watching and resume, Next Episode support, while preserving the validated lifecycle protections and remote-first Live UX."
+  "sha256": "0a64cd30cdfc7a417349ba91c09d9203fa33e75bd8532395c89b9d9276e2c60a",
+  "notes": "Server management upgrade with edit and delete confirmations including the last saved server, direct Live channel favorites with visible star controls, saved-server latency health checks, and active playback connection-quality indicators based on startup time, buffering and playback errors. Preserves the 0.3.6 performance/UX improvements and lifecycle protections."
 }
