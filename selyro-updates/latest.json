@@ -1,7 +1,7 @@
 {
-  "versionCode": 17,
-  "versionName": "0.3.7-management-favorites-quality",
+  "versionCode": 18,
+  "versionName": "0.3.8-navigation-icons",
   "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-  "sha256": "0a64cd30cdfc7a417349ba91c09d9203fa33e75bd8532395c89b9d9276e2c60a",
-  "notes": "Server management upgrade with edit and delete confirmations including the last saved server, direct Live channel favorites with visible star controls, saved-server latency health checks, and active playback connection-quality indicators based on startup time, buffering and playback errors. Preserves the 0.3.6 performance/UX improvements and lifecycle protections."
+  "sha256": "5a3e429bf2b34f6b5c57e001bb13f88f6856f34f148593c5712a7a9bb02eb390",
+  "notes": "Navigation UI refresh with real vector icons (not emoji) for Home, Live TV, Movies, Series, Favorites, Recent and Settings. The sidebar remains permanently visible with icon + text, stronger TV focus states and no folding/collapsing behavior. Playback engine, bitrate, decoder, buffer profiles, server management, favorites and connection-quality behavior remain unchanged from 0.3.7."
 }
