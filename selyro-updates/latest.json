@@ -1,7 +1,7 @@
 {
-  "versionCode": 18,
-  "versionName": "0.3.8-navigation-icons",
+  "versionCode": 19,
+  "versionName": "0.3.9-stability-speed",
   "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-  "sha256": "5a3e429bf2b34f6b5c57e001bb13f88f6856f34f148593c5712a7a9bb02eb390",
-  "notes": "Navigation UI refresh with real vector icons (not emoji) for Home, Live TV, Movies, Series, Favorites, Recent and Settings. The sidebar remains permanently visible with icon + text, stronger TV focus states and no folding/collapsing behavior. Playback engine, bitrate, decoder, buffer profiles, server management, favorites and connection-quality behavior remain unchanged from 0.3.7."
+  "sha256": "66316aebd7a5f52cf14d637e41121fa570b77389b134e4ead2b87c848f1fda68",
+  "notes": "Stability & Speed: automatic server probes removed, connection testing is manual only, the live quality indicator is lighter, and buffering uses a small spinner with Media3 buffered duration when reliable. Playback engine, bitrate, decoder, stream URL logic, buffer profiles, and navigation icons remain unchanged."
 }
