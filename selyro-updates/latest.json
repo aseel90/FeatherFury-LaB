@@ -2,6 +2,6 @@
   "versionCode": 19,
   "versionName": "0.3.9-stability-speed",
   "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-  "sha256": "66316aebd7a5f52cf14d637e41121fa570b77389b134e4ead2b87c848f1fda68",
-  "notes": "Stability & Speed: automatic server probes removed, connection testing is manual only, the live quality indicator is lighter, and buffering uses a small spinner with Media3 buffered duration when reliable. Playback engine, bitrate, decoder, stream URL logic, buffer profiles, and navigation icons remain unchanged."
+  "sha256": "ee907922ea8967c54d20f60a72d8593567fae5c0a156cfb0d8011be54cd57329",
+  "notes": "Stability & Speed: automatic server probes removed, connection testing is manual only, live quality and buffering UI are lighter, and prolonged live buffering now recovers through the existing reconnect path. PlayerFactory, streaming profiles, bitrate, decoder, stream URL logic, LoadControl values, and navigation icons are preserved."
 }
