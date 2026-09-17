@@ -14,28 +14,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download Selyro TV 0.3.9
+      - name: Download Selyro TV 0.4.0
         run: |
+          set -euxo pipefail
           mkdir -p selyro-updates
           curl --fail --location --retry 3 \
             -o selyro-updates/Selyro-TV-latest.apk \
-            https://raw.githubusercontent.com/aseel90/iptv/c37adef61a4c6e3210711e1d72afe1897ab2e0cd/ci-artifacts/Selyro-TV-v0.3.9-stability-speed.apk
-          echo 'ee907922ea8967c54d20f60a72d8593567fae5c0a156cfb0d8011be54cd57329  selyro-updates/Selyro-TV-latest.apk' | sha256sum -c -
+            https://raw.githubusercontent.com/aseel90/iptv/491694089a9d2a9cdca21dd5be5b30c06f5dee47/ci-artifacts/Selyro-TV-v0.4.0-account-foundation.apk
+          echo '71dc9c29ef9c7c4edec67f4cfcba981472d183dbe42c01700b020ece284ccd59  selyro-updates/Selyro-TV-latest.apk' | sha256sum -c -
       - name: Publish updater files
         run: |
-          printf '%s  %s\n' 'ee907922ea8967c54d20f60a72d8593567fae5c0a156cfb0d8011be54cd57329' 'Selyro-TV-latest.apk' > selyro-updates/Selyro-TV-latest.sha256
+          set -euxo pipefail
+          printf '%s  %s\n' '71dc9c29ef9c7c4edec67f4cfcba981472d183dbe42c01700b020ece284ccd59' 'Selyro-TV-latest.apk' > selyro-updates/Selyro-TV-latest.sha256
           cat > selyro-updates/latest.json <<'JSON'
           {
-            "versionCode": 19,
-            "versionName": "0.3.9-stability-speed",
+            "versionCode": 20,
+            "versionName": "0.4.0-account-foundation",
             "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-            "sha256": "ee907922ea8967c54d20f60a72d8593567fae5c0a156cfb0d8011be54cd57329",
-            "notes": "Stability & Speed: automatic server probes removed, connection testing is manual only, live quality and buffering UI are lighter, and prolonged live buffering now recovers through the existing reconnect path. PlayerFactory, streaming profiles, bitrate, decoder, stream URL logic, LoadControl values, and navigation icons are preserved."
+            "sha256": "71dc9c29ef9c7c4edec67f4cfcba981472d183dbe42c01700b020ece284ccd59",
+            "notes": "Account foundation: each IPTV provider now has a stable account identity. Favorites, recent history and resume progress are isolated per server. Existing 0.3.9 local state migrates safely to the active provider, and deleting a server clears only that server's local state. Playback and stream handling are unchanged."
           }
           JSON
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add selyro-updates/Selyro-TV-latest.apk selyro-updates/Selyro-TV-latest.sha256 selyro-updates/latest.json
           git diff --cached --quiet && exit 0
-          git commit -m 'Publish Selyro TV v0.3.9 stability speed'
+          git commit -m 'Publish Selyro TV v0.4.0 account foundation'
           git push
