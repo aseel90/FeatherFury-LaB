@@ -1,7 +1,7 @@
 {
-  "versionCode": 19,
-  "versionName": "0.3.9-stability-speed",
+  "versionCode": 20,
+  "versionName": "0.4.0-account-foundation",
   "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-  "sha256": "ee907922ea8967c54d20f60a72d8593567fae5c0a156cfb0d8011be54cd57329",
-  "notes": "Stability & Speed: automatic server probes removed, connection testing is manual only, live quality and buffering UI are lighter, and prolonged live buffering now recovers through the existing reconnect path. PlayerFactory, streaming profiles, bitrate, decoder, stream URL logic, LoadControl values, and navigation icons are preserved."
+  "sha256": "71dc9c29ef9c7c4edec67f4cfcba981472d183dbe42c01700b020ece284ccd59",
+  "notes": "Account foundation: each IPTV provider now has a stable account identity. Favorites, recent history and resume progress are isolated per server. Existing 0.3.9 local state migrates safely to the active provider, and deleting a server clears only that server's local state. Playback and stream handling are unchanged."
 }
