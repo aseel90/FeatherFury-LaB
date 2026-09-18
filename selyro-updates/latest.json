@@ -1,7 +1,7 @@
 {
-  "versionCode": 21,
-  "versionName": "0.4.1-resume-search-ux",
+  "versionCode": 22,
+  "versionName": "0.4.2-server-recent-hotfix",
   "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-  "sha256": "c12c0f88fea87b31c8cb4d81a9bdd788203253c45e87cc546b09135c6c1ec068",
-  "notes": "Resume and TV search UX: movies and episodes keep their watch position after closing the app. Reopening partially watched content offers Continue from the saved time or Start over. Search no longer opens the keyboard while navigating with the remote; the keyboard opens only after pressing the search box."
+  "sha256": "5f32501c3292c528c35c32c4dc46bcb198d17cf60daa6d008ccb74a3c0cda542",
+  "notes": "Hotfix: server connection test now reports correctly using stable server IDs and performs a real Xtream login or M3U playlist check. Series episodes now appear in Recent after restarting the app and can continue from the saved position. Recent and Favorites also load movie metadata automatically."
 }
