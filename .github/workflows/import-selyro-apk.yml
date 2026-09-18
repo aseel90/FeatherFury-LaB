@@ -14,30 +14,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download Selyro TV 0.4.1
+      - name: Download Selyro TV 0.4.2
         run: |
           set -euxo pipefail
           mkdir -p selyro-updates
           curl --fail --location --retry 3 \
             -o selyro-updates/Selyro-TV-latest.apk \
-            https://raw.githubusercontent.com/aseel90/iptv/51f30026ceb0156936478402e49a353cac3218cd/ci-artifacts/Selyro-TV-v0.4.1-resume-search-ux.apk
-          echo 'c12c0f88fea87b31c8cb4d81a9bdd788203253c45e87cc546b09135c6c1ec068  selyro-updates/Selyro-TV-latest.apk' | sha256sum -c -
+            https://raw.githubusercontent.com/aseel90/iptv/3a0f01cc279bb0cf568799753a0be55e5987b63a/ci-artifacts/Selyro-TV-v0.4.2-server-recent-hotfix.apk
+          echo '5f32501c3292c528c35c32c4dc46bcb198d17cf60daa6d008ccb74a3c0cda542  selyro-updates/Selyro-TV-latest.apk' | sha256sum -c -
       - name: Publish updater files
         run: |
           set -euxo pipefail
-          printf '%s  %s\n' 'c12c0f88fea87b31c8cb4d81a9bdd788203253c45e87cc546b09135c6c1ec068' 'Selyro-TV-latest.apk' > selyro-updates/Selyro-TV-latest.sha256
+          printf '%s  %s\n' '5f32501c3292c528c35c32c4dc46bcb198d17cf60daa6d008ccb74a3c0cda542' 'Selyro-TV-latest.apk' > selyro-updates/Selyro-TV-latest.sha256
           cat > selyro-updates/latest.json <<'JSON'
           {
-            "versionCode": 21,
-            "versionName": "0.4.1-resume-search-ux",
+            "versionCode": 22,
+            "versionName": "0.4.2-server-recent-hotfix",
             "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-            "sha256": "c12c0f88fea87b31c8cb4d81a9bdd788203253c45e87cc546b09135c6c1ec068",
-            "notes": "Resume and TV search UX: movies and episodes keep their watch position after closing the app. Reopening partially watched content offers Continue from the saved time or Start over. Search no longer opens the keyboard while navigating with the remote; the keyboard opens only after pressing the search box."
+            "sha256": "5f32501c3292c528c35c32c4dc46bcb198d17cf60daa6d008ccb74a3c0cda542",
+            "notes": "Hotfix: server connection test now reports correctly using stable server IDs and performs a real Xtream login or M3U playlist check. Series episodes now appear in Recent after restarting the app and can continue from the saved position. Recent and Favorites also load movie metadata automatically."
           }
           JSON
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add selyro-updates/Selyro-TV-latest.apk selyro-updates/Selyro-TV-latest.sha256 selyro-updates/latest.json
           git diff --cached --quiet && exit 0
-          git commit -m 'Publish Selyro TV v0.4.1 resume search UX'
+          git commit -m 'Publish Selyro TV v0.4.2 server recent hotfix'
           git push
