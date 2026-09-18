@@ -1,7 +1,7 @@
 {
-  "versionCode": 22,
-  "versionName": "0.4.2-server-recent-hotfix",
+  "versionCode": 23,
+  "versionName": "0.4.3-remote-navigation-hotfix",
   "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-  "sha256": "5f32501c3292c528c35c32c4dc46bcb198d17cf60daa6d008ccb74a3c0cda542",
-  "notes": "Hotfix: server connection test now reports correctly using stable server IDs and performs a real Xtream login or M3U playlist check. Series episodes now appear in Recent after restarting the app and can continue from the saved position. Recent and Favorites also load movie metadata automatically."
+  "sha256": "0ab2d1cf2f78729220e6f3132289a575960a975e2881cfee05cf41bae3a26b51",
+  "notes": "Remote navigation hotfix: player controls now keep physical left/right behavior consistent in Arabic and English. The live channel drawer stays on the left, channel info stays on the right, and OK controls plus audio/subtitle tabs no longer reverse D-pad direction in RTL. Playback, buffering and streaming profiles are unchanged."
 }
