@@ -1,7 +1,7 @@
 {
-  "versionCode": 20,
-  "versionName": "0.4.0-account-foundation",
+  "versionCode": 21,
+  "versionName": "0.4.1-resume-search-ux",
   "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-  "sha256": "71dc9c29ef9c7c4edec67f4cfcba981472d183dbe42c01700b020ece284ccd59",
-  "notes": "Account foundation: each IPTV provider now has a stable account identity. Favorites, recent history and resume progress are isolated per server. Existing 0.3.9 local state migrates safely to the active provider, and deleting a server clears only that server's local state. Playback and stream handling are unchanged."
+  "sha256": "c12c0f88fea87b31c8cb4d81a9bdd788203253c45e87cc546b09135c6c1ec068",
+  "notes": "Resume and TV search UX: movies and episodes keep their watch position after closing the app. Reopening partially watched content offers Continue from the saved time or Start over. Search no longer opens the keyboard while navigating with the remote; the keyboard opens only after pressing the search box."
 }
