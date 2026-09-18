@@ -14,30 +14,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download Selyro TV 0.4.2
+      - name: Download Selyro TV 0.4.3
         run: |
           set -euxo pipefail
           mkdir -p selyro-updates
           curl --fail --location --retry 3 \
             -o selyro-updates/Selyro-TV-latest.apk \
-            https://raw.githubusercontent.com/aseel90/iptv/3a0f01cc279bb0cf568799753a0be55e5987b63a/ci-artifacts/Selyro-TV-v0.4.2-server-recent-hotfix.apk
-          echo '5f32501c3292c528c35c32c4dc46bcb198d17cf60daa6d008ccb74a3c0cda542  selyro-updates/Selyro-TV-latest.apk' | sha256sum -c -
+            https://raw.githubusercontent.com/aseel90/iptv/454c29a5a85c56f326156194fa3b95907123497e/ci-artifacts/Selyro-TV-v0.4.3-remote-navigation-hotfix.apk
+          echo '0ab2d1cf2f78729220e6f3132289a575960a975e2881cfee05cf41bae3a26b51  selyro-updates/Selyro-TV-latest.apk' | sha256sum -c -
       - name: Publish updater files
         run: |
           set -euxo pipefail
-          printf '%s  %s\n' '5f32501c3292c528c35c32c4dc46bcb198d17cf60daa6d008ccb74a3c0cda542' 'Selyro-TV-latest.apk' > selyro-updates/Selyro-TV-latest.sha256
+          printf '%s  %s\n' '0ab2d1cf2f78729220e6f3132289a575960a975e2881cfee05cf41bae3a26b51' 'Selyro-TV-latest.apk' > selyro-updates/Selyro-TV-latest.sha256
           cat > selyro-updates/latest.json <<'JSON'
           {
-            "versionCode": 22,
-            "versionName": "0.4.2-server-recent-hotfix",
+            "versionCode": 23,
+            "versionName": "0.4.3-remote-navigation-hotfix",
             "apkUrl": "https://raw.githubusercontent.com/aseel90/FeatherFury-LaB/main/selyro-updates/Selyro-TV-latest.apk",
-            "sha256": "5f32501c3292c528c35c32c4dc46bcb198d17cf60daa6d008ccb74a3c0cda542",
-            "notes": "Hotfix: server connection test now reports correctly using stable server IDs and performs a real Xtream login or M3U playlist check. Series episodes now appear in Recent after restarting the app and can continue from the saved position. Recent and Favorites also load movie metadata automatically."
+            "sha256": "0ab2d1cf2f78729220e6f3132289a575960a975e2881cfee05cf41bae3a26b51",
+            "notes": "Remote navigation hotfix: player controls now keep physical left/right behavior consistent in Arabic and English. The live channel drawer stays on the left, channel info stays on the right, and OK controls plus audio/subtitle tabs no longer reverse D-pad direction in RTL. Playback, buffering and streaming profiles are unchanged."
           }
           JSON
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add selyro-updates/Selyro-TV-latest.apk selyro-updates/Selyro-TV-latest.sha256 selyro-updates/latest.json
           git diff --cached --quiet && exit 0
-          git commit -m 'Publish Selyro TV v0.4.2 server recent hotfix'
+          git commit -m 'Publish Selyro TV v0.4.3 remote navigation hotfix'
           git push
